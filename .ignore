@@ -1,0 +1,3 @@
+# Re-include deepwork files for OpenCode readability
+!.slim/deepwork/
+!.slim/deepwork/**
