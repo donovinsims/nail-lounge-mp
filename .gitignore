@@ -18,6 +18,9 @@ dist-ssr
 # .vercel/output is build output; project.json should be committed
 .vercel/output
 
+# Supabase CLI state
+supabase/.temp/
+
 # Env files
 .env
 .env.*.local
