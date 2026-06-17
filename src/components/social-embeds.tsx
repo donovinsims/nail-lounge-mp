@@ -31,12 +31,15 @@ export function InstagramEmbed() {
       <div className="flex items-center justify-between px-5 py-3 border-b border-border/60">
         <a
           href={BUSINESS.instagram}
-          target="_blank" rel="noreferrer"
+          target="_blank"
+          rel="noreferrer"
           className="flex items-center gap-2 text-sm font-medium"
         >
           <Instagram className="h-4 w-4 text-accent" /> @{handle}
         </a>
-        <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Instagram</span>
+        <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+          Instagram
+        </span>
       </div>
       {inView ? (
         <iframe
@@ -63,12 +66,18 @@ export function TikTokEmbed() {
       <div className="flex items-center justify-between px-5 py-3 border-b border-border/60">
         <a
           href={BUSINESS.tiktok}
-          target="_blank" rel="noreferrer"
+          target="_blank"
+          rel="noreferrer"
           className="flex items-center gap-2 text-sm font-medium"
         >
-          <span aria-hidden className="text-accent">♪</span> @{handle}
+          <span aria-hidden className="text-accent">
+            ♪
+          </span>{" "}
+          @{handle}
         </a>
-        <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">TikTok</span>
+        <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+          TikTok
+        </span>
       </div>
       {inView ? (
         <iframe

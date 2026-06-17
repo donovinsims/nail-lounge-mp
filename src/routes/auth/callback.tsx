@@ -11,6 +11,10 @@ export const Route = createFileRoute("/auth/callback")({
         navigate({ to: data.session ? "/admin" : "/auth" });
       });
     }, [navigate]);
-    return <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">Completing sign in…</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
+        Completing sign in…
+      </div>
+    );
   },
 });

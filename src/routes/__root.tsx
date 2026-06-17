@@ -25,8 +25,13 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">404</p>
         <h1 className="mt-4 text-3xl font-bold tracking-tight">Not found</h1>
-        <p className="mt-2 text-sm text-muted-foreground">The page you're looking for doesn't exist.</p>
-        <Link to="/" className="mt-6 inline-flex tap-target items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground">
+        <p className="mt-2 text-sm text-muted-foreground">
+          The page you're looking for doesn't exist.
+        </p>
+        <Link
+          to="/"
+          className="mt-6 inline-flex tap-target items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground"
+        >
           Go home
         </Link>
       </div>
@@ -42,7 +47,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold">Something went wrong</h1>
         <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
-        <button onClick={() => { router.invalidate(); reset(); }} className="mt-6 rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground">
+        <button
+          onClick={() => {
+            router.invalidate();
+            reset();
+          }}
+          className="mt-6 rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground"
+        >
           Try again
         </button>
       </div>
@@ -57,12 +68,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#0a0a0a" },
       { title: "Nail Lounge — Book your appointment" },
-      { name: "description", content: "Book your manicure, pedicure, or acrylic appointment at Nail Lounge in Machesney Park, IL." },
+      {
+        name: "description",
+        content:
+          "Book your manicure, pedicure, or acrylic appointment at Nail Lounge in Machesney Park, IL.",
+      },
       { property: "og:title", content: "Nail Lounge — Book your appointment" },
-      { property: "og:description", content: "Book your manicure, pedicure, or acrylic appointment at Nail Lounge in Machesney Park, IL." },
+      {
+        property: "og:description",
+        content:
+          "Book your manicure, pedicure, or acrylic appointment at Nail Lounge in Machesney Park, IL.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:title", content: "Nail Lounge — Book your appointment" },
-      { name: "twitter:description", content: "Book your manicure, pedicure, or acrylic appointment at Nail Lounge in Machesney Park, IL." },
+      {
+        name: "twitter:description",
+        content:
+          "Book your manicure, pedicure, or acrylic appointment at Nail Lounge in Machesney Park, IL.",
+      },
       { property: "og:image", content: OG_IMAGE },
       { name: "twitter:image", content: OG_IMAGE },
       { name: "twitter:card", content: "summary_large_image" },
@@ -75,7 +98,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap",
+      },
     ],
     scripts: [
       {
@@ -96,11 +122,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             postalCode: "61115",
             addressCountry: "US",
           },
-          geo: { "@type": "GeoCoordinates", latitude: 42.3403, longitude: -89.0420 },
+          geo: { "@type": "GeoCoordinates", latitude: 42.3403, longitude: -89.042 },
           openingHoursSpecification: [
-            { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday"], opens: "09:30", closes: "19:30" },
-            { "@type": "OpeningHoursSpecification", dayOfWeek: "Saturday", opens: "09:30", closes: "18:00" },
-            { "@type": "OpeningHoursSpecification", dayOfWeek: "Sunday", opens: "10:00", closes: "17:00" },
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+              opens: "09:30",
+              closes: "19:30",
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: "Saturday",
+              opens: "09:30",
+              closes: "18:00",
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: "Sunday",
+              opens: "10:00",
+              closes: "17:00",
+            },
           ],
           sameAs: [
             "https://www.facebook.com/nailloungemachesneypark",
@@ -122,8 +163,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head><HeadContent /></head>
-      <body>{children}<Scripts /></body>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        <Scripts />
+      </body>
     </html>
   );
 }

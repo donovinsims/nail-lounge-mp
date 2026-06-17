@@ -5,10 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Cormorant Garamond', 'Times New Roman', serif;
-  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
-
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
   --radius-xs: 4px;
   --radius-sm: 6px;
@@ -97,7 +96,6 @@
   --chart-5: oklch(0.62 0.13 150);
 }
 
-
 .dark {
   --background: oklch(0.08 0 0);
   --foreground: oklch(0.98 0 0);
@@ -133,23 +131,46 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html, body { height: 100%; }
+  * {
+    border-color: var(--color-border);
+  }
+  html,
+  body {
+    height: 100%;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    font-feature-settings: 'ss01', 'cv11';
+    font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; font-weight: 500; }
-  .font-display { font-family: var(--font-display); }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+    font-weight: 500;
+  }
+  .font-display {
+    font-family: var(--font-display);
+  }
 
   /* Safe area for iOS */
-  .safe-pb { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
-  .safe-pt { padding-top: max(env(safe-area-inset-top), 1rem); }
+  .safe-pb {
+    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+  }
+  .safe-pt {
+    padding-top: max(env(safe-area-inset-top), 1rem);
+  }
 }
 
-@utility hairline { box-shadow: inset 0 0 0 1px var(--color-border); }
-@utility tap-target { min-height: 44px; min-width: 44px; }
+@utility hairline {
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+@utility tap-target {
+  min-height: 44px;
+  min-width: 44px;
+}

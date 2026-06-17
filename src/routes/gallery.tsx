@@ -25,9 +25,16 @@ export const Route = createFileRoute("/gallery")({
   head: () => ({
     meta: [
       { title: "Nail Art Gallery — Nail Lounge, Machesney Park IL" },
-      { name: "description", content: "Recent work from the Nail Lounge studio — gel, acrylic, chrome, ombre, french, and custom nail art." },
+      {
+        name: "description",
+        content:
+          "Recent work from the Nail Lounge studio — gel, acrylic, chrome, ombre, french, and custom nail art.",
+      },
       { property: "og:title", content: "Nail Art Gallery — Nail Lounge" },
-      { property: "og:description", content: "Curated nail art and pedicure work from our resident artists." },
+      {
+        property: "og:description",
+        content: "Curated nail art and pedicure work from our resident artists.",
+      },
       { property: "og:image", content: g3 },
       { property: "og:url", content: "/gallery" },
     ],
@@ -48,19 +55,22 @@ function GalleryPage() {
             Recent <span className="italic">work.</span>
           </h1>
           <p className="mt-6 max-w-xl text-base text-muted-foreground">
-            Hand-finished sets and pedicures from our resident artists. Bring a screenshot or describe what you'd love — we'll make it.
+            Hand-finished sets and pedicures from our resident artists. Bring a screenshot or
+            describe what you'd love — we'll make it.
           </p>
           <div className="mt-8 flex gap-4">
             <a
               href={BUSINESS.instagram}
-              target="_blank" rel="noreferrer"
+              target="_blank"
+              rel="noreferrer"
               className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] underline-offset-4 hover:underline"
             >
               <Instagram className="h-4 w-4" /> @nailloungemachesneypark
             </a>
             <a
               href={BUSINESS.tiktok}
-              target="_blank" rel="noreferrer"
+              target="_blank"
+              rel="noreferrer"
               className="text-xs uppercase tracking-[0.25em] underline-offset-4 hover:underline"
             >
               TikTok
@@ -99,10 +109,11 @@ function GalleryPage() {
           </div>
         </section>
 
-
         <div className="mt-20 rounded-3xl bg-surface p-10 text-center">
           <p className="text-[11px] uppercase tracking-[0.3em] text-accent">Inspired?</p>
-          <h3 className="mt-4 font-display text-3xl sm:text-4xl">Bring the look. We'll bring the hands.</h3>
+          <h3 className="mt-4 font-display text-3xl sm:text-4xl">
+            Bring the look. We'll bring the hands.
+          </h3>
           <Link
             to="/book"
             className="mt-8 inline-flex tap-target items-center gap-3 rounded-full bg-primary px-8 py-4 text-sm font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"

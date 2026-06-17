@@ -59,7 +59,12 @@ export const createPublicBooking = createServerFn({ method: "POST" })
     if (!clientId) {
       const { data: created, error: cErr } = await supabaseAdmin
         .from("clients")
-        .insert({ salon_id: data.salonId, phone, name: data.clientName, email: data.clientEmail || null })
+        .insert({
+          salon_id: data.salonId,
+          phone,
+          name: data.clientName,
+          email: data.clientEmail || null,
+        })
         .select("id")
         .single();
       if (cErr || !created) throw new Error("Could not save client");

@@ -3,10 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 export type DayKey = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
 const dayKeys: DayKey[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
-export interface Hours { open: string; close: string }
+export interface Hours {
+  open: string;
+  close: string;
+}
 export type BusinessHours = Partial<Record<DayKey, Hours>>;
 
-export function dayKey(d: Date): DayKey { return dayKeys[d.getDay()]; }
+export function dayKey(d: Date): DayKey {
+  return dayKeys[d.getDay()];
+}
 
 export async function fetchSalon() {
   const { data, error } = await supabase
@@ -20,7 +25,11 @@ export async function fetchSalon() {
 
 export async function fetchServices(salonId: string) {
   const { data, error } = await supabase
-    .from("services").select("*").eq("salon_id", salonId).eq("is_active", true).order("category");
+    .from("services")
+    .select("*")
+    .eq("salon_id", salonId)
+    .eq("is_active", true)
+    .order("category");
   if (error) throw error;
   return data ?? [];
 }
@@ -28,7 +37,9 @@ export async function fetchServices(salonId: string) {
 export async function fetchStaff(salonId: string) {
   const { data, error } = await supabase
     .from("staff")
-    .select("id, salon_id, name, title, bio, specialties, avatar_url, avatar_color, sort_order, working_hours, is_active, created_at")
+    .select(
+      "id, salon_id, name, title, bio, specialties, avatar_url, avatar_color, sort_order, working_hours, is_active, created_at",
+    )
     .eq("salon_id", salonId)
     .eq("is_active", true)
     .order("sort_order");
@@ -43,7 +54,8 @@ export const BUSINESS = {
   phoneHref: "+18159773443",
   email: "wait4alove@yahoo.com",
   mapsUrl: "https://share.google/qo03O2XzAhE7hTXjL",
-  mapEmbed: "https://www.google.com/maps?q=1513+West+Lane+Rd,+Machesney+Park,+IL+61115&output=embed",
+  mapEmbed:
+    "https://www.google.com/maps?q=1513+West+Lane+Rd,+Machesney+Park,+IL+61115&output=embed",
   booksy: "https://booksy.com/en-us/323657_nail-lounge_nail-salon_19333_machesney-park",
   yelp: "https://www.yelp.com/biz/nail-lounge-machesney-park",
   instagram: "https://www.instagram.com/nailloungemachesneypark",
@@ -72,8 +84,10 @@ export async function computeAvailableSlots(opts: {
   const close = parseHM(opts.date, min(wh.close, sh.close));
 
   // Fetch existing bookings on this date for this staff
-  const dayStart = new Date(opts.date); dayStart.setHours(0,0,0,0);
-  const dayEnd = new Date(opts.date); dayEnd.setHours(23,59,59,999);
+  const dayStart = new Date(opts.date);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(opts.date);
+  dayEnd.setHours(23, 59, 59, 999);
   const { data: bookings } = await supabase.rpc("get_busy_slots", {
     p_staff_id: opts.staffId,
     p_day_start: dayStart.toISOString(),
@@ -100,17 +114,31 @@ export async function computeAvailableSlots(opts: {
 
 function parseHM(date: Date, hm: string) {
   const [h, m] = hm.split(":").map(Number);
-  const d = new Date(date); d.setHours(h, m, 0, 0); return d;
+  const d = new Date(date);
+  d.setHours(h, m, 0, 0);
+  return d;
 }
-function max(a: string, b: string) { return a > b ? a : b; }
-function min(a: string, b: string) { return a < b ? a : b; }
+function max(a: string, b: string) {
+  return a > b ? a : b;
+}
+function min(a: string, b: string) {
+  return a < b ? a : b;
+}
 
 export function fmtMoney(n: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(n);
 }
 export function fmtTime(d: Date | string) {
   return new Date(d).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
 export function fmtDate(d: Date | string) {
-  return new Date(d).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  return new Date(d).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
 }

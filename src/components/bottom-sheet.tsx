@@ -29,11 +29,15 @@ export function BottomSheet({
         >
           <div className="mx-auto mt-2 h-1.5 w-10 rounded-full bg-muted" />
           {title && (
-            <VaulDrawer.Title className="px-6 pt-4 text-xl font-bold tracking-tight">{title}</VaulDrawer.Title>
+            <VaulDrawer.Title className="px-6 pt-4 text-xl font-bold tracking-tight">
+              {title}
+            </VaulDrawer.Title>
           )}
           <VaulDrawer.Description className="sr-only">Bottom sheet</VaulDrawer.Description>
           <div className="flex-1 overflow-y-auto px-6 py-4">{children}</div>
-          {footer && <div className="border-t border-border bg-card px-6 py-4 safe-pb">{footer}</div>}
+          {footer && (
+            <div className="border-t border-border bg-card px-6 py-4 safe-pb">{footer}</div>
+          )}
         </VaulDrawer.Content>
       </VaulDrawer.Portal>
     </VaulDrawer.Root>

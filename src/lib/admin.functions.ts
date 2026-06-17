@@ -67,7 +67,10 @@ export const completeBookingWithPayment = createServerFn({ method: "POST" })
     const tipToTech = +((data.tipAmount * data.tipToTechPercent) / 100).toFixed(2);
     const tipToSalon = +(data.tipAmount - tipToTech).toFixed(2);
 
-    await context.supabase.from("bookings").update({ status: "completed" }).eq("id", data.bookingId);
+    await context.supabase
+      .from("bookings")
+      .update({ status: "completed" })
+      .eq("id", data.bookingId);
     const { error } = await context.supabase.from("commission_records").insert({
       salon_id: booking.salon_id,
       booking_id: booking.id,
@@ -95,9 +98,18 @@ export const seedDemoData = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!staff) throw new Error("Not linked to salon");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: services } = await supabaseAdmin.from("services").select("id, duration_minutes").eq("salon_id", staff.salon_id);
-    const { data: staffList } = await supabaseAdmin.from("staff").select("id").eq("salon_id", staff.salon_id);
-    const { data: clients } = await supabaseAdmin.from("clients").select("id").eq("salon_id", staff.salon_id);
+    const { data: services } = await supabaseAdmin
+      .from("services")
+      .select("id, duration_minutes")
+      .eq("salon_id", staff.salon_id);
+    const { data: staffList } = await supabaseAdmin
+      .from("staff")
+      .select("id")
+      .eq("salon_id", staff.salon_id);
+    const { data: clients } = await supabaseAdmin
+      .from("clients")
+      .select("id")
+      .eq("salon_id", staff.salon_id);
     if (!services?.length || !staffList?.length || !clients?.length) return { ok: false };
 
     const today = new Date();
@@ -124,7 +136,8 @@ export const seedDemoData = createServerFn({ method: "POST" })
         salon_id: staff.salon_id,
         caller_phone: "+15553334444",
         caller_name: "Emma R.",
-        transcript: "Hi, I'd like to book a gel manicure this Saturday around 2pm with Mai if she's available.",
+        transcript:
+          "Hi, I'd like to book a gel manicure this Saturday around 2pm with Mai if she's available.",
         intent: "book_appointment",
         intent_data: { service: "Gel Manicure", staff: "Mai", time_pref: "Saturday 2pm" },
         call_duration_seconds: 42,
