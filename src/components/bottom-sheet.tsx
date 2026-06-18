@@ -6,6 +6,7 @@ export function BottomSheet({
   open,
   onOpenChange,
   title,
+  description,
   children,
   footer,
   className,
@@ -13,17 +14,18 @@ export function BottomSheet({
   open: boolean;
   onOpenChange: (o: boolean) => void;
   title?: ReactNode;
+  description?: string;
   children: ReactNode;
   footer?: ReactNode;
   className?: string;
 }) {
   return (
-    <VaulDrawer.Root open={open} onOpenChange={onOpenChange}>
+      <VaulDrawer.Root open={open} onOpenChange={onOpenChange} fixed noBodyStyles>
       <VaulDrawer.Portal>
         <VaulDrawer.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" />
         <VaulDrawer.Content
           className={cn(
-            "fixed inset-x-0 bottom-0 z-50 mt-24 flex max-h-[85dvh] flex-col rounded-t-3xl bg-card text-card-foreground outline-none md:max-h-[90dvh]",
+            "fixed inset-x-0 bottom-0 z-50 mt-24 flex max-h-[85vh] max-h-[85dvh] flex-col rounded-t-3xl bg-card text-card-foreground outline-none md:max-h-[90vh] md:max-h-[90dvh]",
             className,
           )}
         >
@@ -33,7 +35,7 @@ export function BottomSheet({
               {title}
             </VaulDrawer.Title>
           )}
-          <VaulDrawer.Description className="sr-only">Bottom sheet</VaulDrawer.Description>
+          <VaulDrawer.Description className="sr-only">{description ?? "Booking flow"}</VaulDrawer.Description>
           <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-4">{children}</div>
           {footer && (
             <div className="border-t border-border bg-card px-6 py-4 safe-pb">{footer}</div>

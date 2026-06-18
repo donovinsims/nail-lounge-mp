@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { z } from "zod";
 import {
   fetchSalon,
@@ -61,6 +61,8 @@ function Book() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const stepRef = useRef<HTMLDivElement>(null);
+  const [announcement, setAnnouncement] = useState("");
 
   // Prefill from search params
   useEffect(() => {
@@ -73,6 +75,23 @@ function Book() {
       if (serviceId) setStep(3);
     }
   }, [search.staff, staff, serviceId]);
+
+  const next = () => setStep((s) => Math.min(4, s + 1) as Step);
+  const back = () => setStep((s) => Math.max(1, s - 1) as Step);
+
+  // Focus first interactive element on step change
+  useEffect(() => {
+    const el = stepRef.current?.querySelector<HTMLElement>(
+      "button, input, [tabindex]:not([tabindex=\"-1\"])",
+    );
+    el?.focus();
+  }, [step]);
+
+  // Announce step transitions
+  useEffect(() => {
+    const names = ["", "Select a service", "Choose an artist", "Pick a date and time", "Confirm your details"];
+    setAnnouncement(`Step ${step} of 4: ${names[step]}`);
+  }, [step]);
 
   const service = services.find((s) => s.id === serviceId);
   const tech = staff.find((s) => s.id === staffId);
@@ -102,8 +121,10 @@ function Book() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const next = () => setStep((s) => Math.min(4, s + 1) as Step);
-  const back = () => setStep((s) => Math.max(1, s - 1) as Step);
+  // Announce submission
+  useEffect(() => {
+    if (mutation.isPending) setAnnouncement("Submitting your booking\u2026");
+  }, [mutation.isPending]);
 
   const close = () => {
     setOpen(false);
@@ -144,11 +165,12 @@ function Book() {
         onOpenChange={(o) => {
           if (!o) close();
         }}
+        description={`Step ${step} of 4: ${["", "Select a service", "Choose an artist", "Pick a date and time", "Confirm your details"][step]}`}
         title={
           <div className="flex items-center gap-3">
             {step > 1 && (
-              <button onClick={back} className="-ml-2 p-2">
-                <ChevronLeft className="h-5 w-5" />
+              <button onClick={back} aria-label="Go back" className="-ml-2 p-2">
+                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>
             )}
             <span>{["Service", "Artist", "Date & time", "Confirm"][step - 1]}</span>
@@ -156,29 +178,7 @@ function Book() {
           </div>
         }
         footer={
-          step === 4 ? (
-            <button
-              disabled={mutation.isPending || !name || !phone || !slot || !service || !tech}
-              onClick={() =>
-                mutation.mutate({
-                  data: {
-                    salonId: salon!.id,
-                    serviceId: service!.id,
-                    staffId: tech!.id,
-                    startTime: slot!.toISOString(),
-                    clientName: name,
-                    clientPhone: phone,
-                    clientEmail: email,
-                    depositPaid: Number(service!.deposit_amount),
-                  },
-                })
-              }
-              className="flex tap-target w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-base font-semibold text-primary-foreground disabled:opacity-50"
-            >
-              {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Pay {fmtMoney(Number(service?.deposit_amount ?? 0))} deposit
-            </button>
-          ) : (
+          step !== 4 && (
             <button
               disabled={
                 (step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)
@@ -191,7 +191,9 @@ function Book() {
           )
         }
       >
-        {step === 1 &&
+        <div ref={stepRef}>
+          <div aria-live="polite" className="sr-only" aria-atomic="true">{announcement}</div>
+          {step === 1 &&
           (services.length === 0 ? (
             <div className="py-10 text-center text-sm text-muted-foreground">Loading services…</div>
           ) : (
@@ -330,13 +332,15 @@ function Book() {
               </div>
             </div>
             <div className="space-y-2">
-              <Field label="Full name" value={name} onChange={setName} placeholder="Jane Doe" />
+              <Field label="Full name" value={name} onChange={setName} placeholder="Jane Doe" autoComplete="name" enterKeyHint="next" />
               <Field
                 label="Phone"
                 value={phone}
                 onChange={setPhone}
                 type="tel"
                 placeholder="(815) 555-0123"
+                autoComplete="tel"
+                enterKeyHint="next"
               />
               <Field
                 label="Email (optional)"
@@ -344,6 +348,8 @@ function Book() {
                 onChange={setEmail}
                 type="email"
                 placeholder="you@example.com"
+                autoComplete="email"
+                enterKeyHint="done"
               />
             </div>
             <div className="rounded-2xl bg-surface p-4">
@@ -354,8 +360,30 @@ function Book() {
                 Tap card on file <span className="font-mono">•••• 4242</span>
               </p>
             </div>
+            <button
+              disabled={mutation.isPending || !name || !phone || !slot || !service || !tech}
+              onClick={() =>
+                mutation.mutate({
+                  data: {
+                    salonId: salon!.id,
+                    serviceId: service!.id,
+                    staffId: tech!.id,
+                    startTime: slot!.toISOString(),
+                    clientName: name,
+                    clientPhone: phone,
+                    clientEmail: email,
+                    depositPaid: Number(service!.deposit_amount),
+                  },
+                })
+              }
+              className="flex tap-target w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-base font-semibold text-primary-foreground disabled:opacity-50"
+            >
+              {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              Pay {fmtMoney(Number(service?.deposit_amount ?? 0))} deposit
+            </button>
           </div>
         )}
+        </div>
       </BottomSheet>
     </div>
   );
@@ -367,12 +395,16 @@ function Field({
   onChange,
   type = "text",
   placeholder,
+  autoComplete,
+  enterKeyHint,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
   placeholder?: string;
+  autoComplete?: string;
+  enterKeyHint?: React.HTMLAttributes<HTMLInputElement>["enterKeyHint"];
 }) {
   return (
     <label className="block">
@@ -382,10 +414,8 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         type={type}
         placeholder={placeholder}
-        onFocus={(e) => {
-          // Wait for keyboard to settle, then ensure input is visible
-          setTimeout(() => e.currentTarget.scrollIntoView({ block: "center", behavior: "smooth" }), 350);
-        }}
+        autoComplete={autoComplete}
+        enterKeyHint={enterKeyHint}
         className="mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none focus:ring-2 focus:ring-ring"
       />
     </label>
