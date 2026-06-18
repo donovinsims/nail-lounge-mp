@@ -6,7 +6,7 @@
 - **Routing:** TanStack Router — file-based, NOT Next.js/Remix
 - **Styling:** Tailwind CSS v4 (`@import "tailwindcss"` syntax) + `tw-animate-css`, shadcn/ui (new-york, no RSC)
 - **Auth:** Lovable Cloud Auth (Google OAuth) + Supabase Auth
-- **Database:** Supabase PostgreSQL (project: `vqlsfnmxwascmmicqjdo`)
+- **Database:** Supabase PostgreSQL (project: `wjyjgtsaepoxtmalttzj`)
 - **Package manager:** Bun (has bun.lock + bunfig.toml; npm lockfile present as artifact)
 
 ## Commands
