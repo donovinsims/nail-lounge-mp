@@ -161,10 +161,14 @@ function Book() {
   // Focus first interactive element + scroll to top on step change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    const el = stepRef.current?.querySelector<HTMLElement>(
-      'button, input, [tabindex]:not([tabindex="-1"])',
-    );
-    el?.focus();
+    // Only focus on desktop — mobile keyboard would block the view
+    const isMobile = window.matchMedia("(pointer: coarse)").matches;
+    if (!isMobile) {
+      const el = stepRef.current?.querySelector<HTMLElement>(
+        'button, input, [tabindex]:not([tabindex="-1"])',
+      );
+      el?.focus();
+    }
   }, [step]);
 
   // Announce step transitions
@@ -288,6 +292,29 @@ function Book() {
             }
           }}
         />
+      </div>
+
+      {/* Mobile booking summary chips — visible below md */}
+      <div className="md:hidden -mt-4 mb-4 mx-auto max-w-5xl px-6">
+        {(service || tech || slot) && (
+          <div className="flex flex-wrap gap-2">
+            {service && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-surface px-3 py-1 text-xs font-medium">
+                <span className="text-muted-foreground">Service:</span> {service.name}
+              </span>
+            )}
+            {tech && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-surface px-3 py-1 text-xs font-medium">
+                <span className="text-muted-foreground">Artist:</span> {tech.name}
+              </span>
+            )}
+            {slot && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-surface px-3 py-1 text-xs font-medium">
+                <span className="text-muted-foreground">When:</span> {fmtDate(slot)}, {fmtTime(slot)}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Main content area */}
