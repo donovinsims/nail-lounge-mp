@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, Loader2 } from "lucide-react";
 
 interface ServiceInfo {
@@ -44,11 +44,25 @@ export default function StepConfirm({
   formatDate,
   formatMoney,
 }: StepConfirmProps) {
+  useEffect(() => {
+    const handleResize = () => {
+      const vv = window.visualViewport;
+      if (vv) {
+        document.documentElement.style.setProperty('--visual-viewport-height', `${vv.height}px`);
+      }
+    };
+    window.visualViewport?.addEventListener('resize', handleResize);
+    return () => window.visualViewport?.removeEventListener('resize', handleResize);
+  }, []);
+
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const markTouched = (field: string) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
   };
+
+  const PHONE_RE = /^[\d\s\-()]{7,20}$/;
+  const showPhoneFormatError = touched.phone && phone.trim().length > 0 && !PHONE_RE.test(phone.trim());
 
   const showNameError = touched.name && !name.trim();
   const showPhoneError = touched.phone && !phone.trim();
@@ -56,6 +70,7 @@ export default function StepConfirm({
     !isPending &&
     name.trim().length > 0 &&
     phone.trim().length > 0 &&
+    PHONE_RE.test(phone.trim()) &&
     slot != null &&
     service != null &&
     staff != null;
@@ -95,7 +110,9 @@ export default function StepConfirm({
       {/* Client Info Fields */}
       <div className="space-y-2">
         <label className="block">
-          <span className="text-xs font-medium text-muted-foreground">Full name</span>
+          <span className="text-xs font-medium text-muted-foreground">
+            Full name <span className="text-red-500">*</span>
+          </span>
           <input
             value={name}
             onChange={(e) => onNameChange(e.target.value)}
@@ -106,13 +123,21 @@ export default function StepConfirm({
             placeholder="Jane Doe"
             enterKeyHint="next"
             disabled={isPending}
+            aria-invalid={showNameError || undefined}
+            aria-describedby={showNameError ? "name-error" : undefined}
             className="mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
           />
-          {showNameError && <p className="mt-1 text-xs text-red-500">Please enter your name</p>}
+          {showNameError && (
+            <p id="name-error" role="alert" className="mt-1 text-xs text-red-500">
+              Please enter your name
+            </p>
+          )}
         </label>
 
         <label className="block">
-          <span className="text-xs font-medium text-muted-foreground">Phone</span>
+          <span className="text-xs font-medium text-muted-foreground">
+            Phone <span className="text-red-500">*</span>
+          </span>
           <input
             value={phone}
             onChange={(e) => onPhoneChange(e.target.value)}
@@ -123,14 +148,28 @@ export default function StepConfirm({
             placeholder="(815) 555-0123"
             enterKeyHint="next"
             disabled={isPending}
+            aria-invalid={showPhoneError || undefined}
+            aria-describedby={showPhoneError ? "phone-error" : undefined}
             className="mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
           />
-          {showPhoneError && <p className="mt-1 text-xs text-red-500">Required</p>}
+          {showPhoneError && (
+            <p id="phone-error" role="alert" className="mt-1 text-xs text-red-500">
+              Required
+            </p>
+          )}
+          {showPhoneFormatError && (
+            <p className="mt-1 text-xs text-amber-600">
+              Enter a valid phone number (e.g., (815) 555-0123)
+            </p>
+          )}
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            US number: (555) 123-4567
+          </p>
         </label>
 
         <label className="block">
           <span className="text-xs font-medium text-muted-foreground">
-            Email <span className="text-muted-foreground/60">(optional)</span>
+            Email <span className="text-muted-foreground/60" id="email-hint">(optional)</span>
           </span>
           <input
             value={email}
@@ -141,18 +180,20 @@ export default function StepConfirm({
             placeholder="you@example.com"
             enterKeyHint="done"
             disabled={isPending}
+            aria-describedby="email-hint"
             className="mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
           />
         </label>
       </div>
 
-      {/* Mock Payment Section */}
+      {/* Payment Section */}
       <div className="rounded-2xl bg-surface p-4">
-        <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-muted-foreground">
-          <Check className="h-3 w-3" /> Mock payment — demo only
+        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+          <Check className="h-3 w-3 text-success" />
+          No payment required to book
         </div>
         <p className="mt-2 text-sm">
-          Tap card on file <span className="font-mono">•••• 4242</span>
+          Pay at the salon after your service. We'll send a reminder before your appointment.
         </p>
       </div>
 

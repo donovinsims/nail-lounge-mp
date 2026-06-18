@@ -1,5 +1,3 @@
-import { Loader2 } from "lucide-react";
-
 interface StepDateTimeProps {
   date: Date;
   onDateChange: (d: Date) => void;
@@ -33,12 +31,15 @@ export default function StepDateTime({
                 onDateChange(d);
                 onSlotChange(null);
               }}
-              className={`shrink-0 flex flex-col items-center justify-center rounded-2xl px-4 py-3 ${selected ? "bg-primary text-primary-foreground" : "bg-surface"}`}
+              className={`shrink-0 tap-target flex flex-col items-center justify-center rounded-2xl px-4 py-3 ${selected ? "bg-primary text-primary-foreground" : "bg-surface"}`}
             >
-              <span className="text-[10px] uppercase tracking-wider">
+              <span className="text-[11px] sm:text-xs uppercase tracking-wider">
                 {d.toLocaleDateString("en-US", { weekday: "short" })}
               </span>
               <span className="mt-0.5 text-lg font-bold">{d.getDate()}</span>
+              {d.toDateString() === new Date().toDateString() && !selected && (
+                <span className="text-[9px] uppercase tracking-wider text-accent mt-0.5">Today</span>
+              )}
             </button>
           );
         })}
@@ -47,8 +48,14 @@ export default function StepDateTime({
       {/* Time slots */}
       <div className="mt-4">
         {loadingSlots ? (
-          <div className="grid place-items-center py-10">
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-10 rounded-xl bg-surface animate-pulse"
+                aria-hidden="true"
+              />
+            ))}
           </div>
         ) : slots.length === 0 ? (
           <p className="py-10 text-center text-sm text-muted-foreground">

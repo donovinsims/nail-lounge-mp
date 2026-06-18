@@ -6,6 +6,7 @@ interface Props {
 }
 
 const LABELS = ["Service", "Artist", "Date & Time", "Confirm"];
+const MOBILE_LABELS = ["Service", "Artist", "Date/Time", "Confirm"];
 
 export default function BookingStepProgress({ step, onStepClick }: Props) {
   return (
@@ -21,7 +22,7 @@ export default function BookingStepProgress({ step, onStepClick }: Props) {
             <div key={num} className="flex items-center">
               {i > 0 && (
                 <div
-                  className={`h-0.5 w-12 mx-2 rounded-full ${
+                  className={`h-0.5 w-6 sm:w-12 mx-1 sm:mx-2 rounded-full ${
                     isCompleted || isCurrent ? "bg-accent" : "bg-muted"
                   }`}
                   aria-hidden="true"
@@ -33,7 +34,7 @@ export default function BookingStepProgress({ step, onStepClick }: Props) {
                     type="button"
                     aria-current="step"
                     aria-label={`Step ${num}: ${label}`}
-                    className="w-9 h-9 rounded-full bg-accent text-accent-foreground text-sm font-semibold flex items-center justify-center cursor-default ring-2 ring-accent ring-offset-2 ring-offset-background"
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent text-accent-foreground text-sm font-semibold flex items-center justify-center cursor-default ring-2 ring-accent ring-offset-2 ring-offset-background"
                   >
                     {num}
                   </button>
@@ -42,7 +43,7 @@ export default function BookingStepProgress({ step, onStepClick }: Props) {
                     type="button"
                     aria-label={`Step ${num}: ${label} (completed)`}
                     onClick={() => onStepClick(num)}
-                    className="w-9 h-9 rounded-full bg-accent text-accent-foreground text-sm font-semibold flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent text-accent-foreground text-sm font-semibold flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
                   >
                     <Check className="h-4 w-4" aria-hidden="true" />
                   </button>
@@ -51,18 +52,18 @@ export default function BookingStepProgress({ step, onStepClick }: Props) {
                     type="button"
                     aria-label={`Step ${num}: ${label}`}
                     disabled
-                    className="w-9 h-9 rounded-full bg-muted text-muted-foreground text-sm font-semibold flex items-center justify-center cursor-default"
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-muted text-muted-foreground text-sm font-semibold flex items-center justify-center cursor-default"
                   >
                     {num}
                   </button>
                 )}
                 <span
-                  className={`text-[10px] sm:text-xs font-medium whitespace-nowrap ${
+                  className={`text-[11px] sm:text-xs font-medium whitespace-nowrap ${
                     isCurrent ? "text-accent" : "text-muted-foreground"
                   }`}
                 >
                   <span className="hidden sm:inline">{label}</span>
-                  <span className="sm:hidden">{label.split(" ")[0]}</span>
+                  <span className="sm:hidden">{MOBILE_LABELS[i]}</span>
                 </span>
               </div>
             </div>

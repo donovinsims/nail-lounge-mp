@@ -14,7 +14,7 @@ import {
 } from "@/lib/salon";
 import { createPublicBooking } from "@/lib/booking.functions";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import StepService from "./book/-step-service";
 import StepStaff from "./book/-step-staff";
@@ -41,16 +41,18 @@ export const Route = createFileRoute("/book")({
 
 type Step = 1 | 2 | 3 | 4;
 
+const BOOKING_STATE_KEY = "booking-state";
+
 function Book() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const { data: salon } = useQuery({ queryKey: ["salon"], queryFn: fetchSalon });
-  const { data: services = [] } = useQuery({
+  const { data: services = [], isFetching: servicesLoading } = useQuery({
     queryKey: ["services", salon?.id],
     queryFn: () => fetchServices(salon!.id),
     enabled: !!salon,
   });
-  const { data: staff = [] } = useQuery({
+  const { data: staff = [], isFetching: staffLoading } = useQuery({
     queryKey: ["staff", salon?.id],
     queryFn: () => fetchStaff(salon!.id),
     enabled: !!salon,
@@ -66,6 +68,8 @@ function Book() {
   const [email, setEmail] = useState("");
   const stepRef = useRef<HTMLDivElement>(null);
   const [announcement, setAnnouncement] = useState("");
+  const [disabledHint, setDisabledHint] = useState<string | null>(null);
+  const dateDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Prefill from search params
   useEffect(() => {
@@ -85,6 +89,74 @@ function Book() {
   const back = () => {
     setStep((s) => Math.max(1, s - 1) as Step);
   };
+
+  const handleDisabledClick = (clickedStep: number) => {
+    const hints: Record<number, string> = {
+      1: "Please select a service to continue",
+      2: "Please choose an artist to continue",
+      3: "Please pick a date and time to continue",
+    };
+    const hint = hints[clickedStep];
+    if (hint) {
+      setDisabledHint(hint);
+      setTimeout(() => setDisabledHint(null), 3000);
+    }
+  };
+
+  const handleDateChange = (d: Date) => {
+    if (dateDebounceRef.current) clearTimeout(dateDebounceRef.current);
+    dateDebounceRef.current = setTimeout(() => {
+      setDate(d);
+      setSlot(null);
+    }, 300);
+  };
+
+  // Unsaved progress warning
+  const hasSelection = step > 1 || serviceId || staffId || slot || name || phone || email;
+
+  useEffect(() => {
+    if (!hasSelection) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [hasSelection]);
+
+  // Restore booking state from sessionStorage
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(BOOKING_STATE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.serviceId) setServiceId(parsed.serviceId);
+        if (parsed.staffId) setStaffId(parsed.staffId);
+        if (parsed.name) setName(parsed.name);
+        if (parsed.phone) setPhone(parsed.phone);
+        if (parsed.email) setEmail(parsed.email);
+        if (parsed.step) setStep(parsed.step as Step);
+      }
+    } catch {}
+  }, []);
+
+  // Save booking state on change
+  useEffect(() => {
+    if (serviceId || staffId || slot || name || phone || email) {
+      sessionStorage.setItem(
+        BOOKING_STATE_KEY,
+        JSON.stringify({
+          serviceId,
+          staffId,
+          slot: slot?.toISOString(),
+          name,
+          phone,
+          email,
+          step,
+        }),
+      );
+    }
+  }, [serviceId, staffId, slot, name, phone, email, step]);
 
   // Focus first interactive element + scroll to top on step change
   useEffect(() => {
@@ -113,6 +185,7 @@ function Book() {
   const { data: slots = [], isFetching: loadingSlots } = useQuery({
     queryKey: ["slots", staffId, serviceId, date.toDateString()],
     enabled: !!salon && !!service && !!tech,
+    staleTime: 60_000,
     queryFn: () =>
       computeAvailableSlots({
         salonId: salon!.id,
@@ -140,26 +213,81 @@ function Book() {
     if (mutation.isPending) setAnnouncement("Submitting your booking\u2026");
   }, [mutation.isPending]);
 
+  const PHONE_RE = /^[\d\s\-()]{7,20}$/;
+  const canSubmit =
+    !mutation.isPending &&
+    name.trim().length > 0 &&
+    phone.trim().length > 0 &&
+    PHONE_RE.test(phone.trim()) &&
+    slot != null &&
+    service != null &&
+    tech != null;
+
+  const handleSubmit = () => {
+    if (!salon || !service || !tech || !slot) return;
+    mutation.mutate({
+      data: {
+        salonId: salon.id,
+        serviceId: service.id,
+        staffId: tech.id,
+        startTime: slot.toISOString(),
+        clientName: name,
+        clientPhone: phone,
+        clientEmail: email,
+        depositPaid: Number(service.deposit_amount),
+      },
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
       {/* Header section */}
-      <section className="border-b border-border/60">
-        <div className="mx-auto max-w-3xl px-6 py-16 text-center sm:py-20">
-          <p className="text-[11px] uppercase tracking-[0.35em] text-accent">Booking</p>
-          <h1 className="mt-4 font-display text-4xl leading-[0.95] sm:text-5xl">
-            Reserve your <span className="italic">seat.</span>
-          </h1>
-          <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
-            Four short steps — service, artist, time, details.
-          </p>
+      <section className={`border-b border-border/60 ${step > 1 ? "sm:block" : ""}`}>
+        <div
+          className={`mx-auto max-w-3xl px-6 text-center ${
+            step > 1 ? "py-4 sm:py-16" : "py-16 sm:py-20"
+          }`}
+        >
+          {step === 1 ? (
+            <>
+              <p className="text-[11px] uppercase tracking-[0.35em] text-accent">Booking</p>
+              <h1 className="mt-4 font-display text-4xl leading-[0.95] sm:text-5xl">
+                Reserve your <span className="italic">seat.</span>
+              </h1>
+              <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
+                Four short steps — service, artist, time, details.
+              </p>
+            </>
+          ) : (
+            <p className="text-[11px] uppercase tracking-[0.35em] text-accent">
+              Step {step} of 4
+            </p>
+          )}
         </div>
       </section>
 
       {/* Step progress */}
       <div className="mx-auto max-w-5xl px-6 pt-8 pb-6">
-        <BookingStepProgress step={step} onStepClick={(s: number) => setStep(s as Step)} />
+        <BookingStepProgress
+          step={step}
+          onStepClick={(s: number) => {
+            setStep(s as Step);
+            if (s < step) {
+              if (s <= 3) setSlot(null);
+              if (s <= 2) {
+                setStaffId(null);
+                setSlot(null);
+              }
+              if (s <= 1) {
+                setServiceId(null);
+                setStaffId(null);
+                setSlot(null);
+              }
+            }
+          }}
+        />
       </div>
 
       {/* Main content area */}
@@ -171,72 +299,80 @@ function Book() {
               {announcement}
             </div>
 
-            {step === 1 && (
-              <StepService
-                services={services}
-                selectedId={serviceId}
-                onSelect={(id) => {
-                  setServiceId(id);
-                  next();
-                }}
-              />
-            )}
+            <div key={step} className="animate-in fade-in duration-200">
+              {step === 1 && (
+                <StepService
+                  services={services}
+                  selectedId={serviceId}
+                  onSelect={(id) => {
+                    setServiceId(id);
+                    setSlot(null);
+                  }}
+                  isLoading={servicesLoading}
+                />
+              )}
 
-            {step === 2 && (
-              <StepStaff
-                staff={staff}
-                selectedId={staffId}
-                onSelect={(id) => {
-                  setStaffId(id);
-                  next();
-                }}
-              />
-            )}
+              {step === 2 && (
+                <StepStaff
+                  staff={staff}
+                  selectedId={staffId}
+                  onSelect={(id) => {
+                    setStaffId(id);
+                    setSlot(null);
+                  }}
+                  isLoading={staffLoading}
+                />
+              )}
 
-            {step === 3 && (
-              <StepDateTime
-                date={date}
-                onDateChange={(d) => {
-                  setDate(d);
-                  setSlot(null);
-                }}
-                slot={slot}
-                onSlotChange={setSlot}
-                slots={slots}
-                loadingSlots={loadingSlots}
-              />
-            )}
+              {step === 3 && (
+                <StepDateTime
+                  date={date}
+                  onDateChange={handleDateChange}
+                  slot={slot}
+                  onSlotChange={setSlot}
+                  slots={slots}
+                  loadingSlots={loadingSlots}
+                />
+              )}
 
-            {step === 4 && (
-              <StepConfirm
-                service={service ?? undefined}
-                staff={tech ?? undefined}
-                slot={slot}
-                name={name}
-                phone={phone}
-                email={email}
-                onNameChange={setName}
-                onPhoneChange={setPhone}
-                onEmailChange={setEmail}
-                isPending={mutation.isPending}
-                onSubmit={() =>
-                  mutation.mutate({
-                    data: {
-                      salonId: salon!.id,
-                      serviceId: service!.id,
-                      staffId: tech!.id,
-                      startTime: slot!.toISOString(),
-                      clientName: name,
-                      clientPhone: phone,
-                      clientEmail: email,
-                      depositPaid: Number(service!.deposit_amount),
-                    },
-                  })
-                }
-                formatTime={fmtTime}
-                formatDate={fmtDate}
-                formatMoney={fmtMoney}
-              />
+              {step === 4 && (
+                <StepConfirm
+                  service={service ?? undefined}
+                  staff={tech ?? undefined}
+                  slot={slot}
+                  name={name}
+                  phone={phone}
+                  email={email}
+                  onNameChange={setName}
+                  onPhoneChange={setPhone}
+                  onEmailChange={setEmail}
+                  isPending={mutation.isPending}
+                  onSubmit={() =>
+                    mutation.mutate({
+                      data: {
+                        salonId: salon!.id,
+                        serviceId: service!.id,
+                        staffId: tech!.id,
+                        startTime: slot!.toISOString(),
+                        clientName: name,
+                        clientPhone: phone,
+                        clientEmail: email,
+                        depositPaid: Number(service!.deposit_amount),
+                      },
+                    })
+                  }
+                  formatTime={fmtTime}
+                  formatDate={fmtDate}
+                  formatMoney={fmtMoney}
+                />
+              )}
+            </div>
+
+            {/* Disabled button hint */}
+            {disabledHint && (
+              <p className="text-xs text-amber-600 text-center mt-2 animate-in fade-in slide-in-from-bottom-1 duration-200">
+                {disabledHint}
+              </p>
             )}
 
             {/* Desktop navigation buttons */}
@@ -255,7 +391,17 @@ function Book() {
                   disabled={
                     (step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)
                   }
-                  onClick={next}
+                  onClick={() => {
+                    if (
+                      (step === 1 && !serviceId) ||
+                      (step === 2 && !staffId) ||
+                      (step === 3 && !slot)
+                    ) {
+                      handleDisabledClick(step);
+                    } else {
+                      next();
+                    }
+                  }}
                   className="tap-target inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-40 hover:opacity-90 transition"
                 >
                   Continue
@@ -292,7 +438,7 @@ function Book() {
               <ChevronLeft className="h-5 w-5" />
             </button>
           )}
-          {step < 4 && (
+          {step < 4 ? (
             <button
               disabled={
                 (step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)
@@ -302,8 +448,24 @@ function Book() {
             >
               Continue
             </button>
+          ) : (
+            <button
+              disabled={!canSubmit}
+              onClick={handleSubmit}
+              className="flex-1 tap-target rounded-full bg-primary py-3.5 text-sm font-semibold text-primary-foreground disabled:opacity-50 transition"
+            >
+              {mutation.isPending ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Booking…
+                </span>
+              ) : (
+                `Pay ${fmtMoney(Number(service?.deposit_amount ?? 0))} deposit`
+              )}
+            </button>
           )}
         </div>
+      </div>
       </div>
 
       {/* Spacer for mobile CTA */}

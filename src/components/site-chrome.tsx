@@ -32,7 +32,7 @@ export function SiteHeader() {
             Gift Cards
           </Link>
           <Link to="/" hash="visit" className="hover:text-foreground transition">
-            Visit
+            Visit Us
           </Link>
           <Link to="/appointments" className="hover:text-foreground transition">
             My Visits
