@@ -23,7 +23,7 @@ export function BottomSheet({
         <VaulDrawer.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" />
         <VaulDrawer.Content
           className={cn(
-            "fixed inset-x-0 bottom-0 z-50 mt-24 flex max-h-[92vh] flex-col rounded-t-3xl bg-card text-card-foreground outline-none",
+            "fixed inset-x-0 bottom-0 z-50 mt-24 flex max-h-[85vh] flex-col rounded-t-3xl bg-card text-card-foreground outline-none md:max-h-[90vh]",
             className,
           )}
         >

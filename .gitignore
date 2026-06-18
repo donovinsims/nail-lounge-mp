@@ -45,3 +45,4 @@ supabase/.temp/
 
 # Deepwork session state (keep out of git)
 .slim/deepwork/
+.vercel
