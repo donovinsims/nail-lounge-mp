@@ -15,6 +15,15 @@ import {
 import { BottomSheet } from "@/components/bottom-sheet";
 import { createPublicBooking } from "@/lib/booking.functions";
 import { SiteHeader } from "@/components/site-chrome";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { ChevronLeft, Check, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import heroImg from "@/assets/studio.jpg";
@@ -63,6 +72,9 @@ function Book() {
   const [email, setEmail] = useState("");
   const stepRef = useRef<HTMLDivElement>(null);
   const [announcement, setAnnouncement] = useState("");
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true); }, []);
+  const isMobile = useIsMobile();
 
   // Prefill from search params
   useEffect(() => {
@@ -131,6 +143,202 @@ function Book() {
     setTimeout(() => navigate({ to: "/" }), 220);
   };
 
+  const bookingStepContent = (
+    <div ref={stepRef}>
+      <div aria-live="polite" className="sr-only" aria-atomic="true">{announcement}</div>
+      {step === 1 &&
+      (services.length === 0 ? (
+        <div className="py-10 text-center text-sm text-muted-foreground">Loading services…</div>
+      ) : (
+        <ul className="space-y-2">
+          {services.map((s) => (
+            <li key={s.id}>
+              <button
+                onClick={() => {
+                  setServiceId(s.id);
+                  setTimeout(next, 150);
+                }}
+                className={`flex w-full tap-target items-center justify-between gap-3 rounded-2xl bg-surface p-4 text-left active:scale-[0.99] transition ${serviceId === s.id ? "ring-2 ring-ring" : ""}`}
+              >
+                <div className="min-w-0">
+                  <p className="font-semibold truncate">{s.name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {s.category} · {s.duration_minutes} min
+                  </p>
+                </div>
+                <p className="font-mono text-sm font-semibold shrink-0">
+                  {fmtMoney(Number(s.price))}
+                </p>
+              </button>
+            </li>
+          ))}
+        </ul>
+      ))}
+
+      {step === 2 && (
+        <ul className="space-y-2">
+          {staff.map((t: any) => (
+            <li key={t.id}>
+              <button
+                onClick={() => {
+                  setStaffId(t.id);
+                  setTimeout(next, 150);
+                }}
+                className={`flex w-full tap-target items-center gap-4 rounded-2xl bg-surface p-4 text-left ${staffId === t.id ? "ring-2 ring-ring" : ""}`}
+              >
+                <div
+                  className="h-11 w-11 shrink-0 rounded-full grid place-items-center text-white font-semibold"
+                  style={{ background: t.avatar_color || "#000" }}
+                >
+                  {t.name[0]}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-semibold truncate">{t.name}</p>
+                  <p className="text-xs text-muted-foreground capitalize">{t.title || t.role}</p>
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {step === 3 && (
+        <div>
+          <div className="-mx-1 flex gap-2 overflow-x-auto pb-3">
+            {Array.from({ length: 14 }, (_, i) => {
+              const d = new Date();
+              d.setDate(d.getDate() + i);
+              d.setHours(0, 0, 0, 0);
+              const selected = d.toDateString() === date.toDateString();
+              return (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setDate(d);
+                    setSlot(null);
+                  }}
+                  className={`shrink-0 flex flex-col items-center justify-center rounded-2xl px-4 py-3 ${selected ? "bg-primary text-primary-foreground" : "bg-surface"}`}
+                >
+                  <span className="text-[10px] uppercase tracking-wider">
+                    {d.toLocaleDateString("en-US", { weekday: "short" })}
+                  </span>
+                  <span className="text-lg font-bold mt-0.5">{d.getDate()}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-4">
+            {loadingSlots ? (
+              <div className="grid place-items-center py-10">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : slots.length === 0 ? (
+              <p className="py-10 text-center text-sm text-muted-foreground">
+                No availability this day. Try another.
+              </p>
+            ) : (
+              <div className="grid grid-cols-3 gap-2">
+                {slots.map((t) => {
+                  const selected = slot && slot.getTime() === t.getTime();
+                  return (
+                    <button
+                      key={t.toISOString()}
+                      onClick={() => setSlot(t)}
+                      className={`tap-target rounded-xl py-3 text-sm font-medium ${selected ? "bg-primary text-primary-foreground" : "bg-surface"}`}
+                    >
+                      {fmtTime(t)}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {step === 4 && (
+        <div className="space-y-4">
+          <div className="rounded-2xl bg-surface p-4 text-sm space-y-1">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Service</span>
+              <span className="font-medium">{service?.name}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">With</span>
+              <span className="font-medium">{tech?.name}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">When</span>
+              <span className="font-medium">{slot && `${fmtDate(slot)}, ${fmtTime(slot)}`}</span>
+            </div>
+            <div className="mt-2 flex justify-between border-t pt-2">
+              <span className="text-muted-foreground">Total</span>
+              <span className="font-mono font-semibold">
+                {fmtMoney(Number(service?.price ?? 0))}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Deposit today</span>
+              <span className="font-mono font-semibold">
+                {fmtMoney(Number(service?.deposit_amount ?? 0))}
+              </span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Field label="Full name" value={name} onChange={setName} placeholder="Jane Doe" autoComplete="name" enterKeyHint="next" />
+            <Field
+              label="Phone"
+              value={phone}
+              onChange={setPhone}
+              type="tel"
+              placeholder="(815) 555-0123"
+              autoComplete="tel"
+              enterKeyHint="next"
+            />
+            <Field
+              label="Email (optional)"
+              value={email}
+              onChange={setEmail}
+              type="email"
+              placeholder="you@example.com"
+              autoComplete="email"
+              enterKeyHint="done"
+            />
+          </div>
+          <div className="rounded-2xl bg-surface p-4">
+            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-muted-foreground">
+              <Check className="h-3 w-3" /> Mock payment — demo only
+            </div>
+            <p className="mt-2 text-sm">
+              Tap card on file <span className="font-mono">•••• 4242</span>
+            </p>
+          </div>
+          <button
+            disabled={mutation.isPending || !name || !phone || !slot || !service || !tech}
+            onClick={() =>
+              mutation.mutate({
+                data: {
+                  salonId: salon!.id,
+                  serviceId: service!.id,
+                  staffId: tech!.id,
+                  startTime: slot!.toISOString(),
+                  clientName: name,
+                  clientPhone: phone,
+                  clientEmail: email,
+                  depositPaid: Number(service!.deposit_amount),
+                },
+              })
+            }
+            className="flex tap-target w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-base font-semibold text-primary-foreground disabled:opacity-50"
+          >
+            {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+            Pay {fmtMoney(Number(service?.deposit_amount ?? 0))} deposit
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
@@ -160,231 +368,76 @@ function Book() {
         </div>
       </section>
 
-      <BottomSheet
-        open={open}
-        onOpenChange={(o) => {
-          if (!o) close();
-        }}
-        description={`Step ${step} of 4: ${["", "Select a service", "Choose an artist", "Pick a date and time", "Confirm your details"][step]}`}
-        title={
-          <div className="flex items-center gap-3">
-            {step > 1 && (
-              <button onClick={back} aria-label="Go back" className="-ml-2 p-2">
-                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-              </button>
-            )}
-            <span>{["Service", "Artist", "Date & time", "Confirm"][step - 1]}</span>
-            <span className="ml-auto text-xs font-mono text-muted-foreground">Step {step}/4</span>
-          </div>
-        }
-        footer={
-          step !== 4 && (
-            <button
-              disabled={
-                (step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)
-              }
-              onClick={next}
-              className="flex tap-target w-full items-center justify-center rounded-full bg-primary py-4 text-base font-semibold text-primary-foreground disabled:opacity-40"
-            >
-              Continue
-            </button>
-          )
-        }
-      >
-        <div ref={stepRef}>
-          <div aria-live="polite" className="sr-only" aria-atomic="true">{announcement}</div>
-          {step === 1 &&
-          (services.length === 0 ? (
-            <div className="py-10 text-center text-sm text-muted-foreground">Loading services…</div>
-          ) : (
-            <ul className="space-y-2">
-              {services.map((s) => (
-                <li key={s.id}>
-                  <button
-                    onClick={() => {
-                      setServiceId(s.id);
-                      setTimeout(next, 150);
-                    }}
-                    className={`flex w-full tap-target items-center justify-between gap-3 rounded-2xl bg-surface p-4 text-left active:scale-[0.99] transition ${serviceId === s.id ? "ring-2 ring-ring" : ""}`}
-                  >
-                    <div className="min-w-0">
-                      <p className="font-semibold truncate">{s.name}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {s.category} · {s.duration_minutes} min
-                      </p>
-                    </div>
-                    <p className="font-mono text-sm font-semibold shrink-0">
-                      {fmtMoney(Number(s.price))}
-                    </p>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ))}
-
-        {step === 2 && (
-          <ul className="space-y-2">
-            {staff.map((t: any) => (
-              <li key={t.id}>
-                <button
-                  onClick={() => {
-                    setStaffId(t.id);
-                    setTimeout(next, 150);
-                  }}
-                  className={`flex w-full tap-target items-center gap-4 rounded-2xl bg-surface p-4 text-left ${staffId === t.id ? "ring-2 ring-ring" : ""}`}
-                >
-                  <div
-                    className="h-11 w-11 shrink-0 rounded-full grid place-items-center text-white font-semibold"
-                    style={{ background: t.avatar_color || "#000" }}
-                  >
-                    {t.name[0]}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-semibold truncate">{t.name}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{t.title || t.role}</p>
-                  </div>
+      {hydrated && isMobile ? (
+        <BottomSheet
+          open={open}
+          onOpenChange={(o) => {
+            if (!o) close();
+          }}
+          description={`Step ${step} of 4: ${["", "Select a service", "Choose an artist", "Pick a date and time", "Confirm your details"][step]}`}
+          title={
+            <div className="flex items-center gap-3">
+              {step > 1 && (
+                <button onClick={back} aria-label="Go back" className="-ml-2 p-2">
+                  <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                 </button>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {step === 3 && (
-          <div>
-            <div className="-mx-1 flex gap-2 overflow-x-auto pb-3">
-              {Array.from({ length: 14 }, (_, i) => {
-                const d = new Date();
-                d.setDate(d.getDate() + i);
-                d.setHours(0, 0, 0, 0);
-                const selected = d.toDateString() === date.toDateString();
-                return (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      setDate(d);
-                      setSlot(null);
-                    }}
-                    className={`shrink-0 flex flex-col items-center justify-center rounded-2xl px-4 py-3 ${selected ? "bg-primary text-primary-foreground" : "bg-surface"}`}
-                  >
-                    <span className="text-[10px] uppercase tracking-wider">
-                      {d.toLocaleDateString("en-US", { weekday: "short" })}
-                    </span>
-                    <span className="text-lg font-bold mt-0.5">{d.getDate()}</span>
-                  </button>
-                );
-              })}
-            </div>
-            <div className="mt-4">
-              {loadingSlots ? (
-                <div className="grid place-items-center py-10">
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                </div>
-              ) : slots.length === 0 ? (
-                <p className="py-10 text-center text-sm text-muted-foreground">
-                  No availability this day. Try another.
-                </p>
-              ) : (
-                <div className="grid grid-cols-3 gap-2">
-                  {slots.map((t) => {
-                    const selected = slot && slot.getTime() === t.getTime();
-                    return (
-                      <button
-                        key={t.toISOString()}
-                        onClick={() => setSlot(t)}
-                        className={`tap-target rounded-xl py-3 text-sm font-medium ${selected ? "bg-primary text-primary-foreground" : "bg-surface"}`}
-                      >
-                        {fmtTime(t)}
-                      </button>
-                    );
-                  })}
-                </div>
               )}
+              <span>{["Service", "Artist", "Date & time", "Confirm"][step - 1]}</span>
+              <span className="ml-auto text-xs font-mono text-muted-foreground">Step {step}/4</span>
             </div>
-          </div>
-        )}
-
-        {step === 4 && (
-          <div className="space-y-4">
-            <div className="rounded-2xl bg-surface p-4 text-sm space-y-1">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Service</span>
-                <span className="font-medium">{service?.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">With</span>
-                <span className="font-medium">{tech?.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">When</span>
-                <span className="font-medium">{slot && `${fmtDate(slot)}, ${fmtTime(slot)}`}</span>
-              </div>
-              <div className="mt-2 flex justify-between border-t pt-2">
-                <span className="text-muted-foreground">Total</span>
-                <span className="font-mono font-semibold">
-                  {fmtMoney(Number(service?.price ?? 0))}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Deposit today</span>
-                <span className="font-mono font-semibold">
-                  {fmtMoney(Number(service?.deposit_amount ?? 0))}
-                </span>
-              </div>
+          }
+          footer={
+            step !== 4 && (
+              <button
+                disabled={
+                  (step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)
+                }
+                onClick={next}
+                className="flex tap-target w-full items-center justify-center rounded-full bg-primary py-4 text-base font-semibold text-primary-foreground disabled:opacity-40"
+              >
+                Continue
+              </button>
+            )
+          }
+        >
+          {bookingStepContent}
+        </BottomSheet>
+      ) : hydrated ? (
+        <Dialog open={open} onOpenChange={(o) => { if (!o) close(); }}>
+          <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto gap-0 p-0">
+            <DialogHeader className="px-6 pt-6 pb-0">
+              <DialogTitle className="flex items-center gap-3 text-xl font-bold">
+                {step > 1 && (
+                  <button onClick={back} aria-label="Go back" className="-ml-2 p-2">
+                    <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                )}
+                <span>{["Service", "Artist", "Date & time", "Confirm"][step - 1]}</span>
+                <span className="ml-auto text-xs font-mono text-muted-foreground">Step {step}/4</span>
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                Step {step} of 4: {["", "Select a service", "Choose an artist", "Pick a date and time", "Confirm your details"][step]}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              {bookingStepContent}
             </div>
-            <div className="space-y-2">
-              <Field label="Full name" value={name} onChange={setName} placeholder="Jane Doe" autoComplete="name" enterKeyHint="next" />
-              <Field
-                label="Phone"
-                value={phone}
-                onChange={setPhone}
-                type="tel"
-                placeholder="(815) 555-0123"
-                autoComplete="tel"
-                enterKeyHint="next"
-              />
-              <Field
-                label="Email (optional)"
-                value={email}
-                onChange={setEmail}
-                type="email"
-                placeholder="you@example.com"
-                autoComplete="email"
-                enterKeyHint="done"
-              />
-            </div>
-            <div className="rounded-2xl bg-surface p-4">
-              <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                <Check className="h-3 w-3" /> Mock payment — demo only
-              </div>
-              <p className="mt-2 text-sm">
-                Tap card on file <span className="font-mono">•••• 4242</span>
-              </p>
-            </div>
-            <button
-              disabled={mutation.isPending || !name || !phone || !slot || !service || !tech}
-              onClick={() =>
-                mutation.mutate({
-                  data: {
-                    salonId: salon!.id,
-                    serviceId: service!.id,
-                    staffId: tech!.id,
-                    startTime: slot!.toISOString(),
-                    clientName: name,
-                    clientPhone: phone,
-                    clientEmail: email,
-                    depositPaid: Number(service!.deposit_amount),
-                  },
-                })
-              }
-              className="flex tap-target w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-base font-semibold text-primary-foreground disabled:opacity-50"
-            >
-              {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Pay {fmtMoney(Number(service?.deposit_amount ?? 0))} deposit
-            </button>
-          </div>
-        )}
-        </div>
-      </BottomSheet>
+            {step !== 4 && (
+              <DialogFooter className="flex flex-row px-6 pb-6 pt-2 sm:justify-center">
+                <button
+                  disabled={
+                    (step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)
+                  }
+                  onClick={next}
+                  className="flex w-full items-center justify-center rounded-full bg-primary py-3.5 text-base font-semibold text-primary-foreground disabled:opacity-40 hover:opacity-90 transition"
+                >
+                  Continue
+                </button>
+              </DialogFooter>
+            )}
+          </DialogContent>
+        </Dialog>
+      ) : null}
     </div>
   );
 }
