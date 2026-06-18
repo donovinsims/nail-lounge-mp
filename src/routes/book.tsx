@@ -318,10 +318,10 @@ function Book() {
       </div>
 
       {/* Main content area */}
-      <div className="mx-auto max-w-5xl px-6 pb-24">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 pb-24 overflow-x-hidden">
         <div className="grid gap-8 md:grid-cols-12">
           {/* Step content column */}
-          <div className="md:col-span-8" ref={stepRef}>
+          <div className="md:col-span-8 min-w-0" ref={stepRef}>
             <div aria-live="polite" className="sr-only" aria-atomic="true">
               {announcement}
             </div>

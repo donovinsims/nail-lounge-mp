@@ -16,7 +16,7 @@ export default function StepDateTime({
   loadingSlots,
 }: StepDateTimeProps) {
   return (
-    <div className="w-full max-w-full overflow-x-hidden px-4 space-y-6">
+    <div className="w-full space-y-6">
       {/* 14-day date scroller */}
       <div>
         <p className="mb-3 text-xs font-medium text-muted-foreground">Pick a day</p>
