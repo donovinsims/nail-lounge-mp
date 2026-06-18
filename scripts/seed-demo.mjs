@@ -28,10 +28,10 @@ const EXPECTED_PROJECT = "wjyjgtsaepoxtmalttzj";
 const SALON_ID = "11111111-1111-1111-1111-111111111111";
 
 const STAFF = [
-  { id: "a1111111-1111-1111-1111-111111111111", name: "Mia Tran" },
-  { id: "a2222222-2222-2222-2222-222222222222", name: "Linh Pham" },
-  { id: "a3333333-3333-3333-3333-333333333333", name: "Sophia Nguyen" },
-  { id: "a4444444-4444-4444-4444-444444444444", name: "Anh Le" },
+  { id: "a1111111-1111-1111-1111-111111111111", name: "Jessica Moore" },
+  { id: "a2222222-2222-2222-2222-222222222222", name: "Ashley Williams" },
+  { id: "a3333333-3333-3333-3333-333333333333", name: "Sophia Brooks" },
+  { id: "a4444444-4444-4444-4444-444444444444", name: "Emily Davis" },
 ];
 
 // Staff working hours (from DB seed data)

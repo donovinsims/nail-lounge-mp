@@ -25,19 +25,19 @@ ON CONFLICT (id) DO UPDATE
 -- Seed 4 staff
 INSERT INTO public.staff (id, salon_id, name, role, title, bio, specialties, avatar_color, sort_order, working_hours, is_active)
 VALUES
-  ('a1111111-1111-1111-1111-111111111111','11111111-1111-1111-1111-111111111111','Mia Tran','owner','Master Nail Artist','Founder of Nail Lounge. 12+ years sculpting precision acrylic and modern nail art.',
+  ('a1111111-1111-1111-1111-111111111111','11111111-1111-1111-1111-111111111111','Jessica Moore','owner','Master Nail Artist','Founder of Nail Lounge. 12+ years sculpting precision acrylic and modern nail art.',
     ARRAY['Acrylic Sculpture','3D Nail Art','Chrome'], '#7a3b52', 1,
     '{"mon":{"open":"10:00","close":"19:00"},"tue":{"open":"10:00","close":"19:00"},"wed":{"open":"10:00","close":"19:00"},"thu":{"open":"10:00","close":"19:00"},"fri":{"open":"10:00","close":"19:00"},"sat":{"open":"10:00","close":"17:00"}}'::jsonb,
     true),
-  ('a2222222-2222-2222-2222-222222222222','11111111-1111-1111-1111-111111111111','Linh Pham','staff','Gel & Dip Specialist','Known for mirror-finish gel and long-wear dip powder. Loves soft minimal looks.',
+  ('a2222222-2222-2222-2222-222222222222','11111111-1111-1111-1111-111111111111','Ashley Williams','staff','Gel & Dip Specialist','Known for mirror-finish gel and long-wear dip powder. Loves soft minimal looks.',
     ARRAY['Gel Manicure','Dip Powder','Ombre'], '#9b6b78', 2,
     '{"tue":{"open":"09:30","close":"18:00"},"wed":{"open":"09:30","close":"18:00"},"thu":{"open":"09:30","close":"18:00"},"fri":{"open":"09:30","close":"19:30"},"sat":{"open":"09:30","close":"18:00"},"sun":{"open":"10:00","close":"17:00"}}'::jsonb,
     true),
-  ('a3333333-3333-3333-3333-333333333333','11111111-1111-1111-1111-111111111111','Sophia Nguyen','staff','Pedicure & Spa Therapist','Bringing the spa experience to every pedicure — hot stones, paraffin, and the perfect heel reset.',
+  ('a3333333-3333-3333-3333-333333333333','11111111-1111-1111-1111-111111111111','Sophia Brooks','staff','Pedicure & Spa Therapist','Bringing the spa experience to every pedicure — hot stones, paraffin, and the perfect heel reset.',
     ARRAY['Deluxe Pedicure','Hot Stone','Paraffin'], '#5e4b6b', 3,
     '{"mon":{"open":"09:30","close":"18:00"},"wed":{"open":"09:30","close":"19:30"},"thu":{"open":"09:30","close":"19:30"},"fri":{"open":"09:30","close":"19:30"},"sat":{"open":"09:30","close":"18:00"},"sun":{"open":"10:00","close":"17:00"}}'::jsonb,
     true),
-  ('a4444444-4444-4444-4444-444444444444','11111111-1111-1111-1111-111111111111','Anh Le','staff','Nail Art Designer','Custom freehand art, rhinestones, and full-set transformations. Ask for a consultation.',
+  ('a4444444-4444-4444-4444-444444444444','11111111-1111-1111-1111-111111111111','Emily Davis','staff','Nail Art Designer','Custom freehand art, rhinestones, and full-set transformations. Ask for a consultation.',
     ARRAY['Custom Nail Art','Rhinestones','French Tip'], '#a87c5f', 4,
     '{"mon":{"open":"11:00","close":"19:30"},"tue":{"open":"11:00","close":"19:30"},"thu":{"open":"11:00","close":"19:30"},"fri":{"open":"11:00","close":"19:30"},"sat":{"open":"10:00","close":"18:00"}}'::jsonb,
     true)

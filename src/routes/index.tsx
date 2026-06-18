@@ -8,17 +8,6 @@ import art2 from "@/assets/art2.jpg";
 import art3 from "@/assets/art3.jpg";
 import g1 from "@/assets/gallery1.jpg";
 import { SiteHeader, SiteFooter, MapEmbed } from "@/components/site-chrome";
-import artistMia from "@/assets/artist-mia.jpg";
-import artistLinh from "@/assets/artist-linh.jpg";
-import artistSophia from "@/assets/artist-sophia.jpg";
-import artistAnh from "@/assets/artist-anh.jpg";
-
-const ARTIST_PHOTO: Record<string, string> = {
-  "Mia Tran": artistMia,
-  "Linh Pham": artistLinh,
-  "Sophia Nguyen": artistSophia,
-  "Anh Le": artistAnh,
-};
 
 const DAYS: [string, string][] = [
   ["Monday", "mon"],
@@ -261,7 +250,6 @@ function Home() {
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {staff.map((s: any) => {
-            const photo = ARTIST_PHOTO[s.name];
             const wh = s.working_hours as Record<
               string,
               { open: string; close: string } | undefined
@@ -273,23 +261,12 @@ function Home() {
                 className="group rounded-3xl bg-surface overflow-hidden flex flex-col"
               >
                 <div className="relative aspect-[4/5] bg-muted overflow-hidden">
-                  {photo ? (
-                    <img
-                      src={photo}
-                      alt={`${s.name}, ${s.title || s.role}`}
-                      loading="lazy"
-                      width={768}
-                      height={960}
-                      className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div
-                      className="h-full w-full grid place-items-center text-5xl font-display text-white"
-                      style={{ background: s.avatar_color || "#7a3b52" }}
-                    >
-                      {s.name?.[0]}
-                    </div>
-                  )}
+                  <div
+                    className="h-full w-full grid place-items-center text-5xl font-display text-white"
+                    style={{ background: s.avatar_color || "#7a3b52" }}
+                  >
+                    {s.name?.[0]}
+                  </div>
                 </div>
                 <div className="p-6 flex-1 flex flex-col">
                   <p className="font-display text-2xl">{s.name}</p>
