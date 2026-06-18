@@ -382,6 +382,10 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         type={type}
         placeholder={placeholder}
+        onFocus={(e) => {
+          // Wait for keyboard to settle, then ensure input is visible
+          setTimeout(() => e.currentTarget.scrollIntoView({ block: "center", behavior: "smooth" }), 350);
+        }}
         className="mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none focus:ring-2 focus:ring-ring"
       />
     </label>
