@@ -90,7 +90,7 @@ export const completeBookingWithPayment = createServerFn({ method: "POST" })
 export const seedDemoData = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    // Adds demo bookings + AI calls for current salon (idempotent-ish)
+    // Adds demo data — bookings spread across this week + commission records + AI calls
     const { data: staff } = await context.supabase
       .from("staff")
       .select("id, salon_id")
@@ -100,7 +100,7 @@ export const seedDemoData = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: services } = await supabaseAdmin
       .from("services")
-      .select("id, duration_minutes")
+      .select("id, name, price, duration_minutes")
       .eq("salon_id", staff.salon_id);
     const { data: staffList } = await supabaseAdmin
       .from("staff")
@@ -112,25 +112,126 @@ export const seedDemoData = createServerFn({ method: "POST" })
       .eq("salon_id", staff.salon_id);
     if (!services?.length || !staffList?.length || !clients?.length) return { ok: false };
 
-    const today = new Date();
-    today.setHours(10, 0, 0, 0);
-    const bookings = [];
-    for (let i = 0; i < 6; i++) {
-      const start = new Date(today.getTime() + i * 75 * 60_000);
-      const svc = services[i % services.length];
-      bookings.push({
-        salon_id: staff.salon_id,
-        service_id: svc.id,
-        staff_id: staffList[i % staffList.length].id,
-        client_id: clients[i % clients.length].id,
-        start_time: start.toISOString(),
-        end_time: new Date(start.getTime() + svc.duration_minutes * 60_000).toISOString(),
-        status: "confirmed" as const,
-        deposit_paid: 10,
-      });
-    }
-    await supabaseAdmin.from("bookings").insert(bookings);
+    // Build a schedule spread across this week so charts show data
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0=Sun, 4=Thu
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    monday.setHours(9, 0, 0, 0);
 
+    // Define the daily schedule — each day has a list of { hour, svcIndex, status }
+    const schedule: { hour: number; svcIndex: number; status: "completed" | "confirmed" | "cancelled" }[] = [
+      // Monday (past — completed for bar chart)
+      { hour: 9, svcIndex: 0, status: "completed" },
+      { hour: 10, svcIndex: 1, status: "completed" },
+      { hour: 11, svcIndex: 2, status: "completed" },
+      { hour: 14, svcIndex: 3, status: "completed" },
+      // Tuesday
+      { hour: 9, svcIndex: 1, status: "completed" },
+      { hour: 11, svcIndex: 0, status: "completed" },
+      { hour: 13, svcIndex: 2, status: "completed" },
+      { hour: 15, svcIndex: 1, status: "completed" },
+      // Wednesday (mixed)
+      { hour: 10, svcIndex: 3, status: "completed" },
+      { hour: 11, svcIndex: 0, status: "completed" },
+      { hour: 14, svcIndex: 2, status: "completed" },
+      { hour: 16, svcIndex: 1, status: "confirmed" }, // future slot
+      // Thursday / today
+      { hour: 9, svcIndex: 0, status: "confirmed" },
+      { hour: 10, svcIndex: 2, status: "confirmed" },
+      { hour: 11, svcIndex: 1, status: "confirmed" },
+      { hour: 13, svcIndex: 3, status: "confirmed" },
+      { hour: 14, svcIndex: 0, status: "confirmed" },
+    ];
+
+    const commissionSplit = 60; // default 60% tech
+    const tipSplit = 80; // default 80% tip to tech
+    const allBookings: any[] = [];
+    const allCommissions: any[] = [];
+    let bookingCount = 0;
+
+    for (let dayOff = 0; dayOff < 4; dayOff++) {
+      const dayStart = new Date(monday);
+      dayStart.setDate(monday.getDate() + dayOff);
+
+      // Only create past data for days before today
+      const isPastDay = dayStart.toDateString() !== now.toDateString();
+
+      const daySchedule = schedule.filter((_, i) => {
+        if (dayOff === 0) return i < 4; // Mon: first 4
+        if (dayOff === 1) return i >= 4 && i < 8; // Tue: next 4
+        if (dayOff === 2) return i >= 8 && i < 12; // Wed: next 4
+        return i >= 12; // Thu: last 5
+      });
+
+      for (const slot of daySchedule) {
+        const svc = services[slot.svcIndex % services.length];
+        const stf = staffList[bookingCount % staffList.length];
+        const clt = clients[bookingCount % clients.length];
+        const start = new Date(dayStart);
+        start.setHours(slot.hour, 0, 0, 0);
+        start.setMinutes(Math.floor(bookingCount * 17) % 60); // offset within hour
+        const end = new Date(start.getTime() + (svc.duration_minutes || 45) * 60_000);
+
+        allBookings.push({
+          salon_id: staff.salon_id,
+          service_id: svc.id,
+          staff_id: stf.id,
+          client_id: clt.id,
+          start_time: start.toISOString(),
+          end_time: end.toISOString(),
+          status: slot.status,
+          deposit_paid: slot.status === "confirmed" ? 10 : 0,
+        });
+
+        // Create commission records for past completed bookings
+        if (slot.status === "completed" && isPastDay) {
+          const price = Number(svc.price ?? 50);
+          const net = price;
+          const techShare = +((net * commissionSplit) / 100).toFixed(2);
+          const salonShare = +(net - techShare).toFixed(2);
+          const tipAmount = [5, 10, 15, 0, 20][Math.floor(Math.random() * 5)];
+          const tipToTech = +((tipAmount * tipSplit) / 100).toFixed(2);
+          const tipToSalon = +(tipAmount - tipToTech).toFixed(2);
+          allCommissions.push({
+            salon_id: staff.salon_id,
+            booking_id: undefined as string | undefined, // set after insert
+            staff_id: stf.id,
+            gross_amount: price,
+            net_amount: net,
+            tech_share: techShare,
+            salon_share: salonShare,
+            tip_amount: tipAmount,
+            tip_to_tech: tipToTech,
+            tip_to_salon: tipToSalon,
+            created_at: new Date(start.getTime() + 60 * 60_000).toISOString(), // ~1hr after booking start
+          });
+        }
+
+        bookingCount++;
+      }
+    }
+
+    // Insert bookings
+    const { data: inserted } = await supabaseAdmin
+      .from("bookings")
+      .insert(allBookings)
+      .select("id");
+    const insertedIds = inserted?.map((b: any) => b.id) ?? [];
+
+    // Link commission records to inserted booking IDs
+    let ci = 0;
+    for (let i = 0; i < allBookings.length; i++) {
+      if (allBookings[i].status === "completed" && ci < allCommissions.length) {
+        allCommissions[ci].booking_id = insertedIds[i];
+        ci++;
+      }
+    }
+    if (allCommissions.length > 0) {
+      await supabaseAdmin.from("commission_records").insert(allCommissions);
+    }
+
+    // AI calls
     await supabaseAdmin.from("ai_calls").insert([
       {
         salon_id: staff.salon_id,
@@ -152,5 +253,5 @@ export const seedDemoData = createServerFn({ method: "POST" })
         call_duration_seconds: 18,
       },
     ]);
-    return { ok: true, bookings: bookings.length };
+    return { ok: true, bookings: allBookings.length, commissions: allCommissions.length };
   });

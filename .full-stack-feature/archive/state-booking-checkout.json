@@ -1,0 +1,13 @@
+{
+  "feature": "Full-page booking checkout for desktop and mobile — replace dialog/bottom sheet with proper page",
+  "status": "in_progress",
+  "stack": "auto-detect",
+  "api_style": "rest",
+  "complexity": "medium",
+  "current_step": 0,
+  "current_phase": 0,
+  "completed_steps": [],
+  "files_created": [],
+  "started_at": "2026-06-17T00:00:00.000Z",
+  "last_updated": "2026-06-17T00:00:00.000Z"
+}
