@@ -20,7 +20,7 @@ export function BottomSheet({
   className?: string;
 }) {
   return (
-      <VaulDrawer.Root open={open} onOpenChange={onOpenChange} fixed noBodyStyles>
+      <VaulDrawer.Root open={open} onOpenChange={onOpenChange} fixed closeThreshold={0.5}>
       <VaulDrawer.Portal>
         <VaulDrawer.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" />
         <VaulDrawer.Content
