@@ -466,7 +466,6 @@ function Book() {
           )}
         </div>
       </div>
-      </div>
 
       {/* Spacer for mobile CTA */}
       <div className="h-24 sm:hidden" />
