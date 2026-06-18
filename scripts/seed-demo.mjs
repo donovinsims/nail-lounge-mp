@@ -73,7 +73,12 @@ const WORKING_HOURS = {
 const BOOKING_SERVICES = [
   { id: "0462505f-bc0d-41e2-bde2-3e4a59d90dbc", name: "Gel Manicure", duration: 45, buffer: 5 },
   { id: "4f1c40ec-88b2-40df-8251-82a33f277d54", name: "Spa Pedicure", duration: 55, buffer: 10 },
-  { id: "5a3286ca-0cbe-436c-8ac0-e6f73538f766", name: "Acrylic Full Set", duration: 75, buffer: 10 },
+  {
+    id: "5a3286ca-0cbe-436c-8ac0-e6f73538f766",
+    name: "Acrylic Full Set",
+    duration: 75,
+    buffer: 10,
+  },
   { id: "6716d6c9-1d48-415e-a33c-a97efb457667", name: "Deluxe Manicure", duration: 60, buffer: 10 },
   { id: "c8995ac8-8c88-4754-9eb4-2078d5c80ce1", name: "Mani-Pedi Combo", duration: 75, buffer: 10 },
   { id: "16f4877f-ac1c-4218-839d-c98d063aa3cd", name: "Spa Manicure", duration: 45, buffer: 5 },
@@ -169,31 +174,19 @@ async function main() {
       .eq("salon_id", SALON_ID);
     if (e1) console.error("   cleanup commission_records:", e1.message);
 
-    const { error: e2 } = await supabase
-      .from("bookings")
-      .delete()
-      .eq("salon_id", SALON_ID);
+    const { error: e2 } = await supabase.from("bookings").delete().eq("salon_id", SALON_ID);
     if (e2) console.error("   cleanup bookings:", e2.message);
 
     // Also delete waitlist entries (if any)
-    const { error: e3 } = await supabase
-      .from("waitlist_entries")
-      .delete()
-      .eq("salon_id", SALON_ID);
+    const { error: e3 } = await supabase.from("waitlist_entries").delete().eq("salon_id", SALON_ID);
     if (e3 && !e3.message.includes("does not exist")) {
       console.error("   cleanup waitlist_entries:", e3.message);
     }
 
-    const { error: e4 } = await supabase
-      .from("clients")
-      .delete()
-      .eq("salon_id", SALON_ID);
+    const { error: e4 } = await supabase.from("clients").delete().eq("salon_id", SALON_ID);
     if (e4) console.error("   cleanup clients:", e4.message);
 
-    const { error: e5 } = await supabase
-      .from("floor_status")
-      .delete()
-      .eq("salon_id", SALON_ID);
+    const { error: e5 } = await supabase.from("floor_status").delete().eq("salon_id", SALON_ID);
     if (e5) console.error("   cleanup floor_status:", e5.message);
   }
   console.log("   ✅ Cleanup done\n");
@@ -207,7 +200,7 @@ async function main() {
         .from("clients")
         .upsert(
           { salon_id: SALON_ID, name: c.name, phone: c.phone, email: c.email },
-          { onConflict: "salon_id, phone", ignoreDuplicates: false }
+          { onConflict: "salon_id, phone", ignoreDuplicates: false },
         )
         .select("id")
         .single();
@@ -233,7 +226,7 @@ async function main() {
           staff_id: s.id,
           status: "available",
         },
-        { onConflict: "staff_id", ignoreDuplicates: false }
+        { onConflict: "staff_id", ignoreDuplicates: false },
       );
       if (error) console.error(`   ❌ floor ${s.name}: ${error.message}`);
     }
@@ -329,9 +322,7 @@ async function main() {
 
   // Print booking plan
   for (const b of bookingRows) {
-    console.log(
-      `   📌 ${b.svc.name} — ${b.staff.name} — ${fmtTime(b.start)}–${fmtTime(b.end)}`
-    );
+    console.log(`   📌 ${b.svc.name} — ${b.staff.name} — ${fmtTime(b.start)}–${fmtTime(b.end)}`);
   }
   console.log(`   → ${bookingRows.length} bookings planned\n`);
 
@@ -382,13 +373,20 @@ async function main() {
 
   for (let i = 0; i < Math.min(2, insertedBookingIds.length); i++) {
     const b = bookingRows[i];
-    const price = b.svc.name === "Gel Manicure" ? 40
-      : b.svc.name === "Spa Pedicure" ? 50
-      : b.svc.name === "Acrylic Full Set" ? 45
-      : b.svc.name === "Deluxe Manicure" ? 48
-      : b.svc.name === "Mani-Pedi Combo" ? 45
-      : b.svc.name === "Spa Manicure" ? 38
-      : 40;
+    const price =
+      b.svc.name === "Gel Manicure"
+        ? 40
+        : b.svc.name === "Spa Pedicure"
+          ? 50
+          : b.svc.name === "Acrylic Full Set"
+            ? 45
+            : b.svc.name === "Deluxe Manicure"
+              ? 48
+              : b.svc.name === "Mani-Pedi Combo"
+                ? 45
+                : b.svc.name === "Spa Manicure"
+                  ? 38
+                  : 40;
 
     const net = price;
     const commissionPct = 60;

@@ -46,7 +46,7 @@ export default function POS({ salonId }: { salonId: string }) {
     }
   };
 
-  const tipPresets = [0, 5, 10, 15, 20, 25];
+  const tipPresetsPct = [0, 10, 15, 18, 20, 25]; // percentage of service price
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_420px]">
@@ -135,19 +135,22 @@ export default function POS({ salonId }: { salonId: string }) {
                 Tip
               </label>
               <div className="grid grid-cols-3 gap-2">
-                {tipPresets.map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTip(t)}
-                    className={`tap-target rounded-xl text-sm font-medium transition-all ${
-                      tip === t
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "bg-surface-2 hover:bg-surface-2/70 text-foreground"
-                    }`}
-                  >
-                    ${t}
-                  </button>
-                ))}
+                {tipPresetsPct.map((pct) => {
+                  const val = Math.round(Number(sel?.services?.price ?? 0) * pct / 100);
+                  return (
+                    <button
+                      key={pct}
+                      onClick={() => setTip(val)}
+                      className={`tap-target rounded-xl text-sm font-medium transition-all ${
+                        tip === val
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "bg-surface-2 hover:bg-surface-2/70 text-foreground"
+                      }`}
+                    >
+                      ${pct === 0 ? "0" : val}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

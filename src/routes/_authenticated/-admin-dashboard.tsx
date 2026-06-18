@@ -238,13 +238,17 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
         .lte("start_time", end.toISOString());
       if (count === 0) {
         seeded.current = true;
-        const r: any = await seed();
-        if (r?.ok) {
-          toast.success(
-            `Loaded ${r.bookings || 0} sample bookings and ${r.commissions || 0} commission records for you to explore`,
-            { duration: 4000 },
-          );
-          qc.invalidateQueries();
+        try {
+          const r: any = await seed();
+          if (r?.ok) {
+            toast.success(
+              `Loaded ${r.bookings || 0} sample bookings and ${r.commissions || 0} commission records for you to explore`,
+              { duration: 4000 },
+            );
+            qc.invalidateQueries();
+          }
+        } catch {
+          // seed may fail if data already exists or permissions aren't ready
         }
       }
     };
@@ -385,12 +389,15 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
             </p>
           </div>
           <button
-            onClick={() =>
-              seed().then((r: any) => {
-                toast.success(`Seeded ${r.bookings || 0} bookings`);
+            onClick={async () => {
+              try {
+                const r: any = await seed();
+                toast.success(`Seeded ${r?.bookings || 0} bookings`);
                 qc.invalidateQueries();
-              })
-            }
+              } catch (e: any) {
+                toast.error(e?.message ?? "Failed to seed");
+              }
+            }}
             className="inline-flex items-center gap-1.5 rounded-lg bg-surface-2 px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             <Sparkles className="h-3.5 w-3.5" /> Seed demo

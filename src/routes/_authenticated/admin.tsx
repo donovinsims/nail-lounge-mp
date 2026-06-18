@@ -154,7 +154,7 @@ function Admin() {
       </aside>
 
       {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-border bg-background/95 backdrop-blur safe-pb">
+      <nav className="md:hidden fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-border bg-background/95 backdrop-blur safe-pb pt-2">
         {NAV.slice(0, 4).map((n) => (
           <button
             key={n.id}

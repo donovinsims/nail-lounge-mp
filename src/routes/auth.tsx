@@ -77,7 +77,7 @@ function AuthPage() {
             type="email"
             required
             placeholder="Email"
-            className="w-full tap-target rounded-xl bg-surface px-4 outline-none focus:ring-2 focus:ring-ring"
+            className="w-full tap-target rounded-xl bg-surface px-4 py-3 outline-none focus:ring-2 focus:ring-ring"
           />
           <input
             value={password}
@@ -86,7 +86,7 @@ function AuthPage() {
             required
             minLength={6}
             placeholder="Password"
-            className="w-full tap-target rounded-xl bg-surface px-4 outline-none focus:ring-2 focus:ring-ring"
+            className="w-full tap-target rounded-xl bg-surface px-4 py-3 outline-none focus:ring-2 focus:ring-ring"
           />
           <button
             disabled={loading}

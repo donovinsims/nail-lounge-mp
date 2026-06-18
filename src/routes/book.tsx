@@ -86,8 +86,9 @@ function Book() {
     setStep((s) => Math.max(1, s - 1) as Step);
   };
 
-  // Focus first interactive element on step change
+  // Focus first interactive element + scroll to top on step change
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     const el = stepRef.current?.querySelector<HTMLElement>(
       'button, input, [tabindex]:not([tabindex="-1"])',
     );

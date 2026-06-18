@@ -1,4 +1,11 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["list"]
+  "plugin": ["list"],
+  "mcp": {
+    "typeui": {
+      "type": "remote",
+      "url": "https://mcp.typeui.sh/mcp",
+      "enabled": true
+    }
+  }
 }

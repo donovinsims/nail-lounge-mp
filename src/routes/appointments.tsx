@@ -46,7 +46,7 @@ function Appointments() {
           onChange={(e) => setPhone(e.target.value)}
           type="tel"
           placeholder="(815) 555-0123"
-          className="flex-1 tap-target rounded-xl bg-surface px-4 outline-none focus:ring-2 focus:ring-ring"
+          className="flex-1 tap-target rounded-xl bg-surface px-4 py-3 outline-none focus:ring-2 focus:ring-ring"
         />
         <button
           className="tap-target rounded-xl bg-primary px-5 font-medium text-primary-foreground"
@@ -56,11 +56,22 @@ function Appointments() {
         </button>
       </form>
 
-      <ul className="mt-8 space-y-3">
-        {lookupMutation.data?.length === 0 && (
-          <p className="text-sm text-muted-foreground">No appointments found.</p>
+      <div className="mt-8 space-y-3">
+        {lookupMutation.isPending && (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="rounded-2xl bg-surface p-4 animate-pulse">
+                <div className="h-4 w-2/3 rounded bg-muted" />
+                <div className="mt-2 h-3 w-1/3 rounded bg-muted" />
+                <div className="mt-3 h-3 w-1/2 rounded bg-muted" />
+              </div>
+            ))}
+          </div>
         )}
-        {lookupMutation.data?.map((b: any) => (
+        {!lookupMutation.isPending && lookupMutation.data?.length === 0 && (
+          <p className="pt-4 text-sm text-muted-foreground">No appointments found.</p>
+        )}
+        {!lookupMutation.isPending && lookupMutation.data?.map((b: any) => (
           <li key={b.id} className="rounded-2xl bg-surface p-4">
             <div className="flex items-baseline justify-between gap-3">
               <div className="min-w-0">
@@ -82,7 +93,11 @@ function Appointments() {
             </p>
             {b.status === "confirmed" && (
               <button
-                onClick={() => cancelMutation.mutate({ data: { bookingId: b.id, phone } })}
+                onClick={() => {
+                  if (window.confirm("Cancel this appointment?")) {
+                    cancelMutation.mutate({ data: { bookingId: b.id, phone } });
+                  }
+                }}
                 className="mt-3 text-sm font-medium text-destructive underline-offset-4 hover:underline"
               >
                 Cancel appointment
@@ -90,7 +105,7 @@ function Appointments() {
             )}
           </li>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

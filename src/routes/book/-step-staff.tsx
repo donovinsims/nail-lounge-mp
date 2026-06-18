@@ -36,7 +36,7 @@ export default function StepStaff({ staff, selectedId, onSelect }: StepStaffProp
               >
                 <div
                   className="h-11 w-11 shrink-0 rounded-full grid place-items-center text-white font-semibold"
-                  style={{ background: member.avatar_color || "#000" }}
+                  style={{ background: member.avatar_color || "var(--color-accent)" }}
                   aria-hidden="true"
                 >
                   {member.name[0]}

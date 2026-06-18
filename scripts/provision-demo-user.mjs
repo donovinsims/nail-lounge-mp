@@ -83,7 +83,11 @@ async function main() {
 
     if (error) {
       // Check if user already exists
-      if (error.message?.includes("already exists") || error.message?.includes("already been registered") || error.status === 409) {
+      if (
+        error.message?.includes("already exists") ||
+        error.message?.includes("already been registered") ||
+        error.status === 409
+      ) {
         console.log("   ℹ️  User already exists in Auth. Looking up by email…");
         const { data: existingUsers, error: listError } = await supabase.auth.admin.listUsers();
         if (listError) {
@@ -120,7 +124,7 @@ async function main() {
         email: DEMO_EMAIL,
         full_name: DEMO_NAME,
       },
-      { onConflict: "id", ignoreDuplicates: false }
+      { onConflict: "id", ignoreDuplicates: false },
     );
     if (error) {
       console.error("   ❌ Failed to create profile:", error.message);

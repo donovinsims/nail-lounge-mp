@@ -55,7 +55,7 @@ export default function StepDateTime({
             No availability this day. Try another.
           </p>
         ) : (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {slots.map((t) => {
               const selected = slot !== null && slot.getTime() === t.getTime();
               return (

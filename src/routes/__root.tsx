@@ -14,8 +14,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 
-// TODO: Replace with branded OG image hosted on your domain after deploy
-// Current URL is Cloudflare R2 (no Lovable dependency — just a stale object path).
+// TODO: Replace with a branded OG image on your own domain after deploy.
+// Current URL is a generated preview on Cloudflare R2 — works for now but should
+// be swapped for /og-image.jpg in public/ once you have one.
 const OG_IMAGE =
   "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ac3d18b7-2275-40d8-873c-ea7183ee4f13/id-preview-90fe0b6c--a0e6aeda-fff0-4bdc-8a55-de8fec4c877c.lovable.app-1781667178638.png";
 

@@ -1,0 +1,39 @@
+{
+  "feature": "Admin Dashboard Tables & Widgets — replace bare data views with TypeUI.sh-inspired data tables and KPI/Chart widgets",
+  "status": "completed",
+  "stack": "tanstack-start",
+  "api_style": "rest",
+  "complexity": "medium",
+  "current_step": 10,
+  "current_phase": 3,
+  "completed_steps": [
+    "step1-requirements",
+    "step2-database-design",
+    "step3-architecture",
+    "step4-ux-principles",
+    "step5-extract-tabs",
+    "step6-shared-components",
+    "step7-dashboard-charts",
+    "step8-commissions-table",
+    "step9-remaining-tabs",
+    "step10-verification"
+  ],
+  "files_created": [
+    "01-requirements.md",
+    "02-database-design.md",
+    "03-architecture.md",
+    "04-ux-principles.md",
+    "-admin-components/kpi-card.tsx",
+    "-admin-components/status-badge.tsx",
+    "-admin-dashboard.tsx",
+    "-admin-calendar.tsx",
+    "-admin-floor.tsx",
+    "-admin-pos.tsx",
+    "-admin-commissions.tsx",
+    "-admin-waitlist.tsx",
+    "-admin-calls.tsx",
+    "-admin-settings.tsx"
+  ],
+  "started_at": "2026-06-18T00:00:00.000Z",
+  "last_updated": "2026-06-18T08:45:00.000Z"
+}

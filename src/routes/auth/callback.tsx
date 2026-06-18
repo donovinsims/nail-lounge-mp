@@ -6,11 +6,14 @@ function CallbackPage() {
   const navigate = useNavigate();
   useEffect(() => {
     let cancelled = false;
-    supabase.auth.getSession().then(({ data }) => {
-      if (!cancelled) navigate({ to: data.session ? "/admin" : "/auth" });
-    }).catch(() => {
-      if (!cancelled) navigate({ to: "/auth" });
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (!cancelled) navigate({ to: data.session ? "/admin" : "/auth" });
+      })
+      .catch(() => {
+        if (!cancelled) navigate({ to: "/auth" });
+      });
     return () => {
       cancelled = true;
     };
