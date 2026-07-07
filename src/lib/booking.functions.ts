@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { rateLimiter } from "@/lib/rate-limiter";
+import { RateLimiter } from "@/lib/rate-limiter";
 
 // Public booking functions — use service role inside handler for validated public writes.
 // All operations validate input and confirm slot availability before writing.
@@ -8,7 +8,7 @@ import { rateLimiter } from "@/lib/rate-limiter";
 const PHONE_RE = /^\+?[0-9\s\-()]{7,20}$/;
 
 // Rate limiter: max 3 booking attempts per phone number per 5 minutes (in-memory per process)
-const bookingRateLimiter = rateLimiter({ windowMs: 300_000, max: 3 });
+const bookingRateLimiter = new RateLimiter({ key: "booking", maxRequests: 3, windowMs: 300_000 });
 
 export const createPublicBooking = createServerFn({ method: "POST" })
   .inputValidator((d) =>
@@ -28,7 +28,8 @@ export const createPublicBooking = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Rate limit: per phone number
-    if (!bookingRateLimiter.check(data.clientPhone)) {
+    const { allowed } = await bookingRateLimiter.check(data.clientPhone);
+    if (!allowed) {
       throw new Error("Too many booking attempts. Please try again later.");
     }
 
@@ -177,7 +178,7 @@ export const getPendingCompletions = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const now = new Date();
 
-    const { data: bookings } = await (supabaseAdmin as any)
+    const { data: bookings } = await supabaseAdmin
       .from("bookings")
       .select(`id, created_at, start_time, services!inner(name), clients(name)`)
       .eq("staff_id", data.staffId)
@@ -213,7 +214,7 @@ export const completeStaffModal = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Update the booking
-    await (supabaseAdmin as any)
+    await supabaseAdmin
       .from("bookings")
       .update({
         completed_at: new Date().toISOString(),
@@ -224,31 +225,51 @@ export const completeStaffModal = createServerFn({ method: "POST" })
       })
       .eq("id", data.bookingId);
 
-    // Get booking details for SMS
-    const { data: booking } = await (supabaseAdmin as any)
+    // Get booking details for SMS and commission
+    const { data: booking } = await supabaseAdmin
       .from("bookings")
-      .select("client_phone, start_time, salons!inner(name)")
+      .select("client_phone, start_time, staff_id, salon_id, services(price, name), salons(name)")
       .eq("id", data.bookingId)
       .single();
 
     if (booking) {
+      // Insert commission record
+      const price = Number(booking.services?.price ?? 0);
+      const net = price;
+      const commissionPct = 60;
+      const techShare = +((net * commissionPct) / 100).toFixed(2);
+      const salonShare = +(net - techShare).toFixed(2);
+
+      await supabaseAdmin.from("commission_records").insert({
+        booking_id: data.bookingId,
+        staff_id: booking.staff_id,
+        salon_id: booking.salon_id,
+        gross_amount: price,
+        net_amount: net,
+        tech_share: techShare,
+        salon_share: salonShare,
+        tip_amount: data.tipAmount,
+        tip_to_tech: data.tipAmount,
+        tip_to_salon: 0,
+      });
+
       // Fire-and-forget the rating SMS
       import("./twilio.server")
         .then(async ({ sendRatingSms }) => {
           const { getSalonName } = await import("./env");
           await sendRatingSms({
-            to: booking.client_phone,
+            to: booking.client_phone!,
             bookingId: data.bookingId,
             salonName: getSalonName(),
           });
 
           // Mark that we sent the rating request
-          await (supabaseAdmin as any)
+          await supabaseAdmin
             .from("bookings")
             .update({ rating_sent_at: new Date().toISOString() })
             .eq("id", data.bookingId);
         })
-        .catch(console.error);
+        .catch((err: unknown) => console.error("Booking function error:", err));
     }
 
     return { success: true };
@@ -261,7 +282,7 @@ export const getStaffAppointments = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ staffId: z.string() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows } = await (supabaseAdmin as any)
+    const { data: rows } = await supabaseAdmin
       .from("bookings")
       .select("id, start_time, end_time, status, services(name), clients(name, phone)")
       .eq("staff_id", data.staffId)
@@ -270,7 +291,7 @@ export const getStaffAppointments = createServerFn({ method: "GET" })
       .order("start_time", { ascending: true })
       .limit(50);
 
-    return (rows || []).map((b: any) => ({
+    return (rows || []).map((b) => ({
       id: b.id,
       start_time: b.start_time,
       end_time: b.end_time,
@@ -300,7 +321,9 @@ export const cancelPublicBooking = createServerFn({ method: "POST" })
       .eq("id", data.bookingId)
       .eq("salons.id", data.salonId)
       .maybeSingle();
-    if (!bk || (bk as any).clients?.phone !== phone) throw new Error("Booking not found");
+    if (!bk) throw new Error("Booking not found");
+    const clientPhone = (bk as { clients: { phone: string } }).clients?.phone;
+    if (clientPhone !== phone) throw new Error("Booking not found");
     const { error } = await supabaseAdmin
       .from("bookings")
       .update({ status: "cancelled" })

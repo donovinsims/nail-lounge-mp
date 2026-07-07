@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { lookupAppointments, cancelPublicBooking } from "@/lib/booking.functions";
 import { fmtDate, fmtTime, fmtMoney } from "@/lib/salon";
-import { getSalonName } from "@/lib/env";
+import { getSalonId, getSalonName } from "@/lib/env";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -38,7 +38,7 @@ function Appointments() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          lookupMutation.mutate({ data: { phone } });
+lookupMutation.mutate({ data: { phone, salonId: getSalonId()! } });
         }}
         className="mt-6 flex gap-2"
       >
