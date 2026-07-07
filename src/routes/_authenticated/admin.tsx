@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type ComponentType } from "react";
-import type { Database } from "@/integrations/supabase/types";
+import type { StaffRow, SalonRow, OwnerAlertRow } from "@/integrations/supabase/rows";
 import { supabase } from "@/integrations/supabase/client";
 import { getSalonName, getSalonNameShort } from "@/lib/env";
 import { getMyStaff, linkSelfToFirstSalon } from "@/lib/admin.functions";
@@ -46,8 +46,8 @@ type Tab =
   | "calls"
   | "settings";
 
-type StaffWithSalon = Database["public"]["Tables"]["staff"]["Row"] & {
-  salons: Database["public"]["Tables"]["salons"]["Row"];
+type StaffWithSalon = StaffRow & {
+  salons: SalonRow;
 };
 
 const NAV: { id: Tab; label: string; icon: ComponentType<{ className?: string }> }[] = [
@@ -127,9 +127,7 @@ function Admin() {
     queryFn: () => fetchAlerts(),
     enabled: !!salonId,
   });
-  const unacknowledgedCount = ownerAlerts.filter(
-    (a: Database["public"]["Tables"]["owner_alerts"]["Row"]) => !a.acknowledged_at,
-  ).length;
+  const unacknowledgedCount = ownerAlerts.filter((a: OwnerAlertRow) => !a.acknowledged_at).length;
 
   const signOut = async () => {
     await qc.cancelQueries();

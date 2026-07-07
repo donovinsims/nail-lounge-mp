@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Database } from "@/integrations/supabase/types";
+import type { BookingRow, CommissionRecordRow } from "@/integrations/supabase/rows";
 import { supabase } from "@/integrations/supabase/client";
 import { fmtMoney, fmtTime } from "@/lib/utils";
 import {
@@ -24,9 +24,6 @@ import type { ChartConfig } from "@/components/ui/chart";
 
 import { KpiCard } from "./-admin-components/kpi-card";
 import { StatusBadge } from "./-admin-components/status-badge";
-
-type BookingRow = Database["public"]["Tables"]["bookings"]["Row"];
-type CrRow = Database["public"]["Tables"]["commission_records"]["Row"];
 
 interface BookingWithRelations extends BookingRow {
   services: { name: string; price: number } | null;
@@ -163,11 +160,11 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
 
   // Compute KPIs
   const todayRev = cr.reduce(
-    (a: number, c: CrRow) => a + Number(c.gross_amount) + Number(c.tip_amount),
+    (a: number, c: CommissionRecordRow) => a + Number(c.gross_amount) + Number(c.tip_amount),
     0,
   );
   const yesterdayRev = yesterdayCr.reduce(
-    (a: number, c: CrRow) => a + Number(c.gross_amount) + Number(c.tip_amount),
+    (a: number, c: CommissionRecordRow) => a + Number(c.gross_amount) + Number(c.tip_amount),
     0,
   );
   const confirmed = bookings.filter((b) => b.status === "confirmed").length;
@@ -182,12 +179,12 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
     const dayEnd = new Date(dayStart);
     dayEnd.setHours(23, 59, 59, 999);
 
-    const dayCr = weekCr.filter((c: CrRow) => {
+    const dayCr = weekCr.filter((c: CommissionRecordRow) => {
       const d = new Date(c.created_at);
       return d >= dayStart && d <= dayEnd;
     });
     const rev = dayCr.reduce(
-      (a: number, c: CrRow) => a + Number(c.gross_amount) + Number(c.tip_amount),
+      (a: number, c: CommissionRecordRow) => a + Number(c.gross_amount) + Number(c.tip_amount),
       0,
     );
     // Count total bookings for this day too

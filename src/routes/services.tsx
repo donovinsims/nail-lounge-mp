@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import type { Database } from "@/integrations/supabase/types";
+import type { ServiceRow } from "@/integrations/supabase/rows";
 import { fetchSalon, fetchServices } from "@/lib/salon";
 import { fmtMoney } from "@/lib/utils";
 import { getSalonName } from "@/lib/env";
@@ -42,16 +42,12 @@ function ServicesPage() {
   const categories = [
     ...new Set(
       services
-        .map((s: Database["public"]["Tables"]["services"]["Row"]) => s.category)
+        .map((s: ServiceRow) => s.category)
         .filter((c: string | null): c is string => c !== null),
     ),
   ].sort() as string[];
   const grouped = categories.map(
-    (cat) =>
-      [
-        cat,
-        services.filter((s: Database["public"]["Tables"]["services"]["Row"]) => s.category === cat),
-      ] as const,
+    (cat) => [cat, services.filter((s: ServiceRow) => s.category === cat)] as const,
   );
 
   return (
@@ -86,7 +82,7 @@ function ServicesPage() {
                 <h2 className="mt-3 font-display text-3xl sm:text-4xl">{category}</h2>
               </header>
               <ul className="md:col-span-8 space-y-3">
-                {items.map((s: Database["public"]["Tables"]["services"]["Row"]) => {
+                {items.map((s: ServiceRow) => {
                   const price = Number(s.price);
                   const isOpen = expanded === s.id;
                   return (

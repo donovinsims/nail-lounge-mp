@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
+import type { AiCallRow } from "@/integrations/supabase/rows";
 import { fmtDate } from "@/lib/utils";
 import { StatusBadge } from "./-admin-components/status-badge";
 import { Phone, Check, PhoneCall, MessageSquare } from "lucide-react";
@@ -50,7 +50,7 @@ export default function Calls({ salonId }: { salonId: string }) {
       )}
 
       <div className="grid gap-3">
-        {rows.map((c: Database["public"]["Tables"]["ai_calls"]["Row"]) => (
+        {rows.map((c: AiCallRow) => (
           <div
             key={c.id}
             className="rounded-2xl bg-surface p-5 transition-colors hover:bg-surface-2/30"

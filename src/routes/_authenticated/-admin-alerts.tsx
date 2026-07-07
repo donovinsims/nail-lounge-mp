@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import type { Database } from "@/integrations/supabase/types";
+import type { OwnerAlertRow } from "@/integrations/supabase/rows";
 import {
   getOwnerAlerts,
   acknowledgeAlert,
@@ -52,9 +52,7 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
 
   const [search, setSearch] = useState("");
 
-  const unacknowledged = alerts.filter(
-    (a: Database["public"]["Tables"]["owner_alerts"]["Row"]) => !a.acknowledged_at,
-  );
+  const unacknowledged = alerts.filter((a: OwnerAlertRow) => !a.acknowledged_at);
 
   const handleAcknowledge = async (alertId: string) => {
     try {
@@ -92,7 +90,7 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
           </div>
         ) : (
           <div className="grid gap-3">
-            {unacknowledged.map((a: Database["public"]["Tables"]["owner_alerts"]["Row"]) => (
+            {unacknowledged.map((a: OwnerAlertRow) => (
               <div
                 key={a.id}
                 className="rounded-2xl bg-surface p-5 transition-colors hover:bg-surface-2/30"

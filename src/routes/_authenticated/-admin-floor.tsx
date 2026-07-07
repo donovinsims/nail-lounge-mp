@@ -2,9 +2,10 @@ import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import type { FloorStatusRow } from "@/integrations/supabase/rows";
 import { StatusBadge } from "./-admin-components/status-badge";
 
-type FloorWithStaff = Database["public"]["Tables"]["floor_status"]["Row"] & {
+type FloorWithStaff = FloorStatusRow & {
   staff: { name: string; avatar_color: string | null } | null;
 };
 

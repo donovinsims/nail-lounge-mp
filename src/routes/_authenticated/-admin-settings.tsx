@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Database } from "@/integrations/supabase/types";
+import type { SalonRow } from "@/integrations/supabase/rows";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/error-handler";
@@ -24,11 +24,7 @@ const BTN_CLS =
 const BTN_SM_CLS =
   "tap-target inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all";
 
-export default function SettingsView({
-  salon,
-}: {
-  salon: Database["public"]["Tables"]["salons"]["Row"];
-}) {
+export default function SettingsView({ salon }: { salon: SalonRow }) {
   const qc = useQueryClient();
   const [name, setName] = useState(salon.name);
   const [phone, setPhone] = useState(salon.phone || "");

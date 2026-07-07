@@ -2,11 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getSalonId } from "@/lib/env";
 import { z } from "zod";
-import type { Database } from "@/integrations/supabase/types";
-
-type StaffUpdate = Database["public"]["Tables"]["staff"]["Update"];
-type ServiceUpdate = Database["public"]["Tables"]["services"]["Update"];
-type SalonUpdate = Database["public"]["Tables"]["salons"]["Update"];
+import type { StaffUpdate, ServiceUpdate, SalonUpdate } from "@/integrations/supabase/rows";
 
 const SALON_ID_FILTER = () => {
   const id = getSalonId();

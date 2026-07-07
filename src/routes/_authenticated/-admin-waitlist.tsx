@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
+import type { WaitlistEntryRow } from "@/integrations/supabase/rows";
 import { StatusBadge } from "./-admin-components/status-badge";
 import { Phone, User, Plus, Clock, Zap } from "lucide-react";
 
@@ -33,9 +33,7 @@ export default function Waitlist({ salonId }: { salonId: string }) {
     qc.invalidateQueries();
   };
 
-  const activeCount = rows.filter(
-    (r: Database["public"]["Tables"]["waitlist_entries"]["Row"]) => r.status === "active",
-  ).length;
+  const activeCount = rows.filter((r: WaitlistEntryRow) => r.status === "active").length;
 
   return (
     <div className="space-y-4">
@@ -87,7 +85,7 @@ export default function Waitlist({ salonId }: { salonId: string }) {
             <span>No waitlist entries.</span>
           </li>
         )}
-        {rows.map((r: Database["public"]["Tables"]["waitlist_entries"]["Row"]) => (
+        {rows.map((r: WaitlistEntryRow) => (
           <li
             key={r.id}
             className={`rounded-2xl bg-surface p-4 transition-colors ${

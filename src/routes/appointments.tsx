@@ -4,7 +4,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { lookupAppointments, cancelPublicBooking } from "@/lib/booking.functions";
 import { fmtDate, fmtTime, fmtMoney } from "@/lib/utils";
-import type { Database } from "@/integrations/supabase/types";
 import { getSalonId, getSalonName } from "@/lib/env";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
+import type { BookingRow, StaffRow } from "@/integrations/supabase/rows";
 import { fmtTime } from "@/lib/utils";
 import { StatusBadge } from "./-admin-components/status-badge";
 
 type CalendarBooking = Pick<
-  Database["public"]["Tables"]["bookings"]["Row"],
+  BookingRow,
   "id" | "start_time" | "end_time" | "status" | "staff_id"
 > & {
   services: { name: string; price: number } | null;
@@ -14,10 +14,7 @@ type CalendarBooking = Pick<
   clients: { name: string } | null;
 };
 
-type CalendarStaff = Pick<
-  Database["public"]["Tables"]["staff"]["Row"],
-  "id" | "name" | "avatar_color"
->;
+type CalendarStaff = Pick<StaffRow, "id" | "name" | "avatar_color">;
 
 const HOURS = Array.from({ length: 12 }, (_, i) => 9 + i); // 9a–8p
 

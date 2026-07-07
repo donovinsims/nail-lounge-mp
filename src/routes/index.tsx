@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSalon, fetchStaff, type BusinessHours } from "@/lib/salon";
-import type { Database } from "@/integrations/supabase/types";
+import type { StaffRow } from "@/integrations/supabase/rows";
 import {
   getSalonName,
   getSalonAddress,
@@ -18,7 +18,7 @@ import g1 from "@/assets/gallery1.jpg";
 import { SiteHeader, SiteFooter, MapEmbed } from "@/components/site-chrome";
 
 type Staff = Pick<
-  Database["public"]["Tables"]["staff"]["Row"],
+  StaffRow,
   | "id"
   | "salon_id"
   | "name"

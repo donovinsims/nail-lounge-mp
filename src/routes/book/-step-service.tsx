@@ -1,5 +1,5 @@
 import { Check } from "lucide-react";
-import { fmtMoney } from "@/lib/salon";
+import { fmtMoney } from "@/lib/utils";
 
 export interface Service {
   id: string;
