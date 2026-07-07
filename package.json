@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepare": "husky"
+    "prepare": "command -v husky > /dev/null 2>&1 && husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
