@@ -10,20 +10,42 @@ const PHONE_RE = /^\+?[0-9\s\-()]{7,20}$/;
 // Rate limiter: max 3 booking attempts per phone number per 5 minutes (in-memory per process)
 const bookingRateLimiter = new RateLimiter({ key: "booking", maxRequests: 3, windowMs: 300_000 });
 
+// ── Input schemas (exported so tests validate the real thing, not copies) ──
+
+export const createBookingSchema = z.object({
+  salonId: z.string().uuid(),
+  serviceId: z.string().uuid(),
+  staffId: z.string().uuid(),
+  startTime: z.string(),
+  clientName: z.string().trim().min(1).max(100),
+  clientPhone: z.string().regex(PHONE_RE),
+  clientEmail: z.string().email().optional().or(z.literal("")),
+});
+
+export const lookupSchema = z.object({
+  phone: z.string().regex(PHONE_RE),
+  salonId: z.string().uuid(),
+});
+
+export const cancelSchema = z.object({
+  bookingId: z.string().uuid(),
+  phone: z.string().regex(PHONE_RE),
+  salonId: z.string().uuid(),
+});
+
+export const completeStaffModalSchema = z.object({
+  bookingId: z.string().uuid(),
+  tipAmount: z.number().min(0).default(0),
+  paymentMethod: z.enum(["Credit/Debit", "Cash", "Venmo", "Cash App"]),
+  serviceNotes: z.string().default(""),
+});
+
+export const staffQuerySchema = z.object({
+  staffId: z.string(),
+});
+
 export const createPublicBooking = createServerFn({ method: "POST" })
-  .inputValidator((d) =>
-    z
-      .object({
-        salonId: z.string().uuid(),
-        serviceId: z.string().uuid(),
-        staffId: z.string().uuid(),
-        startTime: z.string(),
-        clientName: z.string().trim().min(1).max(100),
-        clientPhone: z.string().regex(PHONE_RE),
-        clientEmail: z.string().email().optional().or(z.literal("")),
-      })
-      .parse(d),
-  )
+  .inputValidator((d) => createBookingSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -150,9 +172,7 @@ export const createPublicBooking = createServerFn({ method: "POST" })
   });
 
 export const lookupAppointments = createServerFn({ method: "POST" })
-  .inputValidator((d) =>
-    z.object({ phone: z.string().regex(PHONE_RE), salonId: z.string().uuid() }).parse(d),
-  )
+  .inputValidator((d) => lookupSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const phone = data.phone.replace(/\s/g, "");
@@ -182,7 +202,7 @@ export const lookupAppointments = createServerFn({ method: "POST" })
  * Called when staff route mounts to check for pending modal.
  */
 export const getPendingCompletions = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ staffId: z.string() }).parse(d))
+  .inputValidator((d) => staffQuerySchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const now = new Date();
@@ -209,16 +229,7 @@ export const getPendingCompletions = createServerFn({ method: "GET" })
  * Staff fills in the completion modal — records tip, payment method, notes, marks completed.
  */
 export const completeStaffModal = createServerFn({ method: "POST" })
-  .inputValidator((d) =>
-    z
-      .object({
-        bookingId: z.string().uuid(),
-        tipAmount: z.number().min(0).default(0),
-        paymentMethod: z.enum(["Credit/Debit", "Cash", "Venmo", "Cash App"]),
-        serviceNotes: z.string().default(""),
-      })
-      .parse(d),
-  )
+  .inputValidator((d) => completeStaffModalSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -288,7 +299,7 @@ export const completeStaffModal = createServerFn({ method: "POST" })
  * Get upcoming appointments for a staff member.
  */
 export const getStaffAppointments = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ staffId: z.string() }).parse(d))
+  .inputValidator((d) => staffQuerySchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows } = await supabaseAdmin
@@ -312,15 +323,7 @@ export const getStaffAppointments = createServerFn({ method: "GET" })
   });
 
 export const cancelPublicBooking = createServerFn({ method: "POST" })
-  .inputValidator((d) =>
-    z
-      .object({
-        bookingId: z.string().uuid(),
-        phone: z.string().regex(PHONE_RE),
-        salonId: z.string().uuid(),
-      })
-      .parse(d),
-  )
+  .inputValidator((d) => cancelSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const phone = data.phone.replace(/\s/g, "");

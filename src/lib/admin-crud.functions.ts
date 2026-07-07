@@ -14,6 +14,51 @@ const SALON_ID_FILTER = () => {
   return id;
 };
 
+// ── Input schemas (exported so tests validate the real thing, not copies) ──
+
+export const createStaffSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  role: z.enum(["owner", "staff"]).default("staff"),
+  workingHours: z.record(z.any()).default({}),
+  avatarColor: z.string().default("#0a0a0a"),
+});
+
+export const updateStaffSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().trim().min(1).max(100).optional(),
+  role: z.enum(["owner", "staff"]).optional(),
+  workingHours: z.record(z.any()).optional(),
+  isActive: z.boolean().optional(),
+  avatarColor: z.string().optional(),
+});
+
+export const deleteStaffSchema = z.object({ id: z.string().uuid() });
+
+export const createServiceSchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  category: z.string().trim().max(100).optional().or(z.literal("")),
+  durationMinutes: z.number().int().min(5).max(480),
+  price: z.number().min(0),
+  bufferAfterMinutes: z.number().int().min(0).default(0),
+});
+
+export const updateServiceSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().trim().min(1).max(200).optional(),
+  category: z.string().trim().max(100).optional(),
+  durationMinutes: z.number().int().min(5).max(480).optional(),
+  price: z.number().min(0).optional(),
+  bufferAfterMinutes: z.number().int().min(0).optional(),
+  isActive: z.boolean().optional(),
+});
+
+export const deleteServiceSchema = z.object({ id: z.string().uuid() });
+
+export const updateSalonHoursSchema = z.object({
+  businessHours: z.record(z.any()),
+  holidaySchedule: z.array(z.any()).optional(),
+});
+
 // ── Staff CRUD ────────────────────────────────────────────────────────
 
 export const getAllStaffForSalon = createServerFn({ method: "GET" })
@@ -30,16 +75,7 @@ export const getAllStaffForSalon = createServerFn({ method: "GET" })
 
 export const createStaff = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) =>
-    z
-      .object({
-        name: z.string().trim().min(1).max(100),
-        role: z.enum(["owner", "staff"]).default("staff"),
-        workingHours: z.record(z.any()).default({}),
-        avatarColor: z.string().default("#0a0a0a"),
-      })
-      .parse(d),
-  )
+  .inputValidator((d) => createStaffSchema.parse(d))
   .handler(async ({ data, context }) => {
     const salonId = SALON_ID_FILTER();
     const { data: staff, error } = await context.supabase
@@ -59,18 +95,7 @@ export const createStaff = createServerFn({ method: "POST" })
 
 export const updateStaff = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) =>
-    z
-      .object({
-        id: z.string().uuid(),
-        name: z.string().trim().min(1).max(100).optional(),
-        role: z.enum(["owner", "staff"]).optional(),
-        workingHours: z.record(z.any()).optional(),
-        isActive: z.boolean().optional(),
-        avatarColor: z.string().optional(),
-      })
-      .parse(d),
-  )
+  .inputValidator((d) => updateStaffSchema.parse(d))
   .handler(async ({ data, context }) => {
     const salonId = SALON_ID_FILTER();
     const update: StaffUpdate = {};
@@ -93,7 +118,7 @@ export const updateStaff = createServerFn({ method: "POST" })
 
 export const deleteStaff = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d) => deleteStaffSchema.parse(d))
   .handler(async ({ data, context }) => {
     const salonId = SALON_ID_FILTER();
     const { error } = await context.supabase
@@ -121,17 +146,7 @@ export const getAllServicesForSalon = createServerFn({ method: "GET" })
 
 export const createService = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) =>
-    z
-      .object({
-        name: z.string().trim().min(1).max(200),
-        category: z.string().trim().max(100).optional().or(z.literal("")),
-        durationMinutes: z.number().int().min(5).max(480),
-        price: z.number().min(0),
-        bufferAfterMinutes: z.number().int().min(0).default(0),
-      })
-      .parse(d),
-  )
+  .inputValidator((d) => createServiceSchema.parse(d))
   .handler(async ({ data, context }) => {
     const salonId = SALON_ID_FILTER();
     const { data: service, error } = await context.supabase
@@ -152,19 +167,7 @@ export const createService = createServerFn({ method: "POST" })
 
 export const updateService = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) =>
-    z
-      .object({
-        id: z.string().uuid(),
-        name: z.string().trim().min(1).max(200).optional(),
-        category: z.string().trim().max(100).optional(),
-        durationMinutes: z.number().int().min(5).max(480).optional(),
-        price: z.number().min(0).optional(),
-        bufferAfterMinutes: z.number().int().min(0).optional(),
-        isActive: z.boolean().optional(),
-      })
-      .parse(d),
-  )
+  .inputValidator((d) => updateServiceSchema.parse(d))
   .handler(async ({ data, context }) => {
     const salonId = SALON_ID_FILTER();
     const update: ServiceUpdate = {};
@@ -189,7 +192,7 @@ export const updateService = createServerFn({ method: "POST" })
 
 export const deleteService = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d) => deleteServiceSchema.parse(d))
   .handler(async ({ data, context }) => {
     const salonId = SALON_ID_FILTER();
     const { error } = await context.supabase
@@ -205,14 +208,7 @@ export const deleteService = createServerFn({ method: "POST" })
 
 export const updateSalonHours = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) =>
-    z
-      .object({
-        businessHours: z.record(z.any()),
-        holidaySchedule: z.array(z.any()).optional(),
-      })
-      .parse(d),
-  )
+  .inputValidator((d) => updateSalonHoursSchema.parse(d))
   .handler(async ({ data, context }) => {
     const salonId = SALON_ID_FILTER();
     const update: SalonUpdate = { business_hours: data.businessHours };

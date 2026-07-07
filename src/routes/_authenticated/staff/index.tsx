@@ -32,23 +32,22 @@ function StaffDashboard() {
   const [serviceNotes, setServiceNotes] = useState("");
 
   useEffect(() => {
-    getMyStaff()
-      .then((staff) => {
-        if (staff) {
-          setStaffId(staff.id);
-          return getPendingCompletions({ data: { staffId: staff.id } });
-        }
-        return [];
-      })
-      .then((bookings) => {
-        const pendingList = bookings as unknown as PendingBooking[];
-        setPending(pendingList);
-        if (pendingList.length > 0) {
+    (async () => {
+      try {
+        const staff = await getMyStaff();
+        if (!staff) return;
+        setStaffId(staff.id);
+        const bookings = await getPendingCompletions({ data: { staffId: staff.id } });
+        setPending(bookings);
+        if (bookings.length > 0) {
           setShowModal(true);
         }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   const currentBooking = pending[currentIndex];
