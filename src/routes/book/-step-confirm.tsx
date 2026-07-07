@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Check, Loader2 } from "lucide-react";
+import { fmtTime, fmtDate, fmtMoney } from "@/lib/utils";
 
 interface ServiceInfo {
   name: string;
@@ -22,9 +23,6 @@ interface StepConfirmProps {
   onEmailChange: (v: string) => void;
   isPending: boolean;
   onSubmit: () => void;
-  formatTime: (d: Date) => string;
-  formatDate: (d: Date) => string;
-  formatMoney: (n: number) => string;
 }
 
 export default function StepConfirm({
@@ -39,9 +37,6 @@ export default function StepConfirm({
   onEmailChange,
   isPending,
   onSubmit,
-  formatTime,
-  formatDate,
-  formatMoney,
 }: StepConfirmProps) {
   useEffect(() => {
     const handleResize = () => {
@@ -89,15 +84,11 @@ export default function StepConfirm({
         </div>
         <div className="flex justify-between">
           <span className="text-muted-foreground">When</span>
-          <span className="font-medium">
-            {slot ? `${formatDate(slot)}, ${formatTime(slot)}` : ""}
-          </span>
+          <span className="font-medium">{slot ? `${fmtDate(slot)}, ${fmtTime(slot)}` : ""}</span>
         </div>
         <div className="mt-2 flex justify-between border-t pt-2">
           <span className="text-muted-foreground">Total</span>
-          <span className="font-mono font-semibold">
-            {formatMoney(Number(service?.price ?? 0))}
-          </span>
+          <span className="font-mono font-semibold">{fmtMoney(Number(service?.price ?? 0))}</span>
         </div>
       </div>
 

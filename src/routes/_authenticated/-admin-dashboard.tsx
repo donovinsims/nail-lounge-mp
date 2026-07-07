@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
-import { fmtMoney, fmtTime } from "@/lib/salon";
+import { fmtMoney, fmtTime } from "@/lib/utils";
 import {
   Calendar,
   DollarSign,

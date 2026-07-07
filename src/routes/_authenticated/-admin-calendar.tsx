@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { fmtTime } from "@/lib/salon";
+import { fmtTime } from "@/lib/utils";
 import { StatusBadge } from "./-admin-components/status-badge";
 
 type CalendarBooking = Pick<

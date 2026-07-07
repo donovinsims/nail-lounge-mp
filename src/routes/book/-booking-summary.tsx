@@ -1,20 +1,12 @@
+import { fmtTime, fmtDate, fmtMoney } from "@/lib/utils";
+
 export interface BookingSummaryProps {
   service: { name: string; price: number } | null;
   staff: { name: string } | null;
   slot: Date | null;
-  fmtMoney: (n: number) => string;
-  fmtTime: (d: Date) => string;
-  fmtDate: (d: Date) => string;
 }
 
-export default function BookingSummary({
-  service,
-  staff,
-  slot,
-  fmtMoney,
-  fmtTime,
-  fmtDate,
-}: BookingSummaryProps) {
+export default function BookingSummary({ service, staff, slot }: BookingSummaryProps) {
   return (
     <aside className="rounded-2xl bg-surface p-5 text-sm space-y-3">
       <h2 className="font-semibold text-base">Your Booking</h2>

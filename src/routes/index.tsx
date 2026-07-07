@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSalon, fetchStaff } from "@/lib/salon";
+import { fetchSalon, fetchStaff, type BusinessHours } from "@/lib/salon";
+import type { Database } from "@/integrations/supabase/types";
 import {
   getSalonName,
   getSalonAddress,
@@ -15,6 +16,22 @@ import art2 from "@/assets/art2.jpg";
 import art3 from "@/assets/art3.jpg";
 import g1 from "@/assets/gallery1.jpg";
 import { SiteHeader, SiteFooter, MapEmbed } from "@/components/site-chrome";
+
+type Staff = Pick<
+  Database["public"]["Tables"]["staff"]["Row"],
+  | "id"
+  | "salon_id"
+  | "name"
+  | "title"
+  | "bio"
+  | "specialties"
+  | "avatar_url"
+  | "avatar_color"
+  | "sort_order"
+  | "working_hours"
+  | "is_active"
+  | "created_at"
+>;
 
 const DAYS: [string, string][] = [
   ["Monday", "mon"],
@@ -259,7 +276,7 @@ function Home() {
           </div>
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {staff.map((s: any) => {
+          {staff.map((s: Staff) => {
             const wh = s.working_hours as Record<
               string,
               { open: string; close: string } | undefined
@@ -281,7 +298,7 @@ function Home() {
                 <div className="p-6 flex-1 flex flex-col">
                   <p className="font-display text-2xl">{s.name}</p>
                   <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-accent">
-                    {s.title || s.role}
+                    {s.title}
                   </p>
                   {s.bio && (
                     <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.bio}</p>
@@ -303,7 +320,7 @@ function Home() {
                   </div>
                   <Link
                     to="/book"
-                    search={{ staff: s.id } as any}
+                    search={{ staff: s.id }}
                     className="mt-6 inline-flex tap-target items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
                   >
                     Book with {s.name.split(" ")[0]}
@@ -431,7 +448,7 @@ function Home() {
             </h3>
             <ul className="mt-8 space-y-2.5 text-sm">
               {DAYS.map(([label, key]) => {
-                const h = (salon?.business_hours as any)?.[key];
+                const h = (salon?.business_hours as BusinessHours)?.[key as keyof BusinessHours];
                 return (
                   <li
                     key={key}

@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { fmtDate } from "@/lib/salon";
+import { fmtDate } from "@/lib/utils";
 import { StatusBadge } from "./-admin-components/status-badge";
 import { Phone, Check, PhoneCall, MessageSquare } from "lucide-react";
 

@@ -41,7 +41,7 @@ function StaffDashboard() {
         return [];
       })
       .then((bookings) => {
-        const pendingList = bookings as unknown as PendingBooking[];
+        const pendingList = bookings as PendingBooking[];
         setPending(pendingList);
         if (pendingList.length > 0) {
           setShowModal(true);

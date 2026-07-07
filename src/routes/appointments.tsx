@@ -3,7 +3,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { lookupAppointments, cancelPublicBooking } from "@/lib/booking.functions";
-import { fmtDate, fmtTime, fmtMoney } from "@/lib/salon";
+import { fmtDate, fmtTime, fmtMoney } from "@/lib/utils";
+import type { Database } from "@/integrations/supabase/types";
 import { getSalonId, getSalonName } from "@/lib/env";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -12,6 +13,15 @@ export const Route = createFileRoute("/appointments")({
   head: () => ({ meta: [{ title: `My appointments — ${getSalonName()}` }] }),
   component: Appointments,
 });
+
+type BookingLookup = {
+  id: string;
+  start_time: string;
+  end_time: string;
+  status: string;
+  services: { name: string; price: number } | null;
+  staff: { name: string } | null;
+};
 
 function Appointments() {
   const [phone, setPhone] = useState("");
@@ -73,7 +83,7 @@ function Appointments() {
           <p className="pt-4 text-sm text-muted-foreground">No appointments found.</p>
         )}
         {!lookupMutation.isPending &&
-          lookupMutation.data?.map((b: any) => (
+          lookupMutation.data?.map((b: BookingLookup) => (
             <li key={b.id} className="rounded-2xl bg-surface p-4">
               <div className="flex items-baseline justify-between gap-3">
                 <div className="min-w-0">
