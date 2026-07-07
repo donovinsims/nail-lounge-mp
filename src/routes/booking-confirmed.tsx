@@ -28,7 +28,7 @@ function BookingConfirmed() {
 
   const { data, isPending, isError } = useQuery({
     queryKey: ["booking-details", bookingId],
-    queryFn: () => fetchDetails({ bookingId }),
+    queryFn: () => fetchDetails({ bookingId } as { bookingId: string }),
     staleTime: 60_000,
   });
 
