@@ -1,12 +1,22 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { fmtMoney, fmtDate } from "@/lib/salon";
 import { Download, Search, ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
 import { KpiCard } from "./-admin-components/kpi-card";
 
 type SortField = "date" | "staffName" | "tip";
 type SortDir = "asc" | "desc";
+
+type BookingWithStaffService = {
+  id: string;
+  completed_at: string | null;
+  tip_amount: number | null;
+  payment_method: Database["public"]["Enums"]["payment_method"] | null;
+  staff: { name: string };
+  services: { name: string };
+};
 
 function fmtSortableDate(d: string) {
   return new Date(d).getTime();
@@ -42,17 +52,17 @@ export default function Commissions({ salonId }: { salonId: string }) {
     if (search) {
       const q = search.toLowerCase();
       arr = arr.filter(
-        (r: any) =>
+        (r: BookingWithStaffService) =>
           r.staff?.name?.toLowerCase().includes(q) || r.services?.name?.toLowerCase().includes(q),
       );
     }
 
     // Sort
-    arr.sort((a: any, b: any) => {
+    arr.sort((a: BookingWithStaffService, b: BookingWithStaffService) => {
       let cmp = 0;
       switch (sortField) {
         case "date":
-          cmp = fmtSortableDate(a.completed_at) - fmtSortableDate(b.completed_at);
+          cmp = fmtSortableDate(a.completed_at ?? "") - fmtSortableDate(b.completed_at ?? "");
           break;
         case "staffName":
           cmp = (a.staff?.name ?? "").localeCompare(b.staff?.name ?? "");
@@ -71,7 +81,7 @@ export default function Commissions({ salonId }: { salonId: string }) {
   const pageRows = filtered.slice(page * perPage, (page + 1) * perPage);
 
   const totals = filtered.reduce(
-    (acc: any, r: any) => ({
+    (acc: { count: number }, _r: BookingWithStaffService) => ({
       count: acc.count + 1,
     }),
     { count: 0 },
@@ -80,9 +90,9 @@ export default function Commissions({ salonId }: { salonId: string }) {
   const exportCsv = () => {
     const headers = ["Date", "Staff Name", "Service Provided", "Tip Amount", "Payment Method"];
     const lines = [headers.join(",")].concat(
-      filtered.map((r: any) =>
+      filtered.map((r: BookingWithStaffService) =>
         [
-          new Date(r.completed_at).toISOString(),
+          new Date(r.completed_at!).toISOString(),
           r.staff?.name,
           r.services?.name,
           r.tip_amount ?? "",

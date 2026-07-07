@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/error-handler";
 import { Save, Plus, Pencil, Trash2, X, Check } from "lucide-react";
 import {
   getAllStaffForSalon,
@@ -22,7 +24,11 @@ const BTN_CLS =
 const BTN_SM_CLS =
   "tap-target inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all";
 
-export default function SettingsView({ salon }: { salon: any }) {
+export default function SettingsView({
+  salon,
+}: {
+  salon: Database["public"]["Tables"]["salons"]["Row"];
+}) {
   const qc = useQueryClient();
   const [name, setName] = useState(salon.name);
   const [phone, setPhone] = useState(salon.phone || "");
@@ -53,8 +59,8 @@ export default function SettingsView({ salon }: { salon: any }) {
       toast.success("Staff added");
       setStaffForm(null);
       qc.invalidateQueries({ queryKey: ["staff-list"] });
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, "Failed to create staff"));
     }
   };
 
@@ -62,8 +68,8 @@ export default function SettingsView({ salon }: { salon: any }) {
     try {
       await updateStaff({ data: { id, isActive: !isActive } });
       qc.invalidateQueries({ queryKey: ["staff-list"] });
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, "Failed to toggle staff"));
     }
   };
 
@@ -72,8 +78,8 @@ export default function SettingsView({ salon }: { salon: any }) {
       await deleteStaff({ data: { id } });
       toast.success("Staff deactivated");
       qc.invalidateQueries({ queryKey: ["staff-list"] });
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, "Failed to delete staff"));
     }
   };
 
@@ -98,8 +104,8 @@ export default function SettingsView({ salon }: { salon: any }) {
       toast.success("Service added");
       setSvcForm(null);
       qc.invalidateQueries({ queryKey: ["services-list"] });
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, "Failed to create service"));
     }
   };
 
@@ -107,8 +113,8 @@ export default function SettingsView({ salon }: { salon: any }) {
     try {
       await updateService({ data: { id, isActive: !isActive } });
       qc.invalidateQueries({ queryKey: ["services-list"] });
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, "Failed to toggle service"));
     }
   };
 
@@ -117,14 +123,14 @@ export default function SettingsView({ salon }: { salon: any }) {
       await deleteService({ data: { id } });
       toast.success("Service deactivated");
       qc.invalidateQueries({ queryKey: ["services-list"] });
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, "Failed to delete service"));
     }
   };
 
   // ── Hours ────────────────────────────────────────────────────────────
   const [hours, setHours] = useState<Record<string, { open: string; close: string }>>(() => {
-    const raw = salon.business_hours || {};
+    const raw = (salon.business_hours ?? {}) as Record<string, { open: string; close: string }[]>;
     const parsed: Record<string, { open: string; close: string }> = {};
     for (const day of [
       "monday",
@@ -153,8 +159,8 @@ export default function SettingsView({ salon }: { salon: any }) {
     try {
       await updateSalonHours({ data: { businessHours } });
       toast.success("Hours saved");
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, "Failed to save hours"));
     }
     setSavingHours(false);
   };
@@ -237,7 +243,7 @@ export default function SettingsView({ salon }: { salon: any }) {
         )}
 
         <div className="space-y-2">
-          {staffList.map((s: any) => (
+          {staffList.map((s) => (
             <div
               key={s.id}
               className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3"
@@ -377,7 +383,7 @@ export default function SettingsView({ salon }: { salon: any }) {
         )}
 
         <div className="space-y-2">
-          {servicesList.map((svc: any) => (
+          {servicesList.map((svc) => (
             <div
               key={svc.id}
               className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3"

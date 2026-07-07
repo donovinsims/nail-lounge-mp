@@ -1,8 +1,23 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { fmtTime } from "@/lib/salon";
 import { StatusBadge } from "./-admin-components/status-badge";
+
+type CalendarBooking = Pick<
+  Database["public"]["Tables"]["bookings"]["Row"],
+  "id" | "start_time" | "end_time" | "status" | "staff_id"
+> & {
+  services: { name: string; price: number } | null;
+  staff: { name: string; avatar_color: string | null } | null;
+  clients: { name: string } | null;
+};
+
+type CalendarStaff = Pick<
+  Database["public"]["Tables"]["staff"]["Row"],
+  "id" | "name" | "avatar_color"
+>;
 
 const HOURS = Array.from({ length: 12 }, (_, i) => 9 + i); // 9a–8p
 
@@ -48,8 +63,8 @@ export default function CalendarView({ salonId }: { salonId: string }) {
   });
 
   // Filter staff to only those with bookings today
-  const staffIdsWithBookings = new Set(bookings.map((b: any) => (b as any).staff_id));
-  const staffWithBookings = staffList.filter((s: any) => staffIdsWithBookings.has(s.id));
+  const staffIdsWithBookings = new Set(bookings.map((b: CalendarBooking) => b.staff_id));
+  const staffWithBookings = staffList.filter((s: CalendarStaff) => staffIdsWithBookings.has(s.id));
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -78,7 +93,7 @@ export default function CalendarView({ salonId }: { salonId: string }) {
       </div>,
     );
   } else {
-    staffWithBookings.forEach((s: any) => {
+    staffWithBookings.forEach((s: CalendarStaff) => {
       gridItems.push(
         <div
           key={`h-${s.id}`}
@@ -108,7 +123,9 @@ export default function CalendarView({ salonId }: { salonId: string }) {
 
     if (staffWithBookings.length === 0) {
       // Single "Bookings" column when no staff with bookings
-      const items = bookings.filter((b: any) => new Date(b.start_time).getHours() === hour);
+      const items = bookings.filter(
+        (b: CalendarBooking) => new Date(b.start_time).getHours() === hour,
+      );
       gridItems.push(
         <div
           key={`c-${hour}`}
@@ -117,15 +134,15 @@ export default function CalendarView({ salonId }: { salonId: string }) {
           {items.length === 0 ? (
             <p className="text-xs text-muted-foreground/50 px-2 py-1">—</p>
           ) : (
-            items.map((b: any) => renderBookingCard(b, expanded, setExpanded))
+            items.map((b: CalendarBooking) => renderBookingCard(b, expanded, setExpanded))
           )}
         </div>,
       );
     } else {
-      staffWithBookings.forEach((staff: any) => {
+      staffWithBookings.forEach((staff: CalendarStaff) => {
         const items = bookings.filter(
-          (b: any) =>
-            (b as any).staff_id === staff.id && new Date(b.start_time).getHours() === hour,
+          (b: CalendarBooking) =>
+            b.staff_id === staff.id && new Date(b.start_time).getHours() === hour,
         );
         gridItems.push(
           <div
@@ -135,7 +152,7 @@ export default function CalendarView({ salonId }: { salonId: string }) {
             {items.length === 0 ? (
               <p className="text-xs text-muted-foreground/50 px-2 py-1">—</p>
             ) : (
-              items.map((b: any) => renderBookingCard(b, expanded, setExpanded))
+              items.map((b: CalendarBooking) => renderBookingCard(b, expanded, setExpanded))
             )}
           </div>,
         );
@@ -205,7 +222,7 @@ export default function CalendarView({ salonId }: { salonId: string }) {
 
 /** Compact booking card used inside grid cells */
 function renderBookingCard(
-  b: any,
+  b: CalendarBooking,
   expanded: string | null,
   setExpanded: (id: string | null) => void,
 ) {

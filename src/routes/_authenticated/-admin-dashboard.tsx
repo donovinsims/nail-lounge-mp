@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import type { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { seedDemoData } from "@/lib/admin.functions";
 import { fmtMoney, fmtTime } from "@/lib/salon";
+import { getErrorMessage } from "@/lib/error-handler";
 import {
   LayoutGrid,
   Sparkles,
@@ -29,6 +31,15 @@ import type { ChartConfig } from "@/components/ui/chart";
 
 import { KpiCard } from "./-admin-components/kpi-card";
 import { StatusBadge } from "./-admin-components/status-badge";
+
+type BookingRow = Database["public"]["Tables"]["bookings"]["Row"];
+type CrRow = Database["public"]["Tables"]["commission_records"]["Row"];
+
+interface BookingWithRelations extends BookingRow {
+  services: { name: string; price: number } | null;
+  staff: { name: string } | null;
+  clients: { name: string } | null;
+}
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -131,7 +142,7 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
       const { start, end } = getWeekRange();
       const { data } = await supabase
         .from("bookings")
-        .select("status")
+        .select("status, start_time")
         .eq("salon_id", salonId)
         .gte("start_time", start.toISOString())
         .lte("start_time", end.toISOString());
@@ -160,14 +171,14 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
 
   // Compute KPIs
   const todayRev = cr.reduce(
-    (a: number, c: any) => a + Number(c.gross_amount) + Number(c.tip_amount),
+    (a: number, c: CrRow) => a + Number(c.gross_amount) + Number(c.tip_amount),
     0,
   );
   const yesterdayRev = yesterdayCr.reduce(
-    (a: number, c: any) => a + Number(c.gross_amount) + Number(c.tip_amount),
+    (a: number, c: CrRow) => a + Number(c.gross_amount) + Number(c.tip_amount),
     0,
   );
-  const confirmed = bookings.filter((b: any) => b.status === "confirmed").length;
+  const confirmed = bookings.filter((b) => b.status === "confirmed").length;
   const trendVal =
     yesterdayRev > 0 ? `${(((todayRev - yesterdayRev) / yesterdayRev) * 100).toFixed(0)}%` : "—";
 
@@ -179,16 +190,16 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
     const dayEnd = new Date(dayStart);
     dayEnd.setHours(23, 59, 59, 999);
 
-    const dayCr = weekCr.filter((c: any) => {
+    const dayCr = weekCr.filter((c: CrRow) => {
       const d = new Date(c.created_at);
       return d >= dayStart && d <= dayEnd;
     });
     const rev = dayCr.reduce(
-      (a: number, c: any) => a + Number(c.gross_amount) + Number(c.tip_amount),
+      (a: number, c: CrRow) => a + Number(c.gross_amount) + Number(c.tip_amount),
       0,
     );
     // Count total bookings for this day too
-    const count = weekBookings.filter((b: any) => {
+    const count = weekBookings.filter((b) => {
       const d = new Date(b.start_time);
       return d >= dayStart && d <= dayEnd;
     }).length;
@@ -200,7 +211,7 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
 
   // Status distribution (donut chart)
   const statusCounts = weekBookings.reduce(
-    (acc: Record<string, number>, b: any) => {
+    (acc: Record<string, number>, b: { status: string }) => {
       acc[b.status] = (acc[b.status] || 0) + 1;
       return acc;
     },
@@ -222,15 +233,19 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
 
   // Payment method breakdown
   const totalTipsToday = todayCompletedBookings.reduce(
-    (sum: number, b: any) => sum + Number((b as any).tip_amount || 0),
+    (sum: number, b: Pick<BookingRow, "payment_method" | "tip_amount">) =>
+      sum + Number(b.tip_amount || 0),
     0,
   );
   const paymentMethodBreakdown = todayCompletedBookings.reduce(
-    (acc: Record<string, { count: number; tips: number }>, b: any) => {
-      const method = (b as any).payment_method || "Unknown";
+    (
+      acc: Record<string, { count: number; tips: number }>,
+      b: Pick<BookingRow, "payment_method" | "tip_amount">,
+    ) => {
+      const method = b.payment_method || "Unknown";
       if (!acc[method]) acc[method] = { count: 0, tips: 0 };
       acc[method].count += 1;
-      acc[method].tips += Number((b as any).tip_amount || 0);
+      acc[method].tips += Number(b.tip_amount || 0);
       return acc;
     },
     {} as Record<string, { count: number; tips: number }>,
@@ -264,7 +279,7 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
       if (count === 0) {
         seeded.current = true;
         try {
-          const r: any = await seed();
+          const r = await seed();
           if (r?.ok) {
             toast.success(
               `Loaded ${r.bookings || 0} sample bookings and ${r.commissions || 0} commission records for you to explore`,
@@ -448,11 +463,11 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
           <button
             onClick={async () => {
               try {
-                const r: any = await seed();
+                const r = await seed();
                 toast.success(`Seeded ${r?.bookings || 0} bookings`);
                 qc.invalidateQueries();
-              } catch (e: any) {
-                toast.error(e?.message ?? "Failed to seed");
+              } catch (e: unknown) {
+                toast.error(getErrorMessage(e, "Failed to seed"));
               }
             }}
             className="inline-flex items-center gap-1.5 rounded-lg bg-surface-2 px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -467,7 +482,7 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
               <span>No bookings today.</span>
             </li>
           )}
-          {bookings.map((b: any) => (
+          {bookings.map((b) => (
             <li
               key={b.id}
               className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-surface-2/50"

@@ -1,11 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
+import type { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { getSalonName, getSalonNameShort } from "@/lib/env";
 import { getMyStaff, linkSelfToFirstSalon } from "@/lib/admin.functions";
 import { getOwnerAlerts } from "@/lib/owner-alerts.functions";
+import { getErrorMessage } from "@/lib/error-handler";
 import {
   Calendar,
   Users,
@@ -44,7 +46,11 @@ type Tab =
   | "calls"
   | "settings";
 
-const NAV: { id: Tab; label: string; icon: any }[] = [
+type StaffWithSalon = Database["public"]["Tables"]["staff"]["Row"] & {
+  salons: Database["public"]["Tables"]["salons"]["Row"];
+};
+
+const NAV: { id: Tab; label: string; icon: ComponentType<{ className?: string }> }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutGrid },
   { id: "calendar", label: "Calendar", icon: Calendar },
   { id: "floor", label: "Live Floor", icon: Users },
@@ -88,7 +94,16 @@ function Admin() {
   // Get the owner's name from auth metadata
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data?.user) setOwnerName(getOwnerName(data.user as any));
+      if (data?.user)
+        setOwnerName(
+          getOwnerName(
+            data.user as {
+              id: string;
+              email?: string | null;
+              user_metadata?: { full_name?: string; name?: string };
+            },
+          ),
+        );
     });
   }, []);
 
@@ -98,21 +113,23 @@ function Admin() {
       setLinkError(null);
       link()
         .then(() => qc.invalidateQueries({ queryKey: ["my-staff"] }))
-        .catch((err) => {
-          setLinkError(err?.message || "Failed to link account to salon");
+        .catch((err: unknown) => {
+          setLinkError(getErrorMessage(err, "Failed to link account to salon"));
         });
     }
   }, [staff, isLoading, isError]);
 
   // Owner alerts for badge count
   const fetchAlerts = useServerFn(getOwnerAlerts);
-  const salonId = (staff as any)?.salons?.id;
+  const salonId = (staff as StaffWithSalon | null)?.salons?.id;
   const { data: ownerAlerts = [] } = useQuery({
     queryKey: ["owner-alerts-count", salonId],
     queryFn: () => fetchAlerts(),
     enabled: !!salonId,
   });
-  const unacknowledgedCount = ownerAlerts.filter((a: any) => !a.acknowledged_at).length;
+  const unacknowledgedCount = ownerAlerts.filter(
+    (a: Database["public"]["Tables"]["owner_alerts"]["Row"]) => !a.acknowledged_at,
+  ).length;
 
   const signOut = async () => {
     await qc.cancelQueries();
@@ -176,7 +193,7 @@ function Admin() {
     );
   }
 
-  const salon = (staff as any).salons;
+  const salon = (staff as StaffWithSalon).salons;
 
   return (
     <div className="flex min-h-screen w-full bg-background">

@@ -1,0 +1,1 @@
+bun run build && bun x tsc --noEmit && bun install --frozen-lockfile

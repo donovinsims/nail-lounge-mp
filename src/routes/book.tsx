@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, useRef } from "react";
+import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
 import {
   fetchSalon,
@@ -75,11 +76,11 @@ function Book() {
 
   // Prefill from search params
   useEffect(() => {
-    if (search.service && services.some((s) => s.id === search.service))
+    if (search.service && services.some((s: { id: string }) => s.id === search.service))
       setServiceId(search.service);
   }, [search.service, services]);
   useEffect(() => {
-    if (search.staff && staff.some((s) => s.id === search.staff)) {
+    if (search.staff && staff.some((s: { id: string }) => s.id === search.staff)) {
       setStaffId(search.staff);
       if (serviceId) setStep(3);
     }
@@ -187,8 +188,8 @@ function Book() {
     setAnnouncement(`Step ${step} of 4: ${names[step]}`);
   }, [step]);
 
-  const service = services.find((s) => s.id === serviceId);
-  const tech = staff.find((s) => s.id === staffId);
+  const service = services.find((s: { id: string }) => s.id === serviceId);
+  const tech = staff.find((s: { id: string }) => s.id === staffId);
 
   const { data: slots = [], isFetching: loadingSlots } = useQuery({
     queryKey: ["slots", staffId, serviceId, date.toDateString()],
@@ -203,7 +204,7 @@ function Book() {
     mutationFn: create,
     onSuccess: () => {
       toast.success("Booking confirmed!");
-      navigate({ to: "/appointments", search: { phone } as any }); // eslint-disable-line @typescript-eslint/no-explicit-any
+      navigate({ to: "/appointments", search: { phone } as { phone: string } });
     },
     onError: (e: Error) => toast.error(e.message),
   });

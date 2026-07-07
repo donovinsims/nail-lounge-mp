@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import type { Database } from "@/integrations/supabase/types";
 import { fetchSalon, fetchServices, fmtMoney } from "@/lib/salon";
 import { getSalonName } from "@/lib/env";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
@@ -37,9 +38,19 @@ function ServicesPage() {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   // Group services dynamically by category — derived from actual DB data, not hardcoded.
-  const categories = [...new Set(services.map((s: any) => s.category).filter(Boolean))].sort();
+  const categories = [
+    ...new Set(
+      services
+        .map((s: Database["public"]["Tables"]["services"]["Row"]) => s.category)
+        .filter((c: string | null): c is string => c !== null),
+    ),
+  ].sort() as string[];
   const grouped = categories.map(
-    (cat) => [cat, services.filter((s) => s.category === cat)] as const,
+    (cat) =>
+      [
+        cat,
+        services.filter((s: Database["public"]["Tables"]["services"]["Row"]) => s.category === cat),
+      ] as const,
   );
 
   return (
@@ -74,7 +85,7 @@ function ServicesPage() {
                 <h2 className="mt-3 font-display text-3xl sm:text-4xl">{category}</h2>
               </header>
               <ul className="md:col-span-8 space-y-3">
-                {items.map((s) => {
+                {items.map((s: Database["public"]["Tables"]["services"]["Row"]) => {
                   const price = Number(s.price);
                   const isOpen = expanded === s.id;
                   return (
@@ -107,7 +118,7 @@ function ServicesPage() {
                             </div>
                             <Link
                               to="/book"
-                              search={{ service: s.id } as any} // eslint-disable-line @typescript-eslint/no-explicit-any
+                              search={{ service: s.id } as { service: string }}
                               className="flex w-full tap-target items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-medium text-primary-foreground hover:opacity-90 transition"
                             >
                               Book Now <ArrowRight className="h-4 w-4" />

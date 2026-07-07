@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { fmtDate } from "@/lib/salon";
 import { StatusBadge } from "./-admin-components/status-badge";
 import { Phone, Check, PhoneCall, MessageSquare } from "lucide-react";
@@ -49,7 +50,7 @@ export default function Calls({ salonId }: { salonId: string }) {
       )}
 
       <div className="grid gap-3">
-        {rows.map((c: any) => (
+        {rows.map((c: Database["public"]["Tables"]["ai_calls"]["Row"]) => (
           <div
             key={c.id}
             className="rounded-2xl bg-surface p-5 transition-colors hover:bg-surface-2/30"
@@ -75,8 +76,8 @@ export default function Calls({ salonId }: { salonId: string }) {
                 {/* Intent badge */}
                 <div className="mt-2 flex items-center gap-2">
                   <StatusBadge
-                    status={INTENT_LABELS[c.intent] || c.intent}
-                    variant={intentVariant(c.intent)}
+                    status={c.intent ? INTENT_LABELS[c.intent] || c.intent : ""}
+                    variant={intentVariant(c.intent ?? "")}
                   />
                 </div>
 

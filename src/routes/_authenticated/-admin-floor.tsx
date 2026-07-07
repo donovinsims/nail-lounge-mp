@@ -1,7 +1,12 @@
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { StatusBadge } from "./-admin-components/status-badge";
+
+type FloorWithStaff = Database["public"]["Tables"]["floor_status"]["Row"] & {
+  staff: { name: string; avatar_color: string | null } | null;
+};
 
 export default function FloorView({ salonId }: { salonId: string }) {
   const qc = useQueryClient();
@@ -31,7 +36,7 @@ export default function FloorView({ salonId }: { salonId: string }) {
     };
   }, [salonId, qc]);
 
-  const cycle = async (id: string, current: string) => {
+  const cycle = async (id: string, current: Database["public"]["Enums"]["floor_state"]) => {
     const next =
       current === "available" ? "with_client" : current === "with_client" ? "offline" : "available";
     await supabase
@@ -43,7 +48,7 @@ export default function FloorView({ salonId }: { salonId: string }) {
   return (
     <div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {floor.map((f: any) => {
+        {floor.map((f: FloorWithStaff) => {
           const isWithClient = f.status === "with_client";
           return (
             <button

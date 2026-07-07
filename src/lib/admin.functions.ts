@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getSalonId } from "@/lib/env";
+import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
 
 export const getMyStaff = createServerFn({ method: "GET" })
@@ -116,8 +117,8 @@ export const seedDemoData = createServerFn({ method: "POST" })
 
     const commissionSplit = 60; // default 60% tech
     const tipSplit = 80; // default 80% tip to tech
-    const allBookings: any[] = [];
-    const allCommissions: any[] = [];
+    const allBookings: Database["public"]["Tables"]["bookings"]["Insert"][] = [];
+    const allCommissions: Database["public"]["Tables"]["commission_records"]["Insert"][] = [];
     let bookingCount = 0;
 
     for (let dayOff = 0; dayOff < 4; dayOff++) {
@@ -161,7 +162,7 @@ export const seedDemoData = createServerFn({ method: "POST" })
           const salonShare = +(net - techShare).toFixed(2);
           allCommissions.push({
             salon_id: staff.salon_id,
-            booking_id: undefined as string | undefined, // set after insert
+            booking_id: "" as string, // set after insert
             staff_id: stf.id,
             gross_amount: price,
             net_amount: net,
@@ -180,13 +181,13 @@ export const seedDemoData = createServerFn({ method: "POST" })
       .from("bookings")
       .insert(allBookings)
       .select("id");
-    const insertedIds = inserted?.map((b: any) => b.id) ?? [];
+    const insertedIds = inserted?.map((b: { id: string }) => b.id) ?? [];
 
     // Link commission records to inserted booking IDs
     let ci = 0;
     for (let i = 0; i < allBookings.length; i++) {
       if (allBookings[i].status === "completed" && ci < allCommissions.length) {
-        allCommissions[ci].booking_id = insertedIds[i];
+        allCommissions[ci].booking_id = insertedIds[i]!;
         ci++;
       }
     }

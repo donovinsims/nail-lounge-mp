@@ -1,9 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import type { Database } from "@/integrations/supabase/types";
 import { getOwnerAlerts, acknowledgeAlert } from "@/lib/owner-alerts.functions";
 import { fmtDate } from "@/lib/salon";
 import { AlertTriangle, Check, Phone } from "lucide-react";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/error-handler";
 
 function timeSince(createdAt: string) {
   const diff = Date.now() - new Date(createdAt).getTime();
@@ -36,15 +38,17 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
     queryFn: () => fetchAlerts(),
   });
 
-  const unacknowledged = alerts.filter((a: any) => !a.acknowledged_at);
+  const unacknowledged = alerts.filter(
+    (a: Database["public"]["Tables"]["owner_alerts"]["Row"]) => !a.acknowledged_at,
+  );
 
   const handleAcknowledge = async (alertId: string) => {
     try {
       await ackAlert({ data: { alertId } });
       toast.success("Alert acknowledged");
       qc.invalidateQueries({ queryKey: ["owner-alerts"] });
-    } catch (e: any) {
-      toast.error(e?.message || "Failed to acknowledge");
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, "Failed to acknowledge"));
     }
   };
 
@@ -59,7 +63,7 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
 
   return (
     <div className="grid gap-3">
-      {unacknowledged.map((a: any) => (
+      {unacknowledged.map((a: Database["public"]["Tables"]["owner_alerts"]["Row"]) => (
         <div
           key={a.id}
           className="rounded-2xl bg-surface p-5 transition-colors hover:bg-surface-2/30"
