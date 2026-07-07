@@ -34,7 +34,9 @@ export default function Commissions({ salonId }: { salonId: string }) {
   const queryClient = useQueryClient();
 
   const payMutation = useMutation({
-    mutationFn: (input: { id: string }) => toggleBookingPaid(input),
+    mutationFn: toggleBookingPaid as (input: {
+      id: string;
+    }) => Promise<{ ok: boolean; paid: boolean }>,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payroll-ledger", salonId] });
     },
