@@ -5,7 +5,7 @@ import { fmtMoney, fmtDate } from "@/lib/salon";
 import { Download, Search, ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
 import { KpiCard } from "./-admin-components/kpi-card";
 
-type SortField = "date" | "tech" | "gross" | "techShare" | "salonShare" | "tip";
+type SortField = "date" | "staffName" | "tip";
 type SortDir = "asc" | "desc";
 
 function fmtSortableDate(d: string) {
@@ -14,20 +14,20 @@ function fmtSortableDate(d: string) {
 
 export default function Commissions({ salonId }: { salonId: string }) {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortField, setSortField] = useState<SortField>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
   const perPage = 20;
 
   const { data: rows = [] } = useQuery({
-    queryKey: ["cr", salonId],
+    queryKey: ["payroll-ledger", salonId],
     queryFn: async () => {
       const { data } = await supabase
-        .from("commission_records")
-        .select("*, staff(name), bookings(start_time, status, services(name))")
+        .from("bookings")
+        .select("id, completed_at, tip_amount, payment_method, staff!inner(name), services!inner(name)")
         .eq("salon_id", salonId)
-        .order("created_at", { ascending: false })
+        .not("completed_at", "is", null)
+        .order("completed_at", { ascending: false })
         .limit(200);
       return data ?? [];
     },
@@ -42,7 +42,7 @@ export default function Commissions({ salonId }: { salonId: string }) {
       arr = arr.filter(
         (r: any) =>
           r.staff?.name?.toLowerCase().includes(q) ||
-          r.bookings?.services?.name?.toLowerCase().includes(q),
+          r.services?.name?.toLowerCase().includes(q),
       );
     }
 
@@ -51,26 +51,13 @@ export default function Commissions({ salonId }: { salonId: string }) {
       let cmp = 0;
       switch (sortField) {
         case "date":
-          cmp = fmtSortableDate(a.created_at) - fmtSortableDate(b.created_at);
+          cmp = fmtSortableDate(a.completed_at) - fmtSortableDate(b.completed_at);
           break;
-        case "tech":
+        case "staffName":
           cmp = (a.staff?.name ?? "").localeCompare(b.staff?.name ?? "");
           break;
-        case "gross":
-          cmp = Number(a.gross_amount) - Number(b.gross_amount);
-          break;
-        case "techShare":
-          cmp =
-            Number(a.tech_share) + Number(a.tip_to_tech) -
-            (Number(b.tech_share) + Number(b.tip_to_tech));
-          break;
-        case "salonShare":
-          cmp =
-            Number(a.salon_share) + Number(a.tip_to_salon) -
-            (Number(b.salon_share) + Number(b.tip_to_salon));
-          break;
         case "tip":
-          cmp = Number(a.tip_amount) - Number(b.tip_amount);
+          cmp = Number(a.tip_amount ?? 0) - Number(b.tip_amount ?? 0);
           break;
       }
       return sortDir === "asc" ? cmp : -cmp;
@@ -84,37 +71,27 @@ export default function Commissions({ salonId }: { salonId: string }) {
 
   const totals = filtered.reduce(
     (acc: any, r: any) => ({
-      gross: acc.gross + Number(r.gross_amount),
-      tech: acc.tech + Number(r.tech_share) + Number(r.tip_to_tech),
-      salon: acc.salon + Number(r.salon_share) + Number(r.tip_to_salon),
-      tip: acc.tip + Number(r.tip_amount),
       count: acc.count + 1,
     }),
-    { gross: 0, tech: 0, salon: 0, tip: 0, count: 0 },
+    { count: 0 },
   );
 
   const exportCsv = () => {
     const headers = [
       "Date",
-      "Tech",
-      "Service",
-      "Gross",
-      "Tech share",
-      "Salon share",
-      "Tip",
-      "Tip→Tech",
+      "Staff Name",
+      "Service Provided",
+      "Tip Amount",
+      "Payment Method",
     ];
     const lines = [headers.join(",")].concat(
       filtered.map((r: any) =>
         [
-          new Date(r.created_at).toISOString(),
+          new Date(r.completed_at).toISOString(),
           r.staff?.name,
-          r.bookings?.services?.name,
-          r.gross_amount,
-          r.tech_share,
-          r.salon_share,
-          r.tip_amount,
-          r.tip_to_tech,
+          r.services?.name,
+          r.tip_amount ?? "",
+          r.payment_method ?? "",
         ].join(","),
       ),
     );
@@ -122,7 +99,7 @@ export default function Commissions({ salonId }: { salonId: string }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "commissions.csv";
+    a.download = "payroll-ledger.csv";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -145,10 +122,8 @@ export default function Commissions({ salonId }: { salonId: string }) {
   return (
     <div className="space-y-4">
       {/* KPI row */}
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-1">
         <KpiCard label="Records" value={String(totals.count)} icon={Download} />
-        <KpiCard label="Tech earnings" value={fmtMoney(totals.tech)} />
-        <KpiCard label="Salon earnings" value={fmtMoney(totals.salon)} />
       </div>
 
       {/* Search + export toolbar */}
@@ -156,7 +131,7 @@ export default function Commissions({ salonId }: { salonId: string }) {
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
-            placeholder="Search tech or service..."
+            placeholder="Search staff or service..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -181,12 +156,10 @@ export default function Commissions({ salonId }: { salonId: string }) {
               <tr>
                 {[
                   { key: "date" as SortField, label: "Date" },
-                  { key: "tech" as SortField, label: "Tech" },
-                  { key: null, label: "Service" },
-                  { key: "gross" as SortField, label: "Gross" },
-                  { key: "techShare" as SortField, label: "Tech" },
-                  { key: "salonShare" as SortField, label: "Salon" },
-                  { key: "tip" as SortField, label: "Tip" },
+                  { key: "staffName" as SortField, label: "Staff Name" },
+                  { key: null, label: "Service Provided" },
+                  { key: "tip" as SortField, label: "Tip Amount" },
+                  { key: null, label: "Payment Method" },
                 ].map(({ key, label }) => (
                   <th
                     key={label}
@@ -204,41 +177,21 @@ export default function Commissions({ salonId }: { salonId: string }) {
             <tbody className="divide-y divide-border">
               {pageRows.map((r: any) => (
                 <tr key={r.id} className="hover:bg-surface-2/30 transition-colors">
-                  <td className="p-4 font-mono text-xs whitespace-nowrap">{fmtDate(r.created_at)}</td>
+                  <td className="p-4 font-mono text-xs whitespace-nowrap">{fmtDate(r.completed_at)}</td>
                   <td className="font-medium whitespace-nowrap">{r.staff?.name}</td>
-                  <td className="text-muted-foreground">{r.bookings?.services?.name}</td>
-                  <td className="font-mono tabular-nums">{fmtMoney(Number(r.gross_amount))}</td>
-                  <td className="font-mono tabular-nums text-success">
-                    {fmtMoney(Number(r.tech_share) + Number(r.tip_to_tech))}
-                  </td>
-                  <td className="font-mono tabular-nums">
-                    {fmtMoney(Number(r.salon_share) + Number(r.tip_to_salon))}
-                  </td>
-                  <td className="font-mono tabular-nums">{fmtMoney(Number(r.tip_amount))}</td>
+                  <td className="text-muted-foreground">{r.services?.name}</td>
+                  <td className="font-mono tabular-nums">{r.tip_amount != null ? fmtMoney(Number(r.tip_amount)) : "—"}</td>
+                  <td className="text-muted-foreground">{r.payment_method || "—"}</td>
                 </tr>
               ))}
               {pageRows.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-muted-foreground">
-                    No records yet.
+                  <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                    No completed bookings yet.
                   </td>
                 </tr>
               )}
             </tbody>
-            {/* Footer totals */}
-            {pageRows.length > 0 && (
-              <tfoot>
-                <tr className="border-t-2 border-border bg-surface-2/50 font-semibold">
-                  <td className="p-4 text-xs font-mono">{filtered.length} total</td>
-                  <td />
-                  <td />
-                  <td className="font-mono tabular-nums">{fmtMoney(totals.gross)}</td>
-                  <td className="font-mono tabular-nums text-success">{fmtMoney(totals.tech)}</td>
-                  <td className="font-mono tabular-nums">{fmtMoney(totals.salon)}</td>
-                  <td className="font-mono tabular-nums">{fmtMoney(totals.tip)}</td>
-                </tr>
-              </tfoot>
-            )}
           </table>
         </div>
 

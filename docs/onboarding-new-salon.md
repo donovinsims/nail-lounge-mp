@@ -151,6 +151,7 @@ VITE_ADMIN_ONBOARD=true
 TWILIO_ACCOUNT_SID=...
 TWILIO_AUTH_TOKEN=...
 TWILIO_PHONE_NUMBER=+1...
+GOOGLE_REVIEW_URL=https://g.page/r/xxxx/review
 
 # ─── Feature Flags ──────────────────────────────────────
 VITE_ALLOW_SEED_DATA=false
@@ -165,6 +166,7 @@ VITE_ALLOW_SEED_DATA=false
 | `VITE_ADMIN_ONBOARD` | Set to `true` to allow the first admin sign-in to auto-link to the salon. Turn to `false` after. |
 | `VITE_OG_IMAGE` | 1200×630px JPEG/PNG. Hosted somewhere accessible (R2, Supabase storage, etc). |
 | `TWILIO_ACCOUNT_SID` + `TWILIO_AUTH_TOKEN` + `TWILIO_PHONE_NUMBER` | Required for SMS confirmations + rating loop. Omit to skip SMS entirely. |
+| `GOOGLE_REVIEW_URL` | Full URL to the salon's Google review page. Used for high-rating (4-5) SMS follow-ups. |
 
 > **Two key sets of Supabase credentials:**
 > - `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` — client-side anon key (safe in browser)
@@ -257,7 +259,7 @@ Same pattern as Netlify — connect repo, set build command/output directory, ad
 
 ## Step 7 — Post-deployment checklist
 
-- [ ] **Twilio (optional)** — buy a phone number, configure the SMS webhook URL to point to `https://nailsbyana.com/api/twilio-webhook`.
+- [ ] **Twilio (optional)** — buy a phone number, set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` and `GOOGLE_REVIEW_URL` in env. Configure the Twilio SMS webhook URL to point to `{APP_URL}/api/twilio-webhook` (e.g. `https://nailsbyana.com/api/twilio-webhook`).
 - [ ] **OG image** — verify social share preview looks right on ogdebug.com.
 - [ ] **Admin (first sign-in)** — sign in at `/admin`. With `VITE_ADMIN_ONBOARD=true`, your account should auto-link.
 - [ ] **Add staff** — go to Settings → Staff, add at least one staff member.

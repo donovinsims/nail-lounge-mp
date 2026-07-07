@@ -66,7 +66,7 @@ export async function handleRatingReply(params: {
     if (config.twilioAccountSid && config.twilioAuthToken && config.twilioPhoneNumber) {
       const client = twilio(config.twilioAccountSid, config.twilioAuthToken);
       await client.messages.create({
-        body: `Thank you! We're so glad you enjoyed your visit. If you have a moment, please leave us a Google review: https://g.page/r/REPLACE_WITH_YOUR_GOOGLE_REVIEW_LINK/review`,
+        body: `Thank you! We're so glad you enjoyed your visit. If you have a moment, please leave us a Google review: ${config.googleReviewUrl}`,
         to: params.from,
         from: config.twilioPhoneNumber,
       });

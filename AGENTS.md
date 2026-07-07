@@ -37,6 +37,11 @@ bun run format       # prettier --write .
 - `/_authenticated/-admin-dashboard.tsx` — overview with stats
 - `/_authenticated/-admin-settings.tsx` — staff/services/hours CRUD
 - `/_authenticated/-admin-waitlist.tsx` — waitlist management
+- `/_authenticated/-admin-commissions.tsx` — payroll ledger (tips + services per staff)
+- `/_authenticated/-admin-floor.tsx` — floor status management
+- `/_authenticated/-admin-alerts.tsx` — low-rating owner alerts
+- `/_authenticated/-admin-calls.tsx` — AI call log
+- `/_authenticated/-admin-calendar.tsx` — calendar view
 
 Generated file (do not edit by hand): `src/routeTree.gen.ts`
 
@@ -45,8 +50,10 @@ Generated file (do not edit by hand): `src/routeTree.gen.ts`
 | File | Role |
 |---|---|
 | `src/lib/env.ts` | Env helpers: `getSalonName()`, `getSalonAddress()`, `getSalonPhone()`, `getSalonSocial()`, `getOGImage()`, `getUmamiWebsiteId()`, `getUmamiHost()`, `getSalonId()`, `isSeedAllowed()`. Reads `VITE_*` env vars with fallbacks. |
-| `src/lib/config.server.ts` | Server-only config: `getServerConfig()`, `hasStripe()`, `hasTwilio()`, `hasEmail()`. Reads non-`VITE_` env vars at call time (for CF Workers compat). |
-| `src/lib/booking.functions.ts` | `createPublicBooking`, `lookupAppointments`, `cancelPublicBooking`, `verifyCheckoutSession`. Integrates Stripe Checkout (when deposit > 0) and Twilio SMS. Rate-limited: 3 per 5min per phone. |
+| `src/lib/config.server.ts` | Server-only config: `getServerConfig()`, `hasTwilio()`, `hasEmail()`. Reads non-`VITE_` env vars at call time (for CF Workers compat). |
+| `src/lib/twilio.server.ts` | `sendRatingSms` (1-5 rating SMS after completed appointment), `handleRatingReply` (processes inbound SMS rating, sends Google Review link for 4-5, apology + owner alert for 1-3). |
+| `src/lib/twilio-webhook.server.ts` | `handleTwilioWebhook` — parses Twilio form-encoded webhook, looks up booking by phone, delegates to `handleRatingReply`. |
+| `src/lib/booking.functions.ts` | `createPublicBooking`, `lookupAppointments`, `getPendingCompletions`, `completeStaffModal`, `getStaffAppointments`, `cancelPublicBooking`. Validates input (Zod), checks slot availability via RPC, upserts client, creates booking with `confirmed` status, sends Twilio SMS + Resend email. Staff modal flow captures tip/payment/notes, then triggers rating SMS. Rate-limited: 3 per 5min per phone. |
 | `src/lib/admin-crud.functions.ts` | CRUD server fns for staff (`getAllStaffForSalon`, `createStaff`, `updateStaff`, `deleteStaff`), services (`getAllServicesForSalon`, `createService`, `updateService`, `deleteService`), and `updateSalonHours`. All gated by `requireSupabaseAuth`. |
 | `src/lib/admin.functions.ts` | `getMyStaff`, `linkSelfToFirstSalon`, `completeBookingWithPayment` (POS), `seedDemoData`. |
 | `src/lib/rate-limiter.ts` | Generic sliding-window rate limiter class. |
@@ -82,6 +89,7 @@ Generated file (do not edit by hand): `src/routeTree.gen.ts`
 | `TWILIO_ACCOUNT_SID` | Server-only | For SMS |
 | `TWILIO_AUTH_TOKEN` | Server-only | For SMS |
 | `TWILIO_PHONE_NUMBER` | Server-only | For SMS |
+| `GOOGLE_REVIEW_URL` | Server-only | Google review link for high-rating SMS follow-up |
 | `RESEND_API_KEY` | Server-only | For email |
 | `VITE_UMAMI_WEBSITE_ID` | Public | Optional (analytics) |
 | `VITE_UMAMI_HOST` | Public | Optional (analytics) |

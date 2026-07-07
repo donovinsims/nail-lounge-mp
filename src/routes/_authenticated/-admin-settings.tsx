@@ -28,15 +28,13 @@ export default function SettingsView({ salon }: { salon: any }) {
   const qc = useQueryClient();
   const [name, setName] = useState(salon.name);
   const [phone, setPhone] = useState(salon.phone || "");
-  const [commission, setCommission] = useState(Number(salon.commission_split));
-  const [tipSplit, setTipSplit] = useState(Number(salon.tip_split_default));
   const [saving, setSaving] = useState(false);
 
   const saveBusiness = async () => {
     setSaving(true);
     const { error } = await supabase
       .from("salons")
-      .update({ name, phone, commission_split: commission, tip_split_default: tipSplit })
+      .update({ name, phone })
       .eq("id", salon.id);
     if (error) toast.error(error.message);
     else toast.success("Settings saved");
@@ -173,34 +171,6 @@ export default function SettingsView({ salon }: { salon: any }) {
           <Save className="h-4 w-4" />
           {saving ? "Saving..." : "Save changes"}
         </button>
-      </div>
-
-      {/* Commission & tips */}
-      <div className="rounded-2xl bg-surface p-6 space-y-5">
-        <h3 className="font-semibold">Commission & tips</h3>
-        <div>
-          <label className="flex items-center justify-between text-xs text-muted-foreground font-medium mb-2">
-            <span>Tech commission</span>
-            <span className="font-mono text-foreground">{commission}%</span>
-          </label>
-          <input type="range" min={0} max={100} value={commission}
-            onChange={(e) => setCommission(Number(e.target.value))} className="w-full accent-primary" />
-          <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-            <span>0%</span><span>100%</span>
-          </div>
-        </div>
-        <div>
-          <label className="flex items-center justify-between text-xs text-muted-foreground font-medium mb-2">
-            <span>Default tip to tech</span>
-            <span className="font-mono text-foreground">{tipSplit}%</span>
-          </label>
-          <input type="range" min={0} max={100} step={10} value={tipSplit}
-            onChange={(e) => setTipSplit(Number(e.target.value))} className="w-full accent-primary" />
-          <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-            <span>Tech: {tipSplit}%</span>
-            <span>Salon: {100 - tipSplit}%</span>
-          </div>
-        </div>
       </div>
 
       {/* Staff */}
