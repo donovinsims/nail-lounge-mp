@@ -39,6 +39,14 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    // Handle Twilio webhook before TanStack Start — Twilio sends
+    // application/x-www-form-urlencoded, not JSON, so we parse it here.
+    const url = new URL(request.url);
+    if (url.pathname === "/api/twilio-webhook" && request.method === "POST") {
+      const { handleTwilioWebhook } = await import("./lib/twilio-webhook.server");
+      return handleTwilioWebhook(request);
+    }
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

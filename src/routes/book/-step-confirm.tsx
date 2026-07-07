@@ -4,7 +4,6 @@ import { Check, Loader2 } from "lucide-react";
 interface ServiceInfo {
   name: string;
   price: number;
-  deposit_amount: number;
 }
 
 interface StaffInfo {
@@ -75,8 +74,6 @@ export default function StepConfirm({
     service != null &&
     staff != null;
 
-  const depositAmount = service ? Number(service.deposit_amount) : 0;
-
   return (
     <div className="space-y-4">
       {/* Order Summary Card */}
@@ -100,10 +97,6 @@ export default function StepConfirm({
           <span className="font-mono font-semibold">
             {formatMoney(Number(service?.price ?? 0))}
           </span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Deposit today</span>
-          <span className="font-mono font-semibold">{formatMoney(depositAmount)}</span>
         </div>
       </div>
 
@@ -210,7 +203,7 @@ export default function StepConfirm({
             Processing…
           </>
         ) : (
-          <>Pay {formatMoney(depositAmount)} deposit</>
+          <>Confirm booking</>
         )}
       </button>
     </div>

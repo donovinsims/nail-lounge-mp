@@ -7,5 +7,33 @@
       "url": "https://mcp.typeui.sh/mcp",
       "enabled": true
     }
+  },
+  "tools": {
+    "playwright_*": false,
+    "tally-so_*": false,
+    "typeui_*": false
+  },
+  "agent": {
+    "playwright": {
+      "description": "playwright operations",
+      "mode": "subagent",
+      "tools": {
+        "playwright_*": true
+      }
+    },
+    "tally-so": {
+      "description": "tally-so operations",
+      "mode": "subagent",
+      "tools": {
+        "tally-so_*": true
+      }
+    },
+    "typeui": {
+      "description": "typeui operations",
+      "mode": "subagent",
+      "tools": {
+        "typeui_*": true
+      }
+    }
   }
 }

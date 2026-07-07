@@ -13,6 +13,7 @@ import {
   fmtDate,
 } from "@/lib/salon";
 import { createPublicBooking } from "@/lib/booking.functions";
+import { getSalonName } from "@/lib/env";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -32,7 +33,7 @@ export const Route = createFileRoute("/book")({
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
     meta: [
-      { title: "Book — Nail Lounge" },
+      { title: `Book — ${getSalonName()}` },
       { name: "description", content: "Pick a service, technician, and time." },
     ],
   }),
@@ -238,7 +239,6 @@ function Book() {
         clientName: name,
         clientPhone: phone,
         clientEmail: email,
-        depositPaid: Number(service.deposit_amount),
       },
     });
   };
@@ -384,7 +384,6 @@ function Book() {
                         clientName: name,
                         clientPhone: phone,
                         clientEmail: email,
-                        depositPaid: Number(service!.deposit_amount),
                       },
                     })
                   }
@@ -487,7 +486,7 @@ function Book() {
                   Booking…
                 </span>
               ) : (
-                `Pay ${fmtMoney(Number(service?.deposit_amount ?? 0))} deposit`
+                "Confirm booking"
               )}
             </button>
           )}

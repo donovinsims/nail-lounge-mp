@@ -1,8 +1,28 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Save } from "lucide-react";
+import {
+  Save, Plus, Pencil, Trash2, X, Check,
+} from "lucide-react";
+import {
+  getAllStaffForSalon,
+  createStaff,
+  updateStaff,
+  deleteStaff,
+  getAllServicesForSalon,
+  createService,
+  updateService,
+  deleteService,
+  updateSalonHours,
+} from "@/lib/admin-crud.functions";
+
+const INPUT_CLS =
+  "mt-1.5 w-full tap-target rounded-xl bg-surface-2 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all";
+const BTN_CLS =
+  "tap-target inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-all";
+const BTN_SM_CLS =
+  "tap-target inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all";
 
 export default function SettingsView({ salon }: { salon: any }) {
   const qc = useQueryClient();
@@ -12,26 +32,130 @@ export default function SettingsView({ salon }: { salon: any }) {
   const [tipSplit, setTipSplit] = useState(Number(salon.tip_split_default));
   const [saving, setSaving] = useState(false);
 
-  const save = async () => {
+  const saveBusiness = async () => {
     setSaving(true);
     const { error } = await supabase
       .from("salons")
-      .update({
-        name,
-        phone,
-        commission_split: commission,
-        tip_split_default: tipSplit,
-      })
+      .update({ name, phone, commission_split: commission, tip_split_default: tipSplit })
       .eq("id", salon.id);
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Settings saved");
-      qc.invalidateQueries({ queryKey: ["my-staff"] });
-    }
+    if (error) toast.error(error.message);
+    else toast.success("Settings saved");
     setSaving(false);
   };
 
+  // ── Staff ───────────────────────────────────────────────────────────
+  const { data: staffList = [] } = useQuery({
+    queryKey: ["staff-list"],
+    queryFn: () => getAllStaffForSalon(),
+  });
+  const [staffForm, setStaffForm] = useState<{ name: string; role: "owner" | "staff" } | null>(null);
+  const [editingStaff, setEditingStaff] = useState<string | null>(null);
+
+  const handleCreateStaff = async () => {
+    if (!staffForm) return;
+    try {
+      await createStaff({ data: { name: staffForm.name, role: staffForm.role } });
+      toast.success("Staff added");
+      setStaffForm(null);
+      qc.invalidateQueries({ queryKey: ["staff-list"] });
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  const handleToggleStaffActive = async (id: string, isActive: boolean) => {
+    try {
+      await updateStaff({ data: { id, isActive: !isActive } });
+      qc.invalidateQueries({ queryKey: ["staff-list"] });
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  const handleDeleteStaff = async (id: string) => {
+    try {
+      await deleteStaff({ data: { id } });
+      toast.success("Staff deactivated");
+      qc.invalidateQueries({ queryKey: ["staff-list"] });
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  // ── Services ─────────────────────────────────────────────────────────
+  const { data: servicesList = [] } = useQuery({
+    queryKey: ["services-list"],
+    queryFn: () => getAllServicesForSalon(),
+  });
+  const [svcForm, setSvcForm] = useState<{
+    name: string; category: string; durationMinutes: number;
+    price: number; bufferAfterMinutes: number;
+  } | null>(null);
+  const [editingSvc, setEditingSvc] = useState<string | null>(null);
+
+  const handleCreateService = async () => {
+    if (!svcForm) return;
+    try {
+      await createService({ data: svcForm });
+      toast.success("Service added");
+      setSvcForm(null);
+      qc.invalidateQueries({ queryKey: ["services-list"] });
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  const handleToggleSvcActive = async (id: string, isActive: boolean) => {
+    try {
+      await updateService({ data: { id, isActive: !isActive } });
+      qc.invalidateQueries({ queryKey: ["services-list"] });
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  const handleDeleteService = async (id: string) => {
+    try {
+      await deleteService({ data: { id } });
+      toast.success("Service deactivated");
+      qc.invalidateQueries({ queryKey: ["services-list"] });
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  // ── Hours ────────────────────────────────────────────────────────────
+  const [hours, setHours] = useState<Record<string, { open: string; close: string }>>(
+    () => {
+      const raw = salon.business_hours || {};
+      const parsed: Record<string, { open: string; close: string }> = {};
+      for (const day of ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]) {
+        const slot = raw[day]?.[0];
+        parsed[day] = { open: slot?.open ?? "", close: slot?.close ?? "" };
+      }
+      return parsed;
+    },
+  );
+  const [savingHours, setSavingHours] = useState(false);
+
+  const handleSaveHours = async () => {
+    setSavingHours(true);
+    const businessHours: Record<string, { open: string; close: string }[]> = {};
+    for (const [day, times] of Object.entries(hours)) {
+      if (times.open && times.close) {
+        businessHours[day] = [{ open: times.open, close: times.close }];
+      }
+    }
+    try {
+      await updateSalonHours({ data: { businessHours } });
+      toast.success("Hours saved");
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+    setSavingHours(false);
+  };
+
+  // ── Render ───────────────────────────────────────────────────────────
   return (
     <div className="max-w-xl space-y-5">
       {/* Business info */}
@@ -39,20 +163,16 @@ export default function SettingsView({ salon }: { salon: any }) {
         <h3 className="font-semibold">Business</h3>
         <label className="block">
           <span className="text-xs text-muted-foreground font-medium">Salon name</span>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1.5 w-full tap-target rounded-xl bg-surface-2 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-          />
+          <input value={name} onChange={(e) => setName(e.target.value)} className={INPUT_CLS} />
         </label>
         <label className="block">
           <span className="text-xs text-muted-foreground font-medium">Phone</span>
-          <input
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="mt-1.5 w-full tap-target rounded-xl bg-surface-2 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-          />
+          <input value={phone} onChange={(e) => setPhone(e.target.value)} className={INPUT_CLS} />
         </label>
+        <button onClick={saveBusiness} disabled={saving} className={BTN_CLS}>
+          <Save className="h-4 w-4" />
+          {saving ? "Saving..." : "Save changes"}
+        </button>
       </div>
 
       {/* Commission & tips */}
@@ -63,17 +183,10 @@ export default function SettingsView({ salon }: { salon: any }) {
             <span>Tech commission</span>
             <span className="font-mono text-foreground">{commission}%</span>
           </label>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={commission}
-            onChange={(e) => setCommission(Number(e.target.value))}
-            className="w-full accent-primary"
-          />
+          <input type="range" min={0} max={100} value={commission}
+            onChange={(e) => setCommission(Number(e.target.value))} className="w-full accent-primary" />
           <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-            <span>0%</span>
-            <span>100%</span>
+            <span>0%</span><span>100%</span>
           </div>
         </div>
         <div>
@@ -81,15 +194,8 @@ export default function SettingsView({ salon }: { salon: any }) {
             <span>Default tip to tech</span>
             <span className="font-mono text-foreground">{tipSplit}%</span>
           </label>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            step={10}
-            value={tipSplit}
-            onChange={(e) => setTipSplit(Number(e.target.value))}
-            className="w-full accent-primary"
-          />
+          <input type="range" min={0} max={100} step={10} value={tipSplit}
+            onChange={(e) => setTipSplit(Number(e.target.value))} className="w-full accent-primary" />
           <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
             <span>Tech: {tipSplit}%</span>
             <span>Salon: {100 - tipSplit}%</span>
@@ -97,19 +203,208 @@ export default function SettingsView({ salon }: { salon: any }) {
         </div>
       </div>
 
-      {/* Save */}
-      <button
-        onClick={save}
-        disabled={saving}
-        className="tap-target inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-all"
-      >
-        <Save className="h-4 w-4" />
-        {saving ? "Saving..." : "Save changes"}
-      </button>
+      {/* Staff */}
+      <div className="rounded-2xl bg-surface p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold">Staff</h3>
+          <button onClick={() => setStaffForm({ name: "", role: "staff" })}
+            className={`${BTN_SM_CLS} bg-primary/10 text-primary hover:bg-primary/20`}>
+            <Plus className="h-3.5 w-3.5" /> Add
+          </button>
+        </div>
 
-      <p className="text-xs text-muted-foreground">
-        Hours and holiday schedules are stored as JSON and can be edited here in a future update.
-      </p>
+        {staffForm && (
+          <div className="rounded-xl bg-surface-2 p-4 space-y-3 border border-border/30">
+            <label className="block">
+              <span className="text-xs text-muted-foreground font-medium">Name</span>
+              <input value={staffForm.name} onChange={(e) => setStaffForm({ ...staffForm, name: e.target.value })}
+                className={INPUT_CLS} placeholder="Staff name" />
+            </label>
+            <label className="block">
+              <span className="text-xs text-muted-foreground font-medium">Role</span>
+              <select value={staffForm.role}
+                onChange={(e) => setStaffForm({ ...staffForm, role: e.target.value as "owner" | "staff" })}
+                className={INPUT_CLS}>
+                <option value="staff">Staff</option>
+                <option value="owner">Owner</option>
+              </select>
+            </label>
+            <div className="flex gap-2">
+              <button onClick={handleCreateStaff} className={`${BTN_SM_CLS} bg-emerald-600 text-white hover:bg-emerald-700`}>
+                <Check className="h-3.5 w-3.5" /> Save
+              </button>
+              <button onClick={() => setStaffForm(null)} className={`${BTN_SM_CLS} bg-surface-3 text-muted-foreground hover:bg-border/40`}>
+                <X className="h-3.5 w-3.5" /> Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {staffList.length === 0 && !staffForm && (
+          <p className="text-sm text-muted-foreground">No staff yet. Add your first team member.</p>
+        )}
+
+        <div className="space-y-2">
+          {staffList.map((s: any) => (
+            <div key={s.id} className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                  style={{ backgroundColor: s.avatar_color || "#0a0a0a" }}>
+                  {(s.name || "?").charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-sm font-medium">{s.name}</p>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{s.role}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleToggleStaffActive(s.id, s.is_active)}
+                  className={`text-xs font-medium px-2 py-1 rounded-lg transition-all ${
+                    s.is_active
+                      ? "bg-emerald-500/10 text-emerald-600"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {s.is_active ? "Active" : "Inactive"}
+                </button>
+                <button onClick={() => handleDeleteStaff(s.id)}
+                  className="tap-target p-1.5 text-muted-foreground hover:text-red-500 transition-colors">
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Services */}
+      <div className="rounded-2xl bg-surface p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold">Services</h3>
+          <button onClick={() => setSvcForm({
+            name: "", category: "", durationMinutes: 30, price: 0,
+            bufferAfterMinutes: 0,
+          })}
+            className={`${BTN_SM_CLS} bg-primary/10 text-primary hover:bg-primary/20`}>
+            <Plus className="h-3.5 w-3.5" /> Add
+          </button>
+        </div>
+
+        {svcForm && (
+          <div className="rounded-xl bg-surface-2 p-4 space-y-3 border border-border/30">
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block col-span-2">
+                <span className="text-xs text-muted-foreground font-medium">Name</span>
+                <input value={svcForm.name} onChange={(e) => setSvcForm({ ...svcForm, name: e.target.value })}
+                  className={INPUT_CLS} placeholder="Service name" />
+              </label>
+              <label className="block">
+                <span className="text-xs text-muted-foreground font-medium">Category</span>
+                <input value={svcForm.category} onChange={(e) => setSvcForm({ ...svcForm, category: e.target.value })}
+                  className={INPUT_CLS} placeholder="e.g. Core Nail" />
+              </label>
+              <label className="block">
+                <span className="text-xs text-muted-foreground font-medium">Duration (min)</span>
+                <input type="number" value={svcForm.durationMinutes}
+                  onChange={(e) => setSvcForm({ ...svcForm, durationMinutes: Number(e.target.value) })}
+                  className={INPUT_CLS} />
+              </label>
+              <label className="block">
+                <span className="text-xs text-muted-foreground font-medium">Price ($)</span>
+                <input type="number" step="0.01" value={svcForm.price}
+                  onChange={(e) => setSvcForm({ ...svcForm, price: Number(e.target.value) })}
+                  className={INPUT_CLS} />
+              </label>
+              <label className="block col-span-2">
+                <span className="text-xs text-muted-foreground font-medium">Buffer after (min)</span>
+                <input type="number" value={svcForm.bufferAfterMinutes}
+                  onChange={(e) => setSvcForm({ ...svcForm, bufferAfterMinutes: Number(e.target.value) })}
+                  className={INPUT_CLS} />
+              </label>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={handleCreateService} className={`${BTN_SM_CLS} bg-emerald-600 text-white hover:bg-emerald-700`}>
+                <Check className="h-3.5 w-3.5" /> Save
+              </button>
+              <button onClick={() => setSvcForm(null)} className={`${BTN_SM_CLS} bg-surface-3 text-muted-foreground hover:bg-border/40`}>
+                <X className="h-3.5 w-3.5" /> Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {servicesList.length === 0 && !svcForm && (
+          <p className="text-sm text-muted-foreground">No services yet. Add your first service.</p>
+        )}
+
+        <div className="space-y-2">
+          {servicesList.map((svc: any) => (
+            <div key={svc.id} className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium truncate">{svc.name}</p>
+                <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                  {svc.category && <span className="px-1.5 py-0.5 rounded bg-muted">{svc.category}</span>}
+                  <span>{svc.duration_minutes} min</span>
+                  <span className="font-mono">${Number(svc.price).toFixed(2)}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0 ml-3">
+                <button
+                  onClick={() => handleToggleSvcActive(svc.id, svc.is_active)}
+                  className={`text-xs font-medium px-2 py-1 rounded-lg transition-all ${
+                    svc.is_active
+                      ? "bg-emerald-500/10 text-emerald-600"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {svc.is_active ? "Active" : "Inactive"}
+                </button>
+                <button onClick={() => handleDeleteService(svc.id)}
+                  className="tap-target p-1.5 text-muted-foreground hover:text-red-500 transition-colors">
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Hours */}
+      <div className="rounded-2xl bg-surface p-6 space-y-4">
+        <h3 className="font-semibold">Business hours</h3>
+        <div className="space-y-3">
+          {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map((day) => (
+            <div key={day} className="flex items-center gap-3">
+              <span className="w-24 text-xs font-medium capitalize text-muted-foreground">{day}</span>
+              <input
+                type="time" value={hours[day]?.open ?? ""}
+                onChange={(e) => setHours({ ...hours, [day]: { ...hours[day], open: e.target.value } })}
+                className="tap-target rounded-lg bg-surface-2 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <span className="text-xs text-muted-foreground">to</span>
+              <input
+                type="time" value={hours[day]?.close ?? ""}
+                onChange={(e) => setHours({ ...hours, [day]: { ...hours[day], close: e.target.value } })}
+                className="tap-target rounded-lg bg-surface-2 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+          ))}
+        </div>
+        <button onClick={handleSaveHours} disabled={savingHours} className={BTN_CLS}>
+          <Save className="h-4 w-4" />
+          {savingHours ? "Saving..." : "Save hours"}
+        </button>
+      </div>
+
+      {/* Social links hint */}
+      <div className="rounded-2xl bg-surface p-6">
+        <h3 className="font-semibold mb-2">Social & online</h3>
+        <p className="text-xs text-muted-foreground">
+          Social links (Instagram, Facebook, TikTok, Booksy, Yelp) are managed via
+          environment variables. Update your <code className="text-primary bg-primary/10 px-1 rounded">.env</code> to change them.
+        </p>
+      </div>
     </div>
   );
 }

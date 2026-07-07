@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BUSINESS } from "@/lib/salon";
+import { getSalonAddress, getSalonName, getSalonPhone, getSalonPhoneHref, getSalonSocial, getSalonTagline } from "@/lib/env";
 import { Instagram, Facebook } from "lucide-react";
 
 export function SiteHeader() {
@@ -7,7 +7,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 sm:px-10">
         <Link to="/" className="font-display text-2xl italic tracking-tight">
-          Nail Lounge
+          {getSalonName()}
         </Link>
         <nav className="hidden items-center gap-10 text-xs uppercase tracking-[0.22em] text-muted-foreground md:flex">
           <Link
@@ -54,19 +54,18 @@ export function SiteFooter() {
     <footer className="border-t border-border bg-background">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 py-16 sm:grid-cols-4 sm:px-10">
         <div className="sm:col-span-2">
-          <p className="font-display text-2xl italic">Nail Lounge</p>
+          <p className="font-display text-2xl italic">{getSalonName()}</p>
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-            A quiet studio for precision manicures, pedicures, and considered nail art in Machesney
-            Park, IL.
+            {getSalonTagline()}
           </p>
-          <p className="mt-4 text-xs text-muted-foreground">{BUSINESS.address}</p>
+          <p className="mt-4 text-xs text-muted-foreground">{getSalonAddress()}</p>
           <p className="text-xs text-muted-foreground">
-            <a href={`tel:${BUSINESS.phoneHref}`} className="hover:text-foreground">
-              {BUSINESS.phone}
+            <a href={`tel:${getSalonPhoneHref()}`} className="hover:text-foreground">
+              {getSalonPhone()}
             </a>{" "}
             ·{" "}
-            <a href={`mailto:${BUSINESS.email}`} className="hover:text-foreground">
-              {BUSINESS.email}
+            <a href={`mailto:${getSalonSocial().email}`} className="hover:text-foreground">
+              {getSalonSocial().email}
             </a>
           </p>
         </div>
@@ -105,7 +104,7 @@ export function SiteFooter() {
           <ul className="mt-4 space-y-2 text-sm">
             <li>
               <a
-                href={BUSINESS.instagram}
+                href={getSalonSocial().instagram}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 hover:underline"
@@ -115,7 +114,7 @@ export function SiteFooter() {
             </li>
             <li>
               <a
-                href={BUSINESS.tiktok}
+                href={getSalonSocial().tiktok}
                 target="_blank"
                 rel="noreferrer"
                 className="hover:underline"
@@ -125,7 +124,7 @@ export function SiteFooter() {
             </li>
             <li>
               <a
-                href={BUSINESS.facebook}
+                href={getSalonSocial().facebook}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 hover:underline"
@@ -134,13 +133,13 @@ export function SiteFooter() {
               </a>
             </li>
             <li>
-              <a href={BUSINESS.yelp} target="_blank" rel="noreferrer" className="hover:underline">
+              <a href={getSalonSocial().yelp} target="_blank" rel="noreferrer" className="hover:underline">
                 Yelp
               </a>
             </li>
             <li>
               <a
-                href={BUSINESS.booksy}
+                href={getSalonSocial().booksy}
                 target="_blank"
                 rel="noreferrer"
                 className="hover:underline"
@@ -153,7 +152,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-border">
         <div className="mx-auto max-w-7xl px-6 py-6 text-center text-[11px] uppercase tracking-[0.3em] text-muted-foreground sm:px-10">
-          © {new Date().getFullYear()} Nail Lounge · Machesney Park, IL
+          © {new Date().getFullYear()} {getSalonName()}
         </div>
       </div>
     </footer>
@@ -163,8 +162,8 @@ export function SiteFooter() {
 export function MapEmbed({ className = "" }: { className?: string }) {
   return (
     <iframe
-      title="Nail Lounge location"
-      src={BUSINESS.mapEmbed}
+      title={`${getSalonName()} location`}
+      src={getSalonSocial().mapEmbed}
       loading="lazy"
       referrerPolicy="no-referrer-when-downgrade"
       className={"h-full w-full border-0 " + className}

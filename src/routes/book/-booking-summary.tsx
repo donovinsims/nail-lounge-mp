@@ -1,5 +1,5 @@
 export interface BookingSummaryProps {
-  service: { name: string; price: number; deposit_amount: number } | null;
+  service: { name: string; price: number } | null;
   staff: { name: string } | null;
   slot: Date | null;
   fmtMoney: (n: number) => string;
@@ -31,12 +31,6 @@ export default function BookingSummary({
         <div className="flex justify-between">
           <span className="text-muted-foreground">Total</span>
           <span className="font-mono font-semibold">{fmtMoney(Number(service?.price ?? 0))}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Deposit today</span>
-          <span className="font-mono font-semibold">
-            {fmtMoney(Number(service?.deposit_amount ?? 0))}
-          </span>
         </div>
       </div>
     </aside>

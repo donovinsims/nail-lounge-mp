@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { InstagramEmbed, TikTokEmbed } from "@/components/social-embeds";
-import { BUSINESS } from "@/lib/salon";
+import { getSalonName, getSalonSocial } from "@/lib/env";
 import { Instagram, ArrowRight } from "lucide-react";
 import art1 from "@/assets/art1.jpg";
 import art2 from "@/assets/art2.jpg";
@@ -24,17 +24,10 @@ const PIECES = [
 export const Route = createFileRoute("/gallery")({
   head: () => ({
     meta: [
-      { title: "Nail Art Gallery — Nail Lounge, Machesney Park IL" },
-      {
-        name: "description",
-        content:
-          "Recent work from the Nail Lounge studio — gel, acrylic, chrome, ombre, french, and custom nail art.",
-      },
-      { property: "og:title", content: "Nail Art Gallery — Nail Lounge" },
-      {
-        property: "og:description",
-        content: "Curated nail art and pedicure work from our resident artists.",
-      },
+      { title: `Gallery — ${getSalonName()}` },
+      { name: "description", content: `Recent work from the ${getSalonName()} studio — gel, acrylic, chrome, ombre, french, and custom nail art.` },
+      { property: "og:title", content: `Gallery — ${getSalonName()}` },
+      { property: "og:description", content: "Curated nail art and pedicure work from our resident artists." },
       { property: "og:image", content: g3 },
       { property: "og:url", content: "/gallery" },
     ],
@@ -60,15 +53,23 @@ function GalleryPage() {
           </p>
           <div className="mt-8 flex gap-4">
             <a
-              href={BUSINESS.instagram}
+              href={getSalonSocial().instagram}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] underline-offset-4 hover:underline"
             >
-              <Instagram className="h-4 w-4" /> @nailloungemachesneypark
+              <Instagram className="h-4 w-4" /> Instagram
             </a>
             <a
-              href={BUSINESS.tiktok}
+              href={getSalonSocial().tiktok}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs uppercase tracking-[0.25em] underline-offset-4 hover:underline"
+            >
+              TikTok
+            </a>
+            <a
+              href={getSalonSocial().tiktok}
               target="_blank"
               rel="noreferrer"
               className="text-xs uppercase tracking-[0.25em] underline-offset-4 hover:underline"

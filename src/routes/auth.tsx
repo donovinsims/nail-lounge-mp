@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getSalonName } from "@/lib/env";
 import { toast } from "sonner";
 import { Loader2, ChevronLeft } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — Nail Lounge Admin" }] }),
+  head: () => ({ meta: [{ title: `Sign in — ${getSalonName()} Admin` }] }),
   component: AuthPage,
 });
 

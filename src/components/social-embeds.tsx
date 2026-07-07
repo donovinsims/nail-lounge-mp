@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Instagram } from "lucide-react";
-import { BUSINESS } from "@/lib/salon";
+import { getSalonSocial } from "@/lib/env";
 
 /**
  * Lightweight social embeds — render a static skeleton until the user
@@ -24,13 +24,13 @@ function useInView<T extends Element>(rootMargin = "200px") {
 
 export function InstagramEmbed() {
   const { ref, inView } = useInView<HTMLDivElement>();
-  const handle = BUSINESS.instagram.split("/").filter(Boolean).pop() || "nailloungemachesneypark";
+  const handle = getSalonSocial().instagram.split("/").filter(Boolean).pop() || "";
   const src = `https://www.instagram.com/${handle}/embed`;
   return (
     <div ref={ref} className="overflow-hidden rounded-3xl bg-surface hairline">
       <div className="flex items-center justify-between px-5 py-3 border-b border-border/60">
         <a
-          href={BUSINESS.instagram}
+          href={getSalonSocial().instagram}
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-2 text-sm font-medium"
@@ -58,14 +58,14 @@ export function InstagramEmbed() {
 
 export function TikTokEmbed() {
   const { ref, inView } = useInView<HTMLDivElement>();
-  const handle = (BUSINESS.tiktok.split("/@").pop() || "nailloungemp").replace(/\/$/, "");
+  const handle = (getSalonSocial().tiktok.split("/@").pop() || "").replace(/\/$/, "");
   // TikTok creator embed
   const src = `https://www.tiktok.com/embed/@${handle}`;
   return (
     <div ref={ref} className="overflow-hidden rounded-3xl bg-surface hairline">
       <div className="flex items-center justify-between px-5 py-3 border-b border-border/60">
         <a
-          href={BUSINESS.tiktok}
+          href={getSalonSocial().tiktok}
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-2 text-sm font-medium"

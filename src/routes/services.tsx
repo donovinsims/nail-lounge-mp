@@ -2,34 +2,17 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { fetchSalon, fetchServices, fmtMoney } from "@/lib/salon";
+import { getSalonName } from "@/lib/env";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { ArrowRight, Clock, Sparkles } from "lucide-react";
-
-const CATEGORY_ORDER = [
-  "Core Nail Services",
-  "Nail Enhancements",
-  "Specialty Nail Art",
-  "Hand & Foot Care",
-  "Waxing Services",
-  "Facial Services",
-  "Common Add-Ons",
-];
 
 export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
-      { title: "Services & Pricing — Nail Lounge, Machesney Park IL" },
-      {
-        name: "description",
-        content:
-          "Full menu of manicures, pedicures, acrylic, gel, dip powder, nail art, waxing, and facials. Transparent pricing at Nail Lounge in Machesney Park, Illinois.",
-      },
-      { property: "og:title", content: "Services & Pricing — Nail Lounge" },
-      {
-        property: "og:description",
-        content:
-          "Full menu and prices for manicures, pedicures, acrylic, gel, dip, nail art, waxing, and facials.",
-      },
+      { title: `Services & Pricing — ${getSalonName()}` },
+      { name: "description", content: `Full service menu at ${getSalonName()}. Transparent pricing, no surprises.` },
+      { property: "og:title", content: `Services & Pricing — ${getSalonName()}` },
+      { property: "og:description", content: `Full menu and prices for all services at ${getSalonName()}.` },
       { property: "og:url", content: "/services" },
     ],
     links: [{ rel: "canonical", href: "/services" }],
@@ -47,9 +30,11 @@ function ServicesPage() {
 
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const grouped = CATEGORY_ORDER.map(
+  // Group services dynamically by category — derived from actual DB data, not hardcoded.
+  const categories = [...new Set(services.map((s: any) => s.category).filter(Boolean))].sort();
+  const grouped = categories.map(
     (cat) => [cat, services.filter((s) => s.category === cat)] as const,
-  ).filter(([, items]) => items.length > 0);
+  );
 
   return (
     <div className="min-h-screen bg-background text-foreground">

@@ -13,6 +13,7 @@ import {
   Users,
   BarChart3,
   PieChart,
+  CreditCard,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -72,7 +73,7 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
       const { data } = await supabase
         .from("bookings")
         .select(
-          "id, start_time, status, deposit_paid, services(name, price), staff(name), clients(name)",
+          "id, start_time, status, services(name, price), staff(name), clients(name)",
         )
         .eq("salon_id", salonId)
         .gte("start_time", start.toISOString())
@@ -147,6 +148,25 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
     },
   });
 
+  // Today's completed bookings (for payment method breakdown)
+  const { data: todayCompletedBookings = [] } = useQuery({
+    queryKey: ["admin-completed-bookings", salonId],
+    queryFn: async () => {
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      const end = new Date();
+      end.setHours(23, 59, 59, 999);
+      const { data } = await supabase
+        .from("bookings")
+        .select("payment_method, tip_amount")
+        .eq("salon_id", salonId)
+        .not("completed_at", "is", null)
+        .gte("completed_at", start.toISOString())
+        .lte("completed_at", end.toISOString());
+      return data ?? [];
+    },
+  });
+
   // Compute KPIs
   const todayRev = cr.reduce(
     (a: number, c: any) => a + Number(c.gross_amount) + Number(c.tip_amount),
@@ -210,6 +230,22 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
       count,
       fill: STATUS_COLORS[status] || "var(--color-chart-4)",
     }));
+
+  // Payment method breakdown
+  const totalTipsToday = todayCompletedBookings.reduce(
+    (sum: number, b: any) => sum + Number((b as any).tip_amount || 0),
+    0,
+  );
+  const paymentMethodBreakdown = todayCompletedBookings.reduce(
+    (acc: Record<string, { count: number; tips: number }>, b: any) => {
+      const method = (b as any).payment_method || "Unknown";
+      if (!acc[method]) acc[method] = { count: 0, tips: 0 };
+      acc[method].count += 1;
+      acc[method].tips += Number((b as any).tip_amount || 0);
+      return acc;
+    },
+    {} as Record<string, { count: number; tips: number }>,
+  );
 
   const chartConfig: ChartConfig = {
     revenue: { label: "Revenue", color: "var(--color-chart-1)" },
@@ -377,6 +413,41 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
             </div>
           )}
         </div>
+      </div>
+
+      {/* Payment Method Breakdown */}
+      <div className="rounded-2xl bg-surface p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-semibold">Payment Methods</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {fmtMoney(totalTipsToday)} in tips collected today
+            </p>
+          </div>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <CreditCard className="h-4 w-4" />
+          </div>
+        </div>
+        {todayCompletedBookings.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(paymentMethodBreakdown).map(([method, data]) => (
+              <div
+                key={method}
+                className="rounded-xl bg-surface-2 px-4 py-3 flex-1 min-w-[140px]"
+              >
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  {method}
+                </p>
+                <p className="text-lg font-bold mt-0.5">{data.count}</p>
+                <p className="text-xs text-muted-foreground">{fmtMoney(data.tips)} tips</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-20 text-sm text-muted-foreground">
+            No completed bookings today
+          </div>
+        )}
       </div>
 
       {/* Today's schedule */}

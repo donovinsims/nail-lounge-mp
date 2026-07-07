@@ -19,8 +19,23 @@ import process from "node:process";
 export function getServerConfig() {
   return {
     nodeEnv: process.env.NODE_ENV,
-    // Add server-only values here, e.g.:
-    //   databaseUrl: process.env.DATABASE_URL,
-    //   stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+    twilioAccountSid: process.env.TWILIO_ACCOUNT_SID || "",
+    twilioAuthToken: process.env.TWILIO_AUTH_TOKEN || "",
+    twilioPhoneNumber: process.env.TWILIO_PHONE_NUMBER || "",
+    appUrl: process.env.APP_URL || import.meta.env.VITE_APP_URL || "",
+    resendApiKey: process.env.RESEND_API_KEY || "",
+    resendFromEmail: process.env.RESEND_FROM_EMAIL || "",
   };
+}
+
+/** High-convenience check — true when Twilio is ready to send SMS. */
+export function hasTwilio(): boolean {
+  const cfg = getServerConfig();
+  return !!(cfg.twilioAccountSid && cfg.twilioAuthToken && cfg.twilioPhoneNumber);
+}
+
+/** High-convenience check — true when Resend is ready to send email. */
+export function hasEmail(): boolean {
+  const cfg = getServerConfig();
+  return !!cfg.resendApiKey;
 }

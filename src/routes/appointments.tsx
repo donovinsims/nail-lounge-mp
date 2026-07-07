@@ -4,11 +4,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { lookupAppointments, cancelPublicBooking } from "@/lib/booking.functions";
 import { fmtDate, fmtTime, fmtMoney } from "@/lib/salon";
+import { getSalonName } from "@/lib/env";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/appointments")({
-  head: () => ({ meta: [{ title: "My appointments — Nail Lounge" }] }),
+  head: () => ({ meta: [{ title: `My appointments — ${getSalonName()}` }] }),
   component: Appointments,
 });
 
@@ -88,8 +89,7 @@ function Appointments() {
               {fmtDate(b.start_time)} · {fmtTime(b.start_time)}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              {fmtMoney(Number(b.services?.price ?? 0))} · deposit{" "}
-              {fmtMoney(Number(b.deposit_paid))}
+              {fmtMoney(Number(b.services?.price ?? 0))}
             </p>
             {b.status === "confirmed" && (
               <button

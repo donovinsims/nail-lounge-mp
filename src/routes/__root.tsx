@@ -13,12 +13,9 @@ import appCss from "../styles.css?url";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { getSalonName, getSalonPhone, getSalonSocial, getOGImage, getUmamiWebsiteId, getUmamiHost } from "@/lib/env";
 
-// TODO: Replace with a branded OG image on your own domain after deploy.
-// Current URL is a generated preview on Cloudflare R2 — works for now but should
-// be swapped for /og-image.jpg in public/ once you have one.
-const OG_IMAGE =
-  "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ac3d18b7-2275-40d8-873c-ea7183ee4f13/id-preview-90fe0b6c--a0e6aeda-fff0-4bdc-8a55-de8fec4c877c.lovable.app-1781667178638.png";
+const OG_IMAGE = getOGImage();
 
 function NotFoundComponent() {
   return (
@@ -68,24 +65,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#0a0a0a" },
-      { title: "Nail Lounge — Book your appointment" },
+      { title: `${getSalonName()} — Book your appointment` },
       {
         name: "description",
-        content:
-          "Book your manicure, pedicure, or acrylic appointment at Nail Lounge in Machesney Park, IL.",
+        content: `Book your appointment at ${getSalonName()}.`,
       },
-      { property: "og:title", content: "Nail Lounge — Book your appointment" },
+      { property: "og:title", content: `${getSalonName()} — Book your appointment` },
       {
         property: "og:description",
-        content:
-          "Book your manicure, pedicure, or acrylic appointment at Nail Lounge in Machesney Park, IL.",
+        content: `Book your appointment at ${getSalonName()}.`,
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:title", content: "Nail Lounge — Book your appointment" },
+      { name: "twitter:title", content: `${getSalonName()} — Book your appointment` },
       {
         name: "twitter:description",
-        content:
-          "Book your manicure, pedicure, or acrylic appointment at Nail Lounge in Machesney Park, IL.",
+        content: `Book your appointment at ${getSalonName()}.`,
       },
       { property: "og:image", content: OG_IMAGE },
       { name: "twitter:image", content: OG_IMAGE },
@@ -110,47 +104,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "NailSalon",
-          name: "Nail Lounge",
-          image: OG_IMAGE,
-          telephone: "+1-815-977-3443",
-          email: "wait4alove@yahoo.com",
+          name: getSalonName(),
+          ...(OG_IMAGE ? { image: OG_IMAGE } : {}),
+          ...(getSalonPhone() ? { telephone: getSalonPhone() } : {}),
+          ...(getSalonSocial().email ? { email: getSalonSocial().email } : {}),
           priceRange: "$$",
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: "1513 West Lane Rd",
-            addressLocality: "Machesney Park",
-            addressRegion: "IL",
-            postalCode: "61115",
-            addressCountry: "US",
-          },
-          geo: { "@type": "GeoCoordinates", latitude: 42.3403, longitude: -89.042 },
-          openingHoursSpecification: [
-            {
-              "@type": "OpeningHoursSpecification",
-              dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-              opens: "09:30",
-              closes: "19:30",
-            },
-            {
-              "@type": "OpeningHoursSpecification",
-              dayOfWeek: "Saturday",
-              opens: "09:30",
-              closes: "18:00",
-            },
-            {
-              "@type": "OpeningHoursSpecification",
-              dayOfWeek: "Sunday",
-              opens: "10:00",
-              closes: "17:00",
-            },
-          ],
-          sameAs: [
-            "https://www.facebook.com/nailloungemachesneypark",
-            "https://www.instagram.com/nailloungemachesneypark",
-            "https://www.tiktok.com/@nailloungemp",
-            "https://www.yelp.com/biz/nail-lounge-machesney-park",
-            "https://booksy.com/en-us/323657_nail-lounge_nail-salon_19333_machesney-park",
-          ],
         }),
       },
     ],
@@ -162,10 +120,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const umamiId = getUmamiWebsiteId();
+  const umamiHost = getUmamiHost();
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        {umamiId && <script defer src={`${umamiHost}/script.js`} data-website-id={umamiId} />}
       </head>
       <body>
         {children}

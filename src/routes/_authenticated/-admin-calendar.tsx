@@ -3,12 +3,30 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { fmtTime } from "@/lib/salon";
 import { StatusBadge } from "./-admin-components/status-badge";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const HOURS = Array.from({ length: 12 }, (_, i) => 9 + i); // 9a–8p
+
+function formatHour(hour: number) {
+  return `${hour > 12 ? hour - 12 : hour}${hour >= 12 ? "p" : "a"}`;
+}
 
 export default function CalendarView({ salonId }: { salonId: string }) {
   const [date, setDate] = useState(() => new Date());
   const [expanded, setExpanded] = useState<string | null>(null);
 
+  // Fetch staff for this salon
+  const { data: staffList = [] } = useQuery({
+    queryKey: ["cal-staff", salonId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("staff")
+        .select("id, name, avatar_color")
+        .eq("salon_id", salonId);
+      return data ?? [];
+    },
+  });
+
+  // Fetch bookings for the selected date
   const { data: bookings = [] } = useQuery({
     queryKey: ["cal", salonId, date.toDateString()],
     queryFn: async () => {
@@ -19,7 +37,7 @@ export default function CalendarView({ salonId }: { salonId: string }) {
       const { data } = await supabase
         .from("bookings")
         .select(
-          "id, start_time, end_time, status, services(name, price), staff(name, avatar_color), clients(name)",
+          "id, start_time, end_time, status, staff_id, services(name, price), staff(name, avatar_color), clients(name)",
         )
         .eq("salon_id", salonId)
         .gte("start_time", start.toISOString())
@@ -29,8 +47,101 @@ export default function CalendarView({ salonId }: { salonId: string }) {
     },
   });
 
+  // Filter staff to only those with bookings today
+  const staffIdsWithBookings = new Set(bookings.map((b: any) => (b as any).staff_id));
+  const staffWithBookings = staffList.filter((s: any) => staffIdsWithBookings.has(s.id));
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  // Build flat grid: corner + staff headers, then hour rows
+  const gridCols = `80px repeat(${Math.max(staffWithBookings.length, 1)}, minmax(180px, 1fr))`;
+
+  const gridItems: React.ReactNode[] = [];
+
+  // Header row — corner cell
+  gridItems.push(
+    <div key="corner" className="p-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground border-b border-border" />,
+  );
+
+  // Staff column headers
+  if (staffWithBookings.length === 0) {
+    gridItems.push(
+      <div
+        key="no-staff-header"
+        className="p-3 text-xs text-muted-foreground border-b border-border border-l border-border"
+      >
+        Bookings
+      </div>,
+    );
+  } else {
+    staffWithBookings.forEach((s: any) => {
+      gridItems.push(
+        <div
+          key={`h-${s.id}`}
+          className="flex items-center gap-2 p-3 text-sm font-semibold border-b border-border border-l border-border"
+        >
+          <div
+            className="h-3 w-3 rounded-full shrink-0"
+            style={{ backgroundColor: s.avatar_color || "#888" }}
+          />
+          <span className="truncate">{s.name}</span>
+        </div>,
+      );
+    });
+  }
+
+  // Hour rows
+  HOURS.forEach((hour) => {
+    // Time label
+    gridItems.push(
+      <div
+        key={`t-${hour}`}
+        className="p-2 text-xs font-mono text-muted-foreground border-b border-border"
+      >
+        {formatHour(hour)}
+      </div>,
+    );
+
+    if (staffWithBookings.length === 0) {
+      // Single "Bookings" column when no staff with bookings
+      const items = bookings.filter(
+        (b: any) => new Date(b.start_time).getHours() === hour,
+      );
+      gridItems.push(
+        <div
+          key={`c-${hour}`}
+          className="p-1.5 space-y-1 min-h-[56px] border-b border-border border-l border-border"
+        >
+          {items.length === 0 ? (
+            <p className="text-xs text-muted-foreground/50 px-2 py-1">—</p>
+          ) : (
+            items.map((b: any) => renderBookingCard(b, expanded, setExpanded))
+          )}
+        </div>,
+      );
+    } else {
+      staffWithBookings.forEach((staff: any) => {
+        const items = bookings.filter(
+          (b: any) =>
+            (b as any).staff_id === staff.id &&
+            new Date(b.start_time).getHours() === hour,
+        );
+        gridItems.push(
+          <div
+            key={`c-${hour}-${staff.id}`}
+            className="p-1.5 space-y-1 min-h-[56px] border-b border-border border-l border-border"
+          >
+            {items.length === 0 ? (
+              <p className="text-xs text-muted-foreground/50 px-2 py-1">—</p>
+            ) : (
+              items.map((b: any) => renderBookingCard(b, expanded, setExpanded))
+            )}
+          </div>,
+        );
+      });
+    }
+  });
 
   return (
     <div>
@@ -71,71 +182,60 @@ export default function CalendarView({ salonId }: { salonId: string }) {
         </h2>
         <span className="text-xs text-muted-foreground">
           {bookings.length} booking{bookings.length !== 1 ? "s" : ""}
+          {staffWithBookings.length > 0 && ` · ${staffWithBookings.length} staff`}
         </span>
       </div>
 
-      {/* Timeline */}
-      <div className="rounded-2xl bg-surface overflow-hidden divide-y divide-border">
-        {Array.from({ length: 12 }, (_, i) => {
-          const hour = 9 + i;
-          const items = bookings.filter(
-            (b: any) => new Date(b.start_time).getHours() === hour,
-          );
-          return (
-            <div key={hour}>
-              <div className="grid grid-cols-[80px_1fr]">
-                <div className="p-3 text-xs font-mono text-muted-foreground border-r border-border">
-                  {hour > 12 ? hour - 12 : hour}{hour >= 12 ? "p" : "a"}
-                </div>
-                <div className="p-2 space-y-1.5 min-h-[56px]">
-                  {items.length === 0 && (
-                    <p className="text-xs text-muted-foreground/50 px-2 py-1">
-                      —
-                    </p>
-                  )}
-                  {items.map((b: any) => {
-                    const isExpanded = expanded === b.id;
-                    return (
-                      <button
-                        key={b.id}
-                        onClick={() => setExpanded(isExpanded ? null : b.id)}
-                        className={`w-full text-left rounded-xl p-3 transition-all ${
-                          isExpanded ? "ring-2 ring-primary/30 shadow-sm" : "hover:shadow-sm"
-                        }`}
-                        style={{
-                          background: (b.staff?.avatar_color || "#888") + "18",
-                        }}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold truncate">
-                              {b.clients?.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {fmtTime(b.start_time)} · {b.services?.name} · {b.staff?.name}
-                            </p>
-                          </div>
-                          <StatusBadge status={b.status} />
-                        </div>
-                        {isExpanded && (
-                          <div className="mt-3 pt-3 border-t border-border/50 text-xs text-muted-foreground space-y-1">
-                            <p><span className="font-medium text-foreground">Service:</span> {b.services?.name}</p>
-                            {b.services?.price && (
-                              <p><span className="font-medium text-foreground">Price:</span> ${b.services.price}</p>
-                            )}
-                            <p><span className="font-medium text-foreground">Staff:</span> {b.staff?.name}</p>
-                            <p><span className="font-medium text-foreground">Ends:</span> {b.end_time ? fmtTime(b.end_time) : "—"}</p>
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          );
-        })}
+      {/* Multi-staff grid */}
+      <div className="rounded-2xl bg-surface overflow-x-auto">
+        <div
+          className="grid"
+          style={{ gridTemplateColumns: gridCols, minWidth: staffWithBookings.length > 0 ? `${80 + staffWithBookings.length * 200}px` : undefined }}
+        >
+          {gridItems}
+        </div>
       </div>
     </div>
+  );
+}
+
+/** Compact booking card used inside grid cells */
+function renderBookingCard(
+  b: any,
+  expanded: string | null,
+  setExpanded: (id: string | null) => void,
+) {
+  const isExpanded = expanded === b.id;
+  const avatarColor = b.staff?.avatar_color || "#888";
+
+  return (
+    <button
+      key={b.id}
+      onClick={() => setExpanded(isExpanded ? null : b.id)}
+      className={`w-full text-left rounded-lg p-2 transition-all ${
+        isExpanded ? "ring-2 ring-primary/30 shadow-sm" : "hover:shadow-sm"
+      }`}
+      style={{ background: avatarColor + "18" }}
+    >
+      <p className="text-xs font-semibold truncate">{b.clients?.name}</p>
+      <p className="text-[10px] text-muted-foreground truncate">
+        {fmtTime(b.start_time)} · {b.services?.name}
+      </p>
+      {isExpanded && (
+        <div className="mt-2 pt-2 border-t border-border/50 text-[10px] text-muted-foreground space-y-0.5">
+          <p>
+            <span className="font-medium text-foreground">Price:</span> $
+            {b.services?.price || "—"}
+          </p>
+          <p>
+            <span className="font-medium text-foreground">Ends:</span>{" "}
+            {b.end_time ? fmtTime(b.end_time) : "—"}
+          </p>
+          <div className="pt-0.5">
+            <StatusBadge status={b.status} />
+          </div>
+        </div>
+      )}
+    </button>
   );
 }

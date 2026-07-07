@@ -13,13 +13,17 @@ import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ServiceRouteImport } from './routes/service'
 import { Route as GiftCardsRouteImport } from './routes/gift-cards'
 import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as BookingConfirmedRouteImport } from './routes/booking-confirmed'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppointmentsRouteImport } from './routes/appointments'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated/staff'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedStaffIndexRouteImport } from './routes/_authenticated/staff/index'
+import { Route as AuthenticatedStaffAppointmentsRouteImport } from './routes/_authenticated/staff/appointments'
 
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
@@ -39,6 +43,11 @@ const GiftCardsRoute = GiftCardsRouteImport.update({
 const GalleryRoute = GalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingConfirmedRoute = BookingConfirmedRouteImport.update({
+  id: '/booking-confirmed',
+  path: '/booking-confirmed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookRoute = BookRouteImport.update({
@@ -70,35 +79,58 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/callback',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthenticatedStaffRoute = AuthenticatedStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStaffIndexRoute = AuthenticatedStaffIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedStaffRoute,
+} as any)
+const AuthenticatedStaffAppointmentsRoute =
+  AuthenticatedStaffAppointmentsRouteImport.update({
+    id: '/appointments',
+    path: '/appointments',
+    getParentRoute: () => AuthenticatedStaffRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/appointments': typeof AppointmentsRoute
   '/auth': typeof AuthRouteWithChildren
   '/book': typeof BookRoute
+  '/booking-confirmed': typeof BookingConfirmedRoute
   '/gallery': typeof GalleryRoute
   '/gift-cards': typeof GiftCardsRoute
   '/service': typeof ServiceRoute
   '/services': typeof ServicesRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/staff': typeof AuthenticatedStaffRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
+  '/staff/appointments': typeof AuthenticatedStaffAppointmentsRoute
+  '/staff/': typeof AuthenticatedStaffIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/appointments': typeof AppointmentsRoute
   '/auth': typeof AuthRouteWithChildren
   '/book': typeof BookRoute
+  '/booking-confirmed': typeof BookingConfirmedRoute
   '/gallery': typeof GalleryRoute
   '/gift-cards': typeof GiftCardsRoute
   '/service': typeof ServiceRoute
   '/services': typeof ServicesRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/staff/appointments': typeof AuthenticatedStaffAppointmentsRoute
+  '/staff': typeof AuthenticatedStaffIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -107,12 +139,16 @@ export interface FileRoutesById {
   '/appointments': typeof AppointmentsRoute
   '/auth': typeof AuthRouteWithChildren
   '/book': typeof BookRoute
+  '/booking-confirmed': typeof BookingConfirmedRoute
   '/gallery': typeof GalleryRoute
   '/gift-cards': typeof GiftCardsRoute
   '/service': typeof ServiceRoute
   '/services': typeof ServicesRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/staff': typeof AuthenticatedStaffRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
+  '/_authenticated/staff/appointments': typeof AuthenticatedStaffAppointmentsRoute
+  '/_authenticated/staff/': typeof AuthenticatedStaffIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,24 +157,31 @@ export interface FileRouteTypes {
     | '/appointments'
     | '/auth'
     | '/book'
+    | '/booking-confirmed'
     | '/gallery'
     | '/gift-cards'
     | '/service'
     | '/services'
     | '/admin'
+    | '/staff'
     | '/auth/callback'
+    | '/staff/appointments'
+    | '/staff/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/appointments'
     | '/auth'
     | '/book'
+    | '/booking-confirmed'
     | '/gallery'
     | '/gift-cards'
     | '/service'
     | '/services'
     | '/admin'
     | '/auth/callback'
+    | '/staff/appointments'
+    | '/staff'
   id:
     | '__root__'
     | '/'
@@ -146,12 +189,16 @@ export interface FileRouteTypes {
     | '/appointments'
     | '/auth'
     | '/book'
+    | '/booking-confirmed'
     | '/gallery'
     | '/gift-cards'
     | '/service'
     | '/services'
     | '/_authenticated/admin'
+    | '/_authenticated/staff'
     | '/auth/callback'
+    | '/_authenticated/staff/appointments'
+    | '/_authenticated/staff/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -160,6 +207,7 @@ export interface RootRouteChildren {
   AppointmentsRoute: typeof AppointmentsRoute
   AuthRoute: typeof AuthRouteWithChildren
   BookRoute: typeof BookRoute
+  BookingConfirmedRoute: typeof BookingConfirmedRoute
   GalleryRoute: typeof GalleryRoute
   GiftCardsRoute: typeof GiftCardsRoute
   ServiceRoute: typeof ServiceRoute
@@ -194,6 +242,13 @@ declare module '@tanstack/react-router' {
       path: '/gallery'
       fullPath: '/gallery'
       preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking-confirmed': {
+      id: '/booking-confirmed'
+      path: '/booking-confirmed'
+      fullPath: '/booking-confirmed'
+      preLoaderRoute: typeof BookingConfirmedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/book': {
@@ -238,6 +293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_authenticated/staff': {
+      id: '/_authenticated/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof AuthenticatedStaffRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -245,15 +307,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/staff/': {
+      id: '/_authenticated/staff/'
+      path: '/'
+      fullPath: '/staff/'
+      preLoaderRoute: typeof AuthenticatedStaffIndexRouteImport
+      parentRoute: typeof AuthenticatedStaffRoute
+    }
+    '/_authenticated/staff/appointments': {
+      id: '/_authenticated/staff/appointments'
+      path: '/appointments'
+      fullPath: '/staff/appointments'
+      preLoaderRoute: typeof AuthenticatedStaffAppointmentsRouteImport
+      parentRoute: typeof AuthenticatedStaffRoute
+    }
   }
 }
 
+interface AuthenticatedStaffRouteChildren {
+  AuthenticatedStaffAppointmentsRoute: typeof AuthenticatedStaffAppointmentsRoute
+  AuthenticatedStaffIndexRoute: typeof AuthenticatedStaffIndexRoute
+}
+
+const AuthenticatedStaffRouteChildren: AuthenticatedStaffRouteChildren = {
+  AuthenticatedStaffAppointmentsRoute: AuthenticatedStaffAppointmentsRoute,
+  AuthenticatedStaffIndexRoute: AuthenticatedStaffIndexRoute,
+}
+
+const AuthenticatedStaffRouteWithChildren =
+  AuthenticatedStaffRoute._addFileChildren(AuthenticatedStaffRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedStaffRoute: typeof AuthenticatedStaffRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedStaffRoute: AuthenticatedStaffRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -275,6 +366,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppointmentsRoute: AppointmentsRoute,
   AuthRoute: AuthRouteWithChildren,
   BookRoute: BookRoute,
+  BookingConfirmedRoute: BookingConfirmedRoute,
   GalleryRoute: GalleryRoute,
   GiftCardsRoute: GiftCardsRoute,
   ServiceRoute: ServiceRoute,

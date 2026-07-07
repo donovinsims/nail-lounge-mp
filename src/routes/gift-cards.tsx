@@ -1,23 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { BUSINESS } from "@/lib/salon";
+import { getSalonName, getSalonPhone, getSalonPhoneHref, getSalonSocial } from "@/lib/env";
 import { Gift, Users, Sparkles, Phone, Mail, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/gift-cards")({
   head: () => ({
     meta: [
-      { title: "Gift Cards & Parties — Nail Lounge, Machesney Park IL" },
-      {
-        name: "description",
-        content:
-          "Treat someone with a Nail Lounge gift card, or book a bridal, birthday, or girls' day party for 4 or more. Bookings in Machesney Park, IL.",
-      },
-      { property: "og:title", content: "Gift Cards & Parties — Nail Lounge" },
-      {
-        property: "og:description",
-        content:
-          "Gift cards and private salon parties at Nail Lounge — bridal, birthdays, bachelorettes, mother-daughter days.",
-      },
+      { title: `Gift Cards & Parties — ${getSalonName()}` },
+      { name: "description", content: `Gift cards and private salon parties at ${getSalonName()} — bridal, birthdays, bachelorettes, mother-daughter days.` },
+      { property: "og:title", content: `Gift Cards & Parties — ${getSalonName()}` },
+      { property: "og:description", content: `Gift cards and private salon parties at ${getSalonName()} — bridal, birthdays, mother-daughter days.` },
       { property: "og:url", content: "/gift-cards" },
     ],
     links: [{ rel: "canonical", href: "/gift-cards" }],
@@ -94,13 +86,13 @@ function GiftCardsPage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
-                href={`tel:${BUSINESS.phoneHref}`}
+                href={`tel:${getSalonPhoneHref()}`}
                 className="inline-flex tap-target items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
               >
                 <Phone className="h-3.5 w-3.5" /> Call to purchase
               </a>
               <a
-                href={`mailto:${BUSINESS.email}?subject=Gift%20card%20request`}
+                href={`mailto:${getSalonSocial().email}?subject=Gift%20card%20request`}
                 className="inline-flex tap-target items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-xs font-medium uppercase tracking-[0.18em] hover:bg-surface transition"
               >
                 <Mail className="h-3.5 w-3.5" /> Email us
@@ -144,8 +136,7 @@ function GiftCardsPage() {
                 assign artists, and share a quote.
               </li>
               <li>
-                <span className="font-mono text-foreground">03</span> &nbsp; A small deposit
-                confirms the booking.
+                <span className="font-mono text-foreground">03</span> &nbsp; Payment is collected in-studio.
               </li>
               <li>
                 <span className="font-mono text-foreground">04</span> &nbsp; Arrive 10 minutes early
@@ -154,7 +145,7 @@ function GiftCardsPage() {
             </ol>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
-                href={`mailto:${BUSINESS.email}?subject=Private%20party%20request`}
+                href={`mailto:${getSalonSocial().email}?subject=Private%20party%20request`}
                 className="inline-flex tap-target items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
               >
                 Request a party

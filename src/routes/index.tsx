@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSalon, fetchStaff, BUSINESS } from "@/lib/salon";
+import { fetchSalon, fetchStaff } from "@/lib/salon";
+import { getSalonName, getSalonAddress, getSalonPhone, getSalonPhoneHref, getSalonSocial } from "@/lib/env";
 import { MapPin, Phone, Clock, ArrowRight, Instagram, Star, Mail } from "lucide-react";
 import heroImg from "@/assets/studio.jpg";
 import art1 from "@/assets/art1.jpg";
@@ -41,13 +42,12 @@ const FEATURED_SERVICES: [string, string, string, string][] = [
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Nail Lounge — Manicures, Pedicures & Nail Art · Machesney Park IL" },
+      { title: `${getSalonName()} — Manicures, Pedicures & Nail Art` },
       {
         name: "description",
-        content:
-          "Precision manicures, pedicures, gel, acrylic, and modern nail art in Machesney Park, IL. Book online in 60 seconds.",
+        content: `Precision manicures, pedicures, gel, acrylic, and modern nail art. Book online in 60 seconds at ${getSalonName()}.`,
       },
-      { property: "og:title", content: "Nail Lounge — Machesney Park, IL" },
+      { property: "og:title", content: `${getSalonName()} — Salon Services` },
       { property: "og:description", content: "Manicures, pedicures, gel, acrylic, and nail art." },
       { property: "og:image", content: heroImg },
       { property: "og:url", content: "/" },
@@ -85,7 +85,7 @@ function Home() {
         <div className="mx-auto grid max-w-7xl gap-10 px-6 pt-16 pb-20 sm:px-10 sm:pt-24 md:grid-cols-12 md:gap-12 md:pt-32">
           <div className="md:col-span-6 md:pt-8">
             <p className="text-[11px] uppercase tracking-[0.35em] text-accent">
-              Est. Machesney Park · IL
+              Est. {getSalonAddress()?.split(",").map((s) => s.trim()).filter(Boolean)[1] || ""}
             </p>
             <h1 className="mt-6 font-display text-6xl leading-[0.92] tracking-[-0.02em] sm:text-7xl lg:text-8xl">
               The quiet
@@ -96,7 +96,7 @@ function Home() {
             </h1>
             <p className="mt-8 max-w-md text-base leading-relaxed text-muted-foreground">
               A considered studio for precision manicures, pedicures, acrylic sculpture, and modern
-              nail art — in the heart of Machesney Park.
+              nail art — precision nail care.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <Link
@@ -170,9 +170,9 @@ function Home() {
           </div>
           <div className="md:col-span-7 md:pt-6">
             <p className="text-lg leading-relaxed text-foreground/80">
-              We opened Nail Lounge because we missed salons that felt like ours — calm rooms,
-              careful hands, and time to do the work properly. No upsells. No rushed corners. Just
-              the right tool, the right colour, and an hour to yourself.
+              A studio for precision manicures, pedicures, acrylic sculpture, and modern nail art.
+              No upsells. No rushed corners. Just the right tool, the right colour, and an hour to
+              yourself.
             </p>
             <div className="mt-10 grid grid-cols-3 gap-6 border-t border-border pt-8">
               <div>
@@ -314,7 +314,7 @@ function Home() {
               <h2 className="mt-4 font-display text-5xl sm:text-6xl">Recent work.</h2>
             </div>
             <a
-              href={BUSINESS.instagram}
+              href={getSalonSocial().instagram}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] underline-offset-4 hover:underline"
@@ -380,29 +380,29 @@ function Home() {
               <div className="mt-6 space-y-4 text-sm">
                 <div className="flex items-start gap-3">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  <span className="text-muted-foreground">{BUSINESS.address}</span>
+                  <span className="text-muted-foreground">{getSalonAddress() || getSalonSocial().mapsUrl}</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <Phone className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                   <a
-                    href={`tel:${BUSINESS.phoneHref}`}
+                    href={`tel:${getSalonPhoneHref()}`}
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    {BUSINESS.phone}
+                    {getSalonPhone()}
                   </a>
                 </div>
                 <div className="flex items-start gap-3">
                   <Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                   <a
-                    href={`mailto:${BUSINESS.email}`}
+                    href={`mailto:${getSalonSocial().email}`}
                     className="text-muted-foreground hover:text-foreground break-all"
                   >
-                    {BUSINESS.email}
+                    {getSalonSocial().email}
                   </a>
                 </div>
               </div>
               <a
-                href={BUSINESS.mapsUrl}
+                href={getSalonSocial().mapsUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-6 inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] underline-offset-4 hover:underline"
@@ -435,7 +435,7 @@ function Home() {
             </ul>
             <div className="mt-8 flex flex-wrap gap-2">
               <a
-                href={BUSINESS.booksy}
+                href={getSalonSocial().booksy}
                 target="_blank"
                 rel="noreferrer"
                 className="rounded-full border border-border bg-card px-4 py-2 text-[10px] uppercase tracking-[0.2em] hover:bg-surface"
@@ -443,7 +443,7 @@ function Home() {
                 Booksy
               </a>
               <a
-                href={BUSINESS.yelp}
+                href={getSalonSocial().yelp}
                 target="_blank"
                 rel="noreferrer"
                 className="rounded-full border border-border bg-card px-4 py-2 text-[10px] uppercase tracking-[0.2em] hover:bg-surface"
@@ -451,7 +451,7 @@ function Home() {
                 Yelp
               </a>
               <a
-                href={BUSINESS.instagram}
+                href={getSalonSocial().instagram}
                 target="_blank"
                 rel="noreferrer"
                 className="rounded-full border border-border bg-card px-4 py-2 text-[10px] uppercase tracking-[0.2em] hover:bg-surface"

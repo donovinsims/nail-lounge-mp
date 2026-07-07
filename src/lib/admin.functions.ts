@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { getSalonId } from "@/lib/env";
 import { z } from "zod";
 
 export const getMyStaff = createServerFn({ method: "GET" })
@@ -16,23 +17,23 @@ export const getMyStaff = createServerFn({ method: "GET" })
 export const linkSelfToFirstSalon = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    // Demo helper: if user has no staff row, link them as owner of the first salon.
+    // Demo helper: if user has no staff row, link them as owner of the configured salon.
     const { data: existing } = await context.supabase
       .from("staff")
       .select("id")
       .eq("auth_user_id", context.userId)
       .maybeSingle();
     if (existing) return { ok: true, already: true };
+    const salonId = getSalonId();
+    if (!salonId) throw new Error("SALON_ID not configured — set VITE_SALON_ID in .env");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: salon } = await supabaseAdmin.from("salons").select("id").limit(1).single();
-    if (!salon) throw new Error("No salon");
     const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("full_name, email")
       .eq("id", context.userId)
       .maybeSingle();
     await supabaseAdmin.from("staff").insert({
-      salon_id: salon.id,
+      salon_id: salonId,
       auth_user_id: context.userId,
       name: profile?.full_name || profile?.email || "Owner",
       role: "owner",
@@ -41,62 +42,27 @@ export const linkSelfToFirstSalon = createServerFn({ method: "POST" })
     return { ok: true, linked: true };
   });
 
-export const completeBookingWithPayment = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d) =>
-    z
-      .object({
-        bookingId: z.string().uuid(),
-        tipAmount: z.number().min(0),
-        tipToTechPercent: z.number().min(0).max(100),
-      })
-      .parse(d),
-  )
-  .handler(async ({ data, context }) => {
-    const { data: booking } = await context.supabase
-      .from("bookings")
-      .select("id, salon_id, staff_id, deposit_paid, services(price), salons(commission_split)")
-      .eq("id", data.bookingId)
-      .maybeSingle();
-    if (!booking) throw new Error("Booking not found");
-    const price = Number((booking as any).services?.price ?? 0);
-    const commissionSplit = Number((booking as any).salons?.commission_split ?? 60);
-    const net = price; // simplified — no fees in mock
-    const techShare = +((net * commissionSplit) / 100).toFixed(2);
-    const salonShare = +(net - techShare).toFixed(2);
-    const tipToTech = +((data.tipAmount * data.tipToTechPercent) / 100).toFixed(2);
-    const tipToSalon = +(data.tipAmount - tipToTech).toFixed(2);
-
-    await context.supabase
-      .from("bookings")
-      .update({ status: "completed" })
-      .eq("id", data.bookingId);
-    const { error } = await context.supabase.from("commission_records").insert({
-      salon_id: booking.salon_id,
-      booking_id: booking.id,
-      staff_id: booking.staff_id,
-      gross_amount: price,
-      net_amount: net,
-      tech_share: techShare,
-      salon_share: salonShare,
-      tip_amount: data.tipAmount,
-      tip_to_tech: tipToTech,
-      tip_to_salon: tipToSalon,
-    });
-    if (error) throw error;
-    return { ok: true, techShare, salonShare, tipToTech, tipToSalon };
-  });
-
 export const seedDemoData = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     // Adds demo data — bookings spread across this week + commission records + AI calls
+    // First-run safety: refuse to seed if the salon already has real data.
     const { data: staff } = await context.supabase
       .from("staff")
       .select("id, salon_id")
       .eq("auth_user_id", context.userId)
       .maybeSingle();
     if (!staff) throw new Error("Not linked to salon");
+
+    // Guard: only seed if the salon has zero existing data (first-run).
+    const { count: existingBookings } = await context.supabase
+      .from("bookings")
+      .select("*", { count: "exact", head: true })
+      .eq("salon_id", staff.salon_id);
+    if (existingBookings && existingBookings > 0) {
+      throw new Error("Salon already has data — seed skipped");
+    }
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: services } = await supabaseAdmin
       .from("services")
@@ -181,7 +147,6 @@ export const seedDemoData = createServerFn({ method: "POST" })
           start_time: start.toISOString(),
           end_time: end.toISOString(),
           status: slot.status,
-          deposit_paid: slot.status === "confirmed" ? 10 : 0,
         });
 
         // Create commission records for past completed bookings
@@ -190,9 +155,6 @@ export const seedDemoData = createServerFn({ method: "POST" })
           const net = price;
           const techShare = +((net * commissionSplit) / 100).toFixed(2);
           const salonShare = +(net - techShare).toFixed(2);
-          const tipAmount = [5, 10, 15, 0, 20][Math.floor(Math.random() * 5)];
-          const tipToTech = +((tipAmount * tipSplit) / 100).toFixed(2);
-          const tipToSalon = +(tipAmount - tipToTech).toFixed(2);
           allCommissions.push({
             salon_id: staff.salon_id,
             booking_id: undefined as string | undefined, // set after insert
@@ -201,9 +163,6 @@ export const seedDemoData = createServerFn({ method: "POST" })
             net_amount: net,
             tech_share: techShare,
             salon_share: salonShare,
-            tip_amount: tipAmount,
-            tip_to_tech: tipToTech,
-            tip_to_salon: tipToSalon,
             created_at: new Date(start.getTime() + 60 * 60_000).toISOString(), // ~1hr after booking start
           });
         }

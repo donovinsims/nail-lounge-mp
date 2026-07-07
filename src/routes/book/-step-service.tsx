@@ -60,7 +60,7 @@ export default function StepService({ services, selectedId, onSelect, isLoading 
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{service.name}</p>
                   <p className="mt-0.5 text-xs sm:text-sm text-muted-foreground">
-                    {service.category ?? "Nail"} · {service.duration_minutes} min
+                    {service.category ?? "Service"} · {service.duration_minutes} min
                   </p>
                 </div>
                 <p className="shrink-0 font-mono text-sm font-semibold">

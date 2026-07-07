@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getSalonId } from "@/lib/env";
 
 export type DayKey = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
 const dayKeys: DayKey[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
@@ -14,13 +15,21 @@ export function dayKey(d: Date): DayKey {
 }
 
 export async function fetchSalon() {
+  const salonId = getSalonId();
+  if (!salonId) throw new Error("VITE_SALON_ID is not set");
   const { data, error } = await supabase
     .from("salons")
     .select("id, name, address, phone, business_hours, holiday_schedule, created_at")
-    .limit(1)
+    .eq("id", salonId)
     .single();
   if (error) throw error;
   return data;
+}
+
+export async function fetchSalonOrThrow() {
+  const salon = await fetchSalon();
+  if (!salon) throw new Error("Salon not found — check VITE_SALON_ID");
+  return salon;
 }
 
 export async function fetchServices(salonId: string) {
@@ -47,21 +56,8 @@ export async function fetchStaff(salonId: string) {
   return data ?? [];
 }
 
-export const BUSINESS = {
-  name: "Nail Lounge",
-  address: "1513 West Lane Rd, Machesney Park, IL 61115",
-  phone: "+1 815-977-3443",
-  phoneHref: "+18159773443",
-  email: "wait4alove@yahoo.com",
-  mapsUrl: "https://share.google/qo03O2XzAhE7hTXjL",
-  mapEmbed:
-    "https://www.google.com/maps?q=1513+West+Lane+Rd,+Machesney+Park,+IL+61115&output=embed",
-  booksy: "https://booksy.com/en-us/323657_nail-lounge_nail-salon_19333_machesney-park",
-  yelp: "https://www.yelp.com/biz/nail-lounge-machesney-park",
-  instagram: "https://www.instagram.com/nailloungemachesneypark",
-  facebook: "https://www.facebook.com/nailloungemachesneypark",
-  tiktok: "https://www.tiktok.com/@nailloungemp",
-} as const;
+// BUSINESS info is now provided by env.ts helpers: getSalonName, getSalonAddress,
+// getSalonPhone, getSalonPhoneHref, getSalonSocial (email, mapsUrl, etc.)
 
 /**
  * Compute available 15-min start slots for a given staff/service on a date.

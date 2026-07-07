@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "autoCreated": {
+    "playwright": "playwright",
+    "tally-so": "tally-so",
+    "typeui": "typeui"
+  }
+}
