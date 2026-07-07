@@ -2,17 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, useRef } from "react";
-import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
-import {
-  fetchSalon,
-  fetchServices,
-  fetchStaff,
-  computeAvailableSlots,
-  fmtMoney,
-  fmtTime,
-  fmtDate,
-} from "@/lib/salon";
+import { fetchSalon, fetchServices, fetchStaff, computeAvailableSlots } from "@/lib/salon";
+import { fmtMoney, fmtTime, fmtDate } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { createPublicBooking } from "@/lib/booking.functions";
 import { getSalonName } from "@/lib/env";

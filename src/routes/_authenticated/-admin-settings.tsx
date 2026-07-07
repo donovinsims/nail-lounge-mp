@@ -4,7 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/error-handler";
-import { Save, Plus, Pencil, Trash2, X, Check } from "lucide-react";
+import { Save, Plus, Trash2, X, Check } from "lucide-react";
 import {
   getAllStaffForSalon,
   createStaff,
@@ -50,7 +50,6 @@ export default function SettingsView({
   const [staffForm, setStaffForm] = useState<{ name: string; role: "owner" | "staff" } | null>(
     null,
   );
-  const [editingStaff, setEditingStaff] = useState<string | null>(null);
 
   const handleCreateStaff = async () => {
     if (!staffForm) return;
@@ -95,7 +94,6 @@ export default function SettingsView({
     price: number;
     bufferAfterMinutes: number;
   } | null>(null);
-  const [editingSvc, setEditingSvc] = useState<string | null>(null);
 
   const handleCreateService = async () => {
     if (!svcForm) return;

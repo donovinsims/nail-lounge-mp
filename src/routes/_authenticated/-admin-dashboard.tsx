@@ -1,7 +1,7 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import type { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
-import { fmtMoney, fmtTime } from "@/lib/salon";
+import { fmtMoney, fmtTime } from "@/lib/utils";
 import {
   Calendar,
   DollarSign,
@@ -28,12 +28,6 @@ import { StatusBadge } from "./-admin-components/status-badge";
 type BookingRow = Database["public"]["Tables"]["bookings"]["Row"];
 type CrRow = Database["public"]["Tables"]["commission_records"]["Row"];
 
-interface BookingWithRelations extends BookingRow {
-  services: { name: string; price: number } | null;
-  staff: { name: string } | null;
-  clients: { name: string } | null;
-}
-
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function getWeekRange() {
@@ -56,8 +50,6 @@ function greeting() {
 }
 
 export default function Dashboard({ salonId, ownerName }: { salonId: string; ownerName?: string }) {
-  const qc = useQueryClient();
-
   // Today's bookings
   const { data: bookings = [] } = useQuery({
     queryKey: ["admin-bookings", salonId],
@@ -199,8 +191,6 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
     return { day: day.slice(0, 3), revenue: rev, bookings: count };
   });
 
-  const maxRev = Math.max(...weekRevenueData.map((d) => d.revenue), 1);
-
   // Status distribution (donut chart)
   const statusCounts = weekBookings.reduce(
     (acc: Record<string, number>, b: { status: string }) => {
@@ -261,7 +251,8 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
         <p className="text-lg font-semibold flex items-center gap-2">
           <span>{greet.emoji}</span>
           <span>
-            {greet.text}, {ownerName ?? "Andy"}
+            {greet.text}
+            {ownerName ? `, ${ownerName}` : ""}
           </span>
         </p>
         <p className="text-sm text-muted-foreground mt-0.5">

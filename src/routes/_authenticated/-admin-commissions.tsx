@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { fmtMoney, fmtDate } from "@/lib/salon";
+import { fmtMoney, fmtDate } from "@/lib/utils";
 import { Download, Search, ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
 import { KpiCard } from "./-admin-components/kpi-card";
 

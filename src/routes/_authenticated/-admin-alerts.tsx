@@ -8,7 +8,7 @@ import {
   getCustomerHistory,
   type CustomerHistoryEntry,
 } from "@/lib/owner-alerts.functions";
-import { fmtDate, fmtMoney } from "@/lib/salon";
+import { fmtDate, fmtMoney } from "@/lib/utils";
 import { AlertTriangle, Check, Phone, Search, Users } from "lucide-react";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/error-handler";

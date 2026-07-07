@@ -41,8 +41,8 @@ supabase/.temp/
 *.sln
 *.sw?
 
-# Full-stack feature orchestrator session state
-.full-stack-feature/
+# Full-stack feature orchestrator session state (incl. archive dirs)
+.full-stack-feature*/
 
 # OpenCode context / memory store
 .ctx/

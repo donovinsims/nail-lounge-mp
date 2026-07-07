@@ -274,8 +274,9 @@ export const completeStaffModal = createServerFn({ method: "POST" })
       });
 
       // Fire-and-forget the rating SMS
-      import("./twilio.server")
-        .then(async ({ sendRatingSms }) => {
+      void (async () => {
+        try {
+          const { sendRatingSms } = await import("./twilio.server");
           const { getSalonName } = await import("./env");
           await sendRatingSms({
             to: booking.client_phone!,
@@ -288,8 +289,10 @@ export const completeStaffModal = createServerFn({ method: "POST" })
             .from("bookings")
             .update({ rating_sent_at: new Date().toISOString() })
             .eq("id", data.bookingId);
-        })
-        .catch((err: unknown) => console.error("Booking function error:", err));
+        } catch (err: unknown) {
+          console.error("Booking function error:", err);
+        }
+      })();
     }
 
     return { success: true };

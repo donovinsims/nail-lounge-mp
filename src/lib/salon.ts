@@ -98,20 +98,4 @@ export async function computeAvailableSlots(
   return (data ?? []).map((row) => new Date(row.start_time));
 }
 
-export function fmtMoney(n: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(n);
-}
-export function fmtTime(d: Date | string) {
-  return new Date(d).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-}
-export function fmtDate(d: Date | string) {
-  return new Date(d).toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
-}
+// Display formatters (fmtMoney, fmtTime, fmtDate) live in @/lib/utils.

@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { getMyStaff } from "@/lib/admin.functions";
 import { getPendingCompletions, completeStaffModal } from "@/lib/booking.functions";
 import { Loader2 } from "lucide-react";
@@ -19,7 +18,6 @@ interface PendingBooking {
 function StaffDashboard() {
   const [pending, setPending] = useState<PendingBooking[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [staffId, setStaffId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -36,7 +34,6 @@ function StaffDashboard() {
       try {
         const staff = await getMyStaff();
         if (!staff) return;
-        setStaffId(staff.id);
         const bookings = await getPendingCompletions({ data: { staffId: staff.id } });
         setPending(bookings);
         if (bookings.length > 0) {

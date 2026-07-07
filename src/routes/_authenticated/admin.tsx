@@ -63,9 +63,9 @@ const NAV: { id: Tab; label: string; icon: ComponentType<{ className?: string }>
 
 /** Extract a friendly first name from the auth user */
 function getOwnerName(user?: { user_metadata?: { full_name?: string; name?: string } } | null) {
-  if (!user) return "Andy";
+  if (!user) return "";
   const full = user.user_metadata?.full_name || user.user_metadata?.name;
-  if (!full) return "Andy";
+  if (!full) return "";
   return full.split(" ")[0];
 }
 
@@ -74,7 +74,7 @@ function Admin() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("dashboard");
   const [collapsed, setCollapsed] = useState(false);
-  const [ownerName, setOwnerName] = useState("Andy");
+  const [ownerName, setOwnerName] = useState("");
 
   const myStaff = useServerFn(getMyStaff);
   const link = useServerFn(linkSelfToFirstSalon);
@@ -93,7 +93,8 @@ function Admin() {
 
   // Get the owner's name from auth metadata
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    (async () => {
+      const { data } = await supabase.auth.getUser();
       if (data?.user)
         setOwnerName(
           getOwnerName(
@@ -104,18 +105,21 @@ function Admin() {
             },
           ),
         );
-    });
+    })();
   }, []);
 
   // Auto-link to salon if no staff record, with error handling
   useEffect(() => {
     if (!isLoading && !staff && !isError) {
       setLinkError(null);
-      link()
-        .then(() => qc.invalidateQueries({ queryKey: ["my-staff"] }))
-        .catch((err: unknown) => {
+      (async () => {
+        try {
+          await link();
+          await qc.invalidateQueries({ queryKey: ["my-staff"] });
+        } catch (err: unknown) {
           setLinkError(getErrorMessage(err, "Failed to link account to salon"));
-        });
+        }
+      })();
     }
   }, [staff, isLoading, isError, link, qc]);
 
@@ -243,7 +247,7 @@ function Admin() {
         <div className="border-t border-sidebar-border">
           {!collapsed && (
             <p className="px-5 pt-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60">
-              Signed in as {ownerName}
+              Signed in as {ownerName || "Owner"}
             </p>
           )}
           <button
