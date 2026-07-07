@@ -26,7 +26,7 @@ import type { ChartConfig } from "@/components/ui/chart";
 import { KpiCard } from "./-admin-components/kpi-card";
 import { StatusBadge } from "./-admin-components/status-badge";
 
-interface BookingWithRelations extends BookingRow {
+interface _BookingWithRelations extends BookingRow {
   services: { name: string; price: number } | null;
   staff: { name: string } | null;
   clients: { name: string } | null;
@@ -54,7 +54,7 @@ function greeting() {
 }
 
 export default function Dashboard({ salonId, ownerName }: { salonId: string; ownerName?: string }) {
-  const qc = useQueryClient();
+  const _qc = useQueryClient();
 
   // Today's bookings
   const { data: bookings = [], isFetching: bookingsLoading } = useQuery({
@@ -197,7 +197,7 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
     return { day: day.slice(0, 3), revenue: rev, bookings: count };
   });
 
-  const maxRev = Math.max(...weekRevenueData.map((d) => d.revenue), 1);
+  const _maxRev = Math.max(...weekRevenueData.map((d) => d.revenue), 1);
 
   // Status distribution (donut chart)
   const statusCounts = weekBookings.reduce(

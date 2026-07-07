@@ -36,12 +36,12 @@ export default function Waitlist({ salonId }: { salonId: string }) {
     qc.invalidateQueries();
   };
 
-  const fulfillEntry = async (id: string) => {
+  const _fulfillEntry = async (id: string) => {
     await supabase.from("waitlist_entries").update({ status: "fulfilled" }).eq("id", id);
     qc.invalidateQueries();
   };
 
-  const cancelEntry = async (id: string) => {
+  const _cancelEntry = async (id: string) => {
     await supabase.from("waitlist_entries").update({ status: "cancelled" }).eq("id", id);
     qc.invalidateQueries();
   };
