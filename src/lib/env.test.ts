@@ -68,7 +68,6 @@ describe("env defaults", () => {
   it("getUmamiHost returns default Umami Cloud URL", () => {
     expect(getUmamiHost()).toBe("https://cloud.umami.is");
   });
-
 });
 
 describe("getSalonId", () => {
