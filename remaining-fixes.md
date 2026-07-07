@@ -1,5 +1,12 @@
 # Remaining Mobile Booking Fixes
 
+> **STATUS (spot-verified in code, 2026-07-07):** Much of this backlog is already **IMPLEMENTED on main**:
+> H1 ✅ loading states · H2 ✅ stale-slot clearing · H5 ✅ auto-advance removed (Option A) ·
+> M4 ✅ beforeunload guard · M7 ✅ ARIA validation attributes · L5 ✅ dead desktop-layout file deleted.
+> H3, H4, M1–M3, M5, M6, M8, and the remaining L items were NOT individually re-verified —
+> re-audit against the code before working any of them. Some snippets reference pre-pivot
+> deposit language.
+
 All fixes not in the top-5 priority list, organized by severity. Each is independent and can be run in a separate chat.
 
 ---

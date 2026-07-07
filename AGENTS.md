@@ -17,6 +17,7 @@ bun run build:dev    # vite build --mode development
 bun run lint         # eslint .
 bun run test         # vitest run
 bun run test:watch   # vitest --watch
+bun run typecheck    # tsc --noEmit
 bun run format       # prettier --write .
 ```
 
@@ -141,7 +142,7 @@ Server-only values (without `VITE_` prefix) must be read inside a function/handl
 
 ## Testing & CI
 
-- **Framework:** Vitest (76+ tests covering Zod schemas and env/config)
+- **Framework:** Vitest (82 tests covering Zod schemas, env/config helpers, and the rate limiter). Input schemas are exported from `booking.functions.ts` / `admin-crud.functions.ts` and imported by tests — never replicate a schema inline in a test.
 - **CI:** GitHub Actions (`.github/workflows/ci.yml`)
 - Run `bun run test` before pushing
 

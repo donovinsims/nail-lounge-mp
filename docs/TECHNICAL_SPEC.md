@@ -30,10 +30,10 @@
 
 | Layer      | Technology                             | Version  | Notes                                           |
 | ---------- | -------------------------------------- | -------- | ----------------------------------------------- |
-| Framework  | TanStack Start (React 19)              | ^1.114.x | SSR + file-based routing via TanStack Router    |
+| Framework  | TanStack Start (React 19)              | ^1.167.x | SSR + file-based routing via TanStack Router ^1.168.x |
 | UI         | Tailwind CSS v4                        | ^4.0.x   | PostCSS-based, shadcn/ui compatible             |
 | Components | shadcn/ui (Radix primitives)           | latest   | Button, Card, Dialog, Table, Input, Badge, etc. |
-| Icons      | Lucide React                           | ^0.479.x | SVG icon set                                    |
+| Icons      | Lucide React                           | ^0.575.x | SVG icon set                                    |
 | Charts     | Recharts                               | ^2.x     | Dashboard charts only                           |
 | Forms      | React Hook Form + Zod                  | latest   | Booking form and admin forms                    |
 | Database   | Supabase (PostgreSQL 15)               | hosted   | Full RLS, realtime, triggers                    |
@@ -41,7 +41,7 @@
 | Hosting    | Vercel / Cloudflare (Nitro serverless) | —        | TanStack Start adapter                          |
 | Runtime    | Bun                                    | ^1.x     | Build + dev                                     |
 | Testing    | Vitest                                 | ^4.x     | Unit tests                                      |
-| CI/CD      | GitHub Actions                         | —        | Lint, typecheck, build on push/PR               |
+| CI/CD      | GitHub Actions                         | —        | Lint (zero-warnings), typecheck, tests, build on push/PR |
 
 ### Architecture Pattern
 
@@ -112,13 +112,18 @@ nail-lounge/
 ├── supabase/
 │   ├── config.toml            # Supabase local config
 │   ├── seed.sql               # Seed: example salon, staff, services for dev
-│   └── migrations/
-│       ├── 20240301000001_initial.sql          # Base schema + RLS
-│       ├── 20240301000002_profiles.sql         # Profiles table + trigger
-│       ├── 20240301000003_hourly_rate.sql      # Commission hourly rate
-│       ├── 20240301000004_waitlist.sql         # Waitlist + floor status
-│       ├── 20240301000005_ai_calls.sql         # AI call logs
-│       └── 0008_pivot.sql                      # Pivot: drop Stripe cols, add payment_method + rating cols
+│   └── migrations/                             # 11 files, apply in timestamp order
+│       ├── 20260617030841_*.sql                # Initial schema + RLS + triggers + seed
+│       ├── 20260617062401_*.sql                # Staff columns + full seed
+│       ├── 20260617104256_*.sql                # Security cleanup (trigger EXECUTE revoke)
+│       ├── 20260617140532_*.sql                # RPC bookings read + column grants
+│       ├── 20260618180000_add_staff_auth_user_id_unique.sql
+│       ├── 20260619000000_add_booking_overlap_constraint.sql
+│       ├── 20260620000000_add_stripe_session_id_to_bookings.sql
+│       ├── 20260621000000_pivot_remove_stripe_add_modal_fields.sql
+│       ├── 20260707000000_add_client_phone_to_bookings.sql
+│       ├── 20260707000001_rate_limits.sql
+│       └── 20260707000002_available_slots_rpc.sql
 │
 └── src/
     ├── routeTree.gen.ts       # Auto-generated route tree
@@ -309,7 +314,7 @@ User → Sign-in (/auth.tsx) → Email magic link → Callback (/auth/callback.t
 | `/admin/alerts`      | (tab)                         | Auth         | Low-rating alerts + CRM data table                                                                                       |
 | `/admin/calls`       | (tab)                         | Auth         | AI call log viewer                                                                                                       |
 | `/admin/settings`    | (tab)                         | Auth         | Full settings: Staff CRUD, Services CRUD, Hours editor, Social links                                                     |
-| `/staff`             | `_staff/-staff-dashboard.tsx` | Auth (staff) | Staff dashboard with forced lockout modal                                                                                |
+| `/staff`             | `staff/index.tsx`             | Auth (staff) | Staff dashboard with forced lockout modal                                                                                |
 
 ---
 
@@ -542,7 +547,7 @@ See `.env.template` for the complete list. Key categories:
 
 ### Open Issues
 
-1. **No email notifications** — Twilio handles SMS but no email provider deeply integrated.
+1. **Email notifications are minimal** — Resend sends booking confirmations only (optional via `RESEND_API_KEY`); no reminder or cancellation emails yet.
 2. **No gallery management UI** — Gallery images are in source code, not admin-uploadable.
 3. **No calendar month/week views** — Daily view + master overlay only.
 4. **No waitlist auto-notify** — Customers aren't notified when a spot opens.
@@ -583,9 +588,9 @@ The following items from the original technical debt have been fully resolved:
 | `src/lib/rate-limiter.ts`                               | Rate limiter        | Sliding-window, configurable window/max                                          |
 | `src/routes/book.tsx`                                   | Booking wizard      | 4-step form, creates confirmed booking directly                                  |
 | `src/routes/_authenticated/-admin-settings.tsx`         | Admin settings      | Full Staff/Services/Hours CRUD                                                   |
-| `src/routes/_authenticated/_staff/-staff-dashboard.tsx` | Staff lockout modal | Forced modal overlay, payment/tip/notes capture                                  |
+| `src/routes/_authenticated/staff/index.tsx`             | Staff lockout modal | Forced modal overlay, payment/tip/notes capture                                  |
 | `src/lib/config.server.ts`                              | Server config       | Service role key, Twilio/Resend env checks                                       |
-| `supabase/migrations/0008_pivot.sql`                    | Pivot schema        | Drop Stripe cols, add payment_method enum, rating columns                        |
+| `supabase/migrations/20260621000000_pivot_remove_stripe_add_modal_fields.sql` | Pivot schema | Drop Stripe cols, add payment_method enum, rating columns          |
 
 ---
 

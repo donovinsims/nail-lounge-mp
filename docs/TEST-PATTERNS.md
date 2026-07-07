@@ -27,10 +27,9 @@ The project uses **Vitest** with `globals: true` enabled.
 
 The CI pipeline runs on push/PR to `main`:
 
-1. **lint-and-typecheck** — `bun run lint` + `bun x tsc --noEmit`
-2. **build** — `bun run build`
+1. **lint-and-typecheck** — `bun run lint` (zero-warnings gate) → `bun run typecheck` → `bun run test` → `bun run build`
 
-> **Note:** Tests are **not** currently run in CI. This is an improvement gap — see [Coverage Goals](#coverage-goals-and-current-status).
+> **Note (2026-07-07):** Tests now run in CI on every push/PR.
 
 ---
 
@@ -50,7 +49,7 @@ The CI pipeline runs on push/PR to `main`:
 
 ## Pattern 1: Zod Schema Validation Tests
 
-This is the **primary testing pattern** in the project. Since schemas are defined inside server function files (and not yet extracted into a shared module), the tests replicate the schema inline.
+This is the **primary testing pattern** in the project. Input schemas are **exported from the source modules** (`booking.functions.ts`, `admin-crud.functions.ts`) and **imported by tests** — so tests always validate the real production schema, never a replica. (The inline schema in the example below illustrates the assertion style only.)
 
 ### Canonical Pattern
 
@@ -469,7 +468,7 @@ import { getServerConfig, hasTwilio } from "./config.server";
 | Env/config coverage   | Full                                    | Maintain                |
 | Rate limiter coverage | Full                                    | Maintain                |
 | Component coverage    | 0%                                      | ≥ 50% of UI components  |
-| CI test execution     | ❌ Not run in CI                        | ✅ Added to CI workflow |
+| CI test execution     | ✅ Runs in CI on every push/PR          | Maintain                |
 
 ### Immediate Gaps
 
@@ -498,7 +497,7 @@ test:
 
 - [ ] Place test file at `src/lib/<module>.test.ts` alongside the source
 - [ ] Import `describe, it, expect` (and `vi` for timers) from vitest
-- [ ] For Zod schemas: replicate the schema inline, use `.safeParse()`, assert `.success`
+- [ ] For Zod schemas: import the schema from its source module (export it if needed), use `.safeParse()`, assert `.success`
 - [ ] For env-dependent code: save/restore env vars in `beforeEach`/`afterEach`
 - [ ] For lazy-read config: static import works; save/restore `process.env`
 - [ ] For time-dependent code: use `vi.useFakeTimers()` + `vi.advanceTimersByTime()`

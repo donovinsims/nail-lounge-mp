@@ -1,5 +1,11 @@
 # Top 5 Mobile Booking Fixes
 
+> **STATUS (verified in code, 2026-07-07):** All 5 fixes below are **IMPLEMENTED on main** —
+> 1 ✅ mobile autofocus guard (`pointer: coarse`) · 2 ✅ responsive connectors (`w-6 sm:w-12`) ·
+> 3 ✅ mobile summary chips · 4 ✅ step-4 sticky submit · 5a ✅ `MOBILE_LABELS` · 5b ✅ client phone regex.
+> Retained as historical reference — do not re-implement. Note: the "Pay deposit" language below
+> predates the 2026-07-06 in-store-payment pivot.
+
 These are the 5 most impactful issues to fix in priority order. Each fix is independent and can be run in a separate chat.
 
 ---
