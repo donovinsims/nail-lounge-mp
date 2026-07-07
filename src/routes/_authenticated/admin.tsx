@@ -117,7 +117,7 @@ function Admin() {
           setLinkError(getErrorMessage(err, "Failed to link account to salon"));
         });
     }
-  }, [staff, isLoading, isError]);
+  }, [staff, isLoading, isError, link, qc]);
 
   // Owner alerts for badge count
   const fetchAlerts = useServerFn(getOwnerAlerts);
