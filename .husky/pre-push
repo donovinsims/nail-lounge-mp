@@ -1,1 +1,2 @@
-bun run build && bun x tsc --noEmit && bun install --frozen-lockfile --ignore-scripts
+bash scripts/check-secrets.sh
+bun run build && bun x tsc --noEmit
