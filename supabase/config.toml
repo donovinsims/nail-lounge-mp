@@ -2,8 +2,8 @@ project_id = "ecqztajukteergupvrkg"
 
 [auth]
 enabled = true
-site_url = "https://mynails.vercel.app"
-additional_redirect_urls = ["https://mynails.vercel.app/auth/callback"]
+site_url = "https://nails815.vercel.app"
+additional_redirect_urls = ["https://nails815.vercel.app/auth/callback", "http://localhost:3000/auth/callback"]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
@@ -13,7 +13,7 @@ minimum_password_length = 6
 password_requirements = "lower_upper_letters_digits_symbols"
 
 [auth.email]
-enable_signup = true
+enable_signup = false
 double_confirm_changes = true
 enable_confirmations = false
 secure_password_change = false
@@ -27,6 +27,11 @@ max_enrolled_factors = 10
 [auth.mfa.totp]
 enroll_enabled = true
 verify_enabled = true
+
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
 
 [auth.mfa.phone]
 enroll_enabled = false

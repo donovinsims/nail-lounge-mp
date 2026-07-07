@@ -6,16 +6,26 @@ function CallbackPage() {
   const navigate = useNavigate();
   useEffect(() => {
     let cancelled = false;
-    supabase.auth
-      .getSession()
-      .then(({ data }) => {
-        if (!cancelled) navigate({ to: data.session ? "/admin" : "/auth" });
-      })
-      .catch(() => {
-        if (!cancelled) navigate({ to: "/auth" });
-      });
+
+    // Listen for the auth state change (handles PKCE exchange completion)
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!cancelled) {
+        if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+          navigate({ to: session ? "/admin" : "/auth", replace: true });
+        }
+      }
+    });
+
+    // Also try immediate getSession (covers code-exchange-on-load)
+    supabase.auth.getSession().then(({ data }) => {
+      if (!cancelled) {
+        navigate({ to: data.session ? "/admin" : "/auth", replace: true });
+      }
+    });
+
     return () => {
       cancelled = true;
+      sub.subscription.unsubscribe();
     };
   }, [navigate]);
   return (

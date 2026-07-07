@@ -3,7 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getSalonName } from "@/lib/env";
 import { toast } from "sonner";
-import { Loader2, ChevronLeft } from "lucide-react";
+import { Loader2, ChevronLeft, Mail } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: `Sign in — ${getSalonName()} Admin` }] }),
@@ -12,29 +12,20 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
 
-  const submit = async (e: React.FormEvent) => {
+  const sendMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin + "/admin" },
-        });
-        if (error) throw error;
-        toast.success("Account created. You can sign in now.");
-        setMode("signin");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        navigate({ to: "/admin" });
-      }
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      });
+      if (error) throw error;
+      setMagicLinkSent(true);
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -66,55 +57,65 @@ function AuthPage() {
       </Link>
       <div className="mx-auto mt-12 max-w-sm">
         <p className="text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground">
-          Staff & Owner
+          Sign in
         </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight">
-          {mode === "signin" ? "Sign in" : "Create account"}
-        </h1>
-        <form onSubmit={submit} className="mt-6 space-y-3">
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            required
-            placeholder="Email"
-            className="w-full tap-target rounded-xl bg-surface px-4 py-3 outline-none focus:ring-2 focus:ring-ring"
-          />
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            required
-            minLength={6}
-            placeholder="Password"
-            className="w-full tap-target rounded-xl bg-surface px-4 py-3 outline-none focus:ring-2 focus:ring-ring"
-          />
-          <button
-            disabled={loading}
-            className="flex w-full tap-target items-center justify-center gap-2 rounded-xl bg-primary py-3 font-semibold text-primary-foreground disabled:opacity-50"
-          >
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />}{" "}
-            {mode === "signin" ? "Sign in" : "Create account"}
-          </button>
-        </form>
-        <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-          <div className="h-px flex-1 bg-border" /> OR <div className="h-px flex-1 bg-border" />
-        </div>
-        <button
-          onClick={google}
-          className="flex w-full tap-target items-center justify-center gap-2 rounded-xl bg-surface py-3 font-medium hairline"
-        >
-          Continue with Google
-        </button>
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          {mode === "signin" ? "No account?" : "Have an account?"}{" "}
-          <button
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-            className="font-medium text-foreground underline-offset-4 hover:underline"
-          >
-            {mode === "signin" ? "Create one" : "Sign in"}
-          </button>
-        </p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight">Sign in</h1>
+
+        {magicLinkSent ? (
+          <div className="mt-8 space-y-4 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <Mail className="h-6 w-6 text-primary" />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Magic link sent to{" "}
+              <span className="font-medium text-foreground">{email}</span>
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Check your inbox and click the link to sign in. You can close this
+              tab.
+            </p>
+            <button
+              onClick={() => {
+                setMagicLinkSent(false);
+                setEmail("");
+              }}
+              className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            >
+              Use a different email
+            </button>
+          </div>
+        ) : (
+          <>
+            <form onSubmit={sendMagicLink} className="mt-6 space-y-3">
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                required
+                placeholder="Email"
+                className="w-full tap-target rounded-xl bg-surface px-4 py-3 outline-none focus:ring-2 focus:ring-ring"
+              />
+              <button
+                disabled={loading}
+                className="flex w-full tap-target items-center justify-center gap-2 rounded-xl bg-primary py-3 font-semibold text-primary-foreground disabled:opacity-50"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                Send magic link
+              </button>
+            </form>
+            <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+              <div className="h-px flex-1 bg-border" /> OR{" "}
+              <div className="h-px flex-1 bg-border" />
+            </div>
+            <button
+              onClick={google}
+              disabled={loading}
+              className="flex w-full tap-target items-center justify-center gap-2 rounded-xl bg-surface py-3 font-medium hairline disabled:opacity-50"
+            >
+              Continue with Google
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
