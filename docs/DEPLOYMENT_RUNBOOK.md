@@ -70,13 +70,21 @@
 ## Supabase Setup
 
 1. **Create a Supabase project** at [supabase.com](https://supabase.com).
-2. **Run migrations** in order from `supabase/migrations/`:
-   - `20260618000000_initial_schema.sql`
-   - `20260618000001_staff_columns.sql`
-   - `20260618000002_security_cleanup.sql`
-   - `20260618000003_rpc_bookings_read.sql`
-   - `20260620000000_add_exclusion_constraint.sql`
-   - `0008_pivot.sql`
+2. **Run migrations** — apply EVERY file in `supabase/migrations/` in filename (timestamp) order. As of 2026-07-07 that is 11 files:
+   - `20260617030841_*.sql` — initial schema + RLS + triggers + seed
+   - `20260617062401_*.sql` — staff columns + full seed
+   - `20260617104256_*.sql` — security cleanup
+   - `20260617140532_*.sql` — RPC bookings read + column grants
+   - `20260618180000_add_staff_auth_user_id_unique.sql`
+   - `20260619000000_add_booking_overlap_constraint.sql`
+   - `20260620000000_add_stripe_session_id_to_bookings.sql`
+   - `20260621000000_pivot_remove_stripe_add_modal_fields.sql`
+   - `20260707000000_add_client_phone_to_bookings.sql`
+   - `20260707000001_rate_limits.sql`
+   - `20260707000002_available_slots_rpc.sql`
+
+   Don't hand-pick — the list above will drift as new migrations land; the folder is the source of truth.
+
 3. **Insert a salon row:**
    - `id` = the UUID you set as `VITE_SALON_ID`
    - `name`, `phone`, `address`, `business_hours` (JSON), `holiday_schedule` (JSON)

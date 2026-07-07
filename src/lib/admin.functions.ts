@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getSalonId } from "@/lib/env";
 import type { BookingInsert, CommissionRecordInsert } from "@/integrations/supabase/rows";
-import { z } from "zod";
 
 export const getMyStaff = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -112,7 +111,7 @@ export const seedDemoData = createServerFn({ method: "POST" })
     ];
 
     const commissionSplit = 60; // default 60% tech
-    const tipSplit = 80; // default 80% tip to tech
+    const _tipSplit = 80; // default 80% tip to tech
     const allBookings: BookingInsert[] = [];
     const allCommissions: CommissionRecordInsert[] = [];
     let bookingCount = 0;

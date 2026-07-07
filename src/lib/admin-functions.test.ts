@@ -1,18 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { z } from "zod";
 
-// ── Schema definitions (mirrors production server functions) ──
+// ── Schemas imported from the source module (booking.functions.ts owns the
+// staff-modal and staff-query schemas) — tests validate the real thing ──
 
-const completeStaffModalSchema = z.object({
-  bookingId: z.string().uuid(),
-  tipAmount: z.number().min(0).default(0),
-  paymentMethod: z.enum(["Credit/Debit", "Cash", "Venmo", "Cash App"]),
-  serviceNotes: z.string().default(""),
-});
-
-const staffQuerySchema = z.object({
-  staffId: z.string(),
-});
+import { completeStaffModalSchema, staffQuerySchema } from "./booking.functions";
 
 // ── Tests ──
 

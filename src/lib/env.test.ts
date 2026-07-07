@@ -11,7 +11,6 @@ import {
   getAppUrl,
   getUmamiWebsiteId,
   getUmamiHost,
-  getSalonId,
 } from "./env";
 
 describe("env defaults", () => {

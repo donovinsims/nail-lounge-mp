@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { getSalonName, getSalonPhone, getSalonPhoneHref, getSalonSocial } from "@/lib/env";
+import { getSalonName, getSalonPhoneHref, getSalonSocial } from "@/lib/env";
 import { Gift, Users, Sparkles, Phone, Mail, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/gift-cards")({

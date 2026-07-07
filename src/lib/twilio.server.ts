@@ -30,6 +30,12 @@ export async function sendRatingSms(params: {
  * Handle an incoming Twilio SMS reply (rating response).
  * Called from the webhook endpoint.
  * Body is the "1-5" text the client replied with.
+ *
+ * Every rating receives the same public-review invitation — the ask is never
+ * gated on the score (selectively soliciting reviews from happy customers
+ * violates Google review policies and the FTC rule on consumer reviews,
+ * 16 CFR Part 465). Low ratings (1-3) additionally trigger an apology and an
+ * owner alert so the salon can follow up personally.
  */
 export async function handleRatingReply(params: {
   from: string;
@@ -58,23 +64,31 @@ export async function handleRatingReply(params: {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   await supabaseAdmin.from("bookings").update({ client_rating: rating }).eq("id", params.bookingId);
 
+  const hasTwilioCreds = Boolean(
+    config.twilioAccountSid && config.twilioAuthToken && config.twilioPhoneNumber,
+  );
+  // Same review invitation for every rating — never conditioned on the score.
+  const reviewInvite = config.googleReviewUrl
+    ? ` If you have a moment, we'd appreciate an honest review: ${config.googleReviewUrl}`
+    : "";
+
   if (rating >= 4) {
-    // High rating — send Google Review SMS
-    if (config.twilioAccountSid && config.twilioAuthToken && config.twilioPhoneNumber) {
+    // High rating — thank the client
+    if (hasTwilioCreds) {
       const client = twilio(config.twilioAccountSid, config.twilioAuthToken);
       await client.messages.create({
-        body: `Thank you! We're so glad you enjoyed your visit. If you have a moment, please leave us a Google review: ${config.googleReviewUrl}`,
+        body: `Thank you! We're so glad you enjoyed your visit.${reviewInvite}`,
         to: params.from,
         from: config.twilioPhoneNumber,
       });
     }
   } else {
-    // Low rating (1-3) — send apology + notify owner
-    if (config.twilioAccountSid && config.twilioAuthToken && config.twilioPhoneNumber) {
+    // Low rating (1-3) — apologize + notify owner for personal follow-up
+    if (hasTwilioCreds) {
       const client = twilio(config.twilioAccountSid, config.twilioAuthToken);
-      // Apology to client
+      // Apology to client (same review invitation as every other rating)
       await client.messages.create({
-        body: `We're sorry your visit didn't meet expectations. We'd love to hear more about how we can improve — please call the salon directly.`,
+        body: `We're sorry your visit didn't meet expectations. The owner will follow up personally to make it right.${reviewInvite}`,
         to: params.from,
         from: config.twilioPhoneNumber,
       });

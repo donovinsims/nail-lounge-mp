@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSalon, fetchStaff, fetchServices, type BusinessHours } from "@/lib/salon";
+import { fetchSalon, fetchStaff, fetchServices, asBusinessHours, type DayKey } from "@/lib/salon";
 import { fmtMoney } from "@/lib/utils";
 import type { StaffRow } from "@/integrations/supabase/rows";
 import {
@@ -35,7 +35,7 @@ type Staff = Pick<
   | "created_at"
 >;
 
-const DAYS: [string, string][] = [
+const DAYS: [string, DayKey][] = [
   ["Monday", "mon"],
   ["Tuesday", "tue"],
   ["Wednesday", "wed"],
@@ -91,7 +91,7 @@ function Home() {
     queryFn: () => fetchStaff(salon!.id),
     enabled: !!salon,
   });
-  const { data: services = [], isFetching: servicesLoading } = useQuery({
+  const { data: services = [] } = useQuery({
     queryKey: ["services", salon?.id],
     queryFn: () => fetchServices(salon!.id),
     enabled: !!salon,
@@ -463,7 +463,7 @@ function Home() {
             </h3>
             <ul className="mt-8 space-y-2.5 text-sm">
               {DAYS.map(([label, key]) => {
-                const h = (salon?.business_hours as BusinessHours)?.[key as keyof BusinessHours];
+                const h = asBusinessHours(salon?.business_hours)[key];
                 return (
                   <li
                     key={key}

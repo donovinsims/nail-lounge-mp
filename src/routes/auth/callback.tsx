@@ -17,11 +17,12 @@ function CallbackPage() {
     });
 
     // Also try immediate getSession (covers code-exchange-on-load)
-    supabase.auth.getSession().then(({ data }) => {
+    (async () => {
+      const { data } = await supabase.auth.getSession();
       if (!cancelled) {
         navigate({ to: data.session ? "/admin" : "/auth", replace: true });
       }
-    });
+    })();
 
     return () => {
       cancelled = true;

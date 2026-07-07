@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { fmtMoney, fmtDate } from "@/lib/utils";
-import { Download, Search, ArrowUpDown, ChevronDown, ChevronUp, Check, X } from "lucide-react";
+import { Download, Search, ArrowUpDown, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { KpiCard } from "./-admin-components/kpi-card";
 import { toggleBookingPaid } from "@/lib/admin-crud.functions";
 
@@ -203,7 +203,7 @@ export default function Commissions({ salonId }: { salonId: string }) {
               {pageRows.map((r: BookingWithStaffService) => (
                 <tr key={r.id} className="hover:bg-surface-2/30 transition-colors">
                   <td className="p-4 font-mono text-xs whitespace-nowrap">
-                    {fmtDate(r.completed_at!)}
+                    {r.completed_at ? fmtDate(r.completed_at) : "—"}
                   </td>
                   <td className="font-medium whitespace-nowrap">{r.staff?.name}</td>
                   <td className="text-muted-foreground">{r.services?.name}</td>

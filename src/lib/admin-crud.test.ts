@@ -1,46 +1,14 @@
 import { describe, it, expect } from "vitest";
-import { z } from "zod";
 
-const createStaffSchema = z.object({
-  name: z.string().trim().min(1).max(100),
-  role: z.enum(["owner", "staff"]).default("staff"),
-  workingHours: z.record(z.any()).default({}),
-  avatarColor: z.string().default("#0a0a0a"),
-});
-
-const updateStaffSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string().trim().min(1).max(100).optional(),
-  role: z.enum(["owner", "staff"]).optional(),
-  workingHours: z.record(z.any()).optional(),
-  isActive: z.boolean().optional(),
-  avatarColor: z.string().optional(),
-});
-
-const deleteStaffSchema = z.object({ id: z.string().uuid() });
-
-const createServiceSchema = z.object({
-  name: z.string().trim().min(1).max(200),
-  category: z.string().trim().max(100).optional().or(z.literal("")),
-  durationMinutes: z.number().int().min(5).max(480),
-  price: z.number().min(0),
-  bufferAfterMinutes: z.number().int().min(0).default(0),
-});
-
-const updateServiceSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string().trim().min(1).max(200).optional(),
-  category: z.string().trim().max(100).optional(),
-  durationMinutes: z.number().int().min(5).max(480).optional(),
-  price: z.number().min(0).optional(),
-  bufferAfterMinutes: z.number().int().min(0).optional(),
-  isActive: z.boolean().optional(),
-});
-
-const updateSalonHoursSchema = z.object({
-  businessHours: z.record(z.any()),
-  holidaySchedule: z.array(z.any()).optional(),
-});
+// Schemas imported from the source module — tests validate the real thing,
+// not replicas (replicas silently drift from production behavior).
+import {
+  createStaffSchema,
+  updateStaffSchema,
+  createServiceSchema,
+  updateServiceSchema,
+  updateSalonHoursSchema,
+} from "./admin-crud.functions";
 
 describe("createStaff", () => {
   it("accepts valid input (name only, rest get defaults)", () => {

@@ -1,43 +1,17 @@
 import { describe, it, expect } from "vitest";
-import { z } from "zod";
 
 // ---------------------------------------------------------------------------
-// Schemas (replicated from booking.functions.ts)
+// Schemas imported from the source module — tests validate the real thing,
+// not replicas (replicas silently drift from production behavior).
 // ---------------------------------------------------------------------------
 
-const PHONE_RE = /^\+?[0-9\s\-()]{7,20}$/;
-
-const createBookingSchema = z.object({
-  salonId: z.string().uuid(),
-  serviceId: z.string().uuid(),
-  staffId: z.string().uuid(),
-  startTime: z.string(),
-  clientName: z.string().trim().min(1).max(100),
-  clientPhone: z.string().regex(PHONE_RE),
-  clientEmail: z.string().email().optional().or(z.literal("")),
-});
-
-const lookupSchema = z.object({
-  phone: z.string().regex(PHONE_RE),
-  salonId: z.string().uuid(),
-});
-
-const cancelSchema = z.object({
-  bookingId: z.string().uuid(),
-  phone: z.string().regex(PHONE_RE),
-  salonId: z.string().uuid(),
-});
-
-const completeStaffModalSchema = z.object({
-  bookingId: z.string().uuid(),
-  tipAmount: z.number().min(0).default(0),
-  paymentMethod: z.enum(["Credit/Debit", "Cash", "Venmo", "Cash App"]),
-  serviceNotes: z.string().default(""),
-});
-
-const staffQuerySchema = z.object({
-  staffId: z.string(),
-});
+import {
+  createBookingSchema,
+  lookupSchema,
+  cancelSchema,
+  completeStaffModalSchema,
+  staffQuerySchema,
+} from "./booking.functions";
 
 // ---------------------------------------------------------------------------
 // Shared valid data

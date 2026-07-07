@@ -16,7 +16,6 @@ export default function BookingStepProgress({ step, onStepClick }: Props) {
           const num = i + 1;
           const isCompleted = num < step;
           const isCurrent = num === step;
-          const isFuture = num > step;
 
           return (
             <div key={num} className="flex items-center">

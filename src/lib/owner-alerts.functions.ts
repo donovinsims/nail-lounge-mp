@@ -49,6 +49,20 @@ export interface CustomerHistoryEntry {
   lastRating: number | null;
 }
 
+type CrmBookingRow = {
+  id: string;
+  client_id: string;
+  start_time: string;
+  completed_at: string | null;
+  status: string;
+  tip_amount: number | null;
+  payment_method: string | null;
+  service_notes: string | null;
+  client_rating: number | null;
+  services: { name: string; price: number } | null;
+  staff: { name: string } | null;
+};
+
 export const getCustomerHistory = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<CustomerHistoryEntry[]> => {
@@ -78,21 +92,10 @@ export const getCustomerHistory = createServerFn({ method: "GET" })
       .order("start_time", { ascending: false });
 
     if (bookingErr) throw bookingErr;
-    const bks = bookings || [];
+    const bks = (bookings || []) as CrmBookingRow[];
 
     return clients.map((client: { id: string; name: string; phone: string }) => {
-      const clientBookings = bks.filter((b: any) => b.client_id === client.id) as Array<{
-        id: string;
-        start_time: string;
-        completed_at: string | null;
-        status: string;
-        tip_amount: number | null;
-        payment_method: string | null;
-        service_notes: string | null;
-        client_rating: number | null;
-        services: { name: string; price: number } | null;
-        staff: { name: string } | null;
-      }>;
+      const clientBookings = bks.filter((b) => b.client_id === client.id);
       const completed = clientBookings.filter((b) => b.status === "completed");
       const totalSpent = completed.reduce((s, b) => s + (b.services?.price || 0), 0);
       const totalTips = completed.reduce((s, b) => s + (b.tip_amount || 0), 0);

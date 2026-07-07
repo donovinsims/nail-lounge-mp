@@ -5,6 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// ── Display formatters (moved from salon.ts — plain utilities, no data deps) ──
+
 /** Format a number as USD currency (no cents). */
 export function fmtMoney(n: number) {
   return new Intl.NumberFormat("en-US", {
