@@ -101,10 +101,12 @@ This deployment has no payment processing dependency — all payments are handle
 ### Vercel Deployment
 
 1. **Connect your GitHub repo** to Vercel.
-2. **Build command:** `bun run build`
+2. **Build command:** `NITRO_PRESET=vercel vite build` (set in `vercel.json`)
 3. **Build output directory:** `dist/`
 4. **Add all environment variables** — mark secrets as **Encrypted**.
 5. **Deploy** (first deploy or automatic on push to `main`).
+
+> **Note:** Vercel auto-detects npm (not Bun) because `package-lock.json` takes priority over `bun.lock`. No custom `installCommand` is needed — `vercel.json` omits it. The `prepare` script gracefully handles missing `husky` on CI.
 
 ### Cloudflare Pages Deployment
 

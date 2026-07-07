@@ -235,6 +235,8 @@ vercel --prod
 
 On first deploy, Vercel will ask you to link the project. During the setup, add all the environment variables from your `.env` file via `vercel env add`.
 
+> **Note:** Vercel auto-detects npm (not Bun) for installs — `package-lock.json` takes priority over `bun.lock`. No custom install command is needed. See `vercel.json` for the pre-configured build command.
+
 Then set up the domain:
 
 ```

@@ -169,6 +169,7 @@ Server-only values (without `VITE_` prefix) must be read inside a function/handl
 
 - Deploy via `bun build` (Vite build with Nitro, Cloudflare target)
 - Per-salon env vars: `VITE_SALON_ID`, `VITE_SALON_NAME`, etc. must be set per deployment
+- **Vercel uses npm, not Bun** — `package-lock.json` takes priority over `bun.lock` in Vercel's auto-detection. No custom `installCommand` in `vercel.json`. The `prepare` script in `package.json` is `command -v husky > /dev/null 2>&1 && husky || :` to gracefully handle missing husky on CI.
 - Twilio webhook endpoint must point to `{APP_URL}/api/twilio-webhook`
 
 ## Projects (DO NOT USE DEPRECATED PROJECTS)
