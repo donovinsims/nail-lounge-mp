@@ -209,7 +209,7 @@ Same for the hero image on the home page (look for the hero section in `src/rout
 
 ### Services & Pricing
 
-**Use the admin Settings page** to add and manage services: navigate to `/admin`, go to **Settings → Services**. You can add services with name, duration, price, category, description, and optional deposit amount. No database editing needed.
+**Use the admin Settings page** to add and manage services: navigate to `/admin`, go to **Settings → Services**. You can add services with name, duration, price, category, and description. No database editing needed.
 
 ### Staff
 

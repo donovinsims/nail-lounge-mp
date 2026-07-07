@@ -33,3 +33,85 @@ export const acknowledgeAlert = createServerFn({ method: "POST" })
 
     return { success: true };
   });
+
+export interface CustomerHistoryEntry {
+  id: string;
+  name: string;
+  phone: string;
+  totalVisits: number;
+  completedVisits: number;
+  totalSpent: number;
+  totalTips: number;
+  lastVisit: string | null;
+  lastStaff: string | null;
+  lastService: string | null;
+  lastNotes: string | null;
+  lastRating: number | null;
+}
+
+export const getCustomerHistory = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<CustomerHistoryEntry[]> => {
+    const { data: clients, error: clientErr } = await context.supabase
+      .from("clients")
+      .select("id, name, phone")
+      .order("name")
+      .limit(100);
+
+    if (clientErr) throw clientErr;
+    if (!clients || clients.length === 0) return [];
+
+    const { data: bookings, error: bookingErr } = await context.supabase
+      .from("bookings")
+      .select(
+        `
+        id, client_id, start_time, completed_at, status, tip_amount,
+        payment_method, service_notes, client_rating,
+        services:service_id(name, price),
+        staff:staff_id(name)
+      `,
+      )
+      .in(
+        "client_id",
+        clients.map((c) => c.id),
+      )
+      .order("start_time", { ascending: false });
+
+    if (bookingErr) throw bookingErr;
+    const bks = bookings || [];
+
+    return clients.map((client: { id: string; name: string; phone: string }) => {
+      const clientBookings = bks.filter((b: any) => b.client_id === client.id) as Array<{
+        id: string;
+        start_time: string;
+        completed_at: string | null;
+        status: string;
+        tip_amount: number | null;
+        payment_method: string | null;
+        service_notes: string | null;
+        client_rating: number | null;
+        services: { name: string; price: number } | null;
+        staff: { name: string } | null;
+      }>;
+      const completed = clientBookings.filter((b) => b.status === "completed");
+      const totalSpent = completed.reduce((s, b) => s + (b.services?.price || 0), 0);
+      const totalTips = completed.reduce((s, b) => s + (b.tip_amount || 0), 0);
+      const lastBooking = clientBookings.length > 0 ? clientBookings[0] : null;
+      const lastRated = [...clientBookings].reverse().find((b) => b.client_rating != null);
+
+      return {
+        id: client.id,
+        name: client.name,
+        phone: client.phone,
+        totalVisits: clientBookings.length,
+        completedVisits: completed.length,
+        totalSpent,
+        totalTips,
+        lastVisit: lastBooking?.start_time ?? null,
+        lastStaff: lastBooking?.staff?.name ?? null,
+        lastService: lastBooking?.services?.name ?? null,
+        lastNotes: lastBooking?.service_notes ?? null,
+        lastRating: lastRated?.client_rating ?? null,
+      };
+    });
+  });

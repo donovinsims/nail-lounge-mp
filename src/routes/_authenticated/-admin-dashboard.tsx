@@ -1,14 +1,8 @@
-import { useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import type { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
-import { seedDemoData } from "@/lib/admin.functions";
 import { fmtMoney, fmtTime } from "@/lib/salon";
-import { getErrorMessage } from "@/lib/error-handler";
 import {
-  LayoutGrid,
-  Sparkles,
   Calendar,
   DollarSign,
   TrendingUp,
@@ -17,9 +11,8 @@ import {
   PieChart,
   CreditCard,
 } from "lucide-react";
-import { toast } from "sonner";
 
-import { Bar, BarChart, Pie, PieChart as RePieChart, ResponsiveContainer, Cell } from "recharts";
+import { Bar, BarChart, Pie, PieChart as RePieChart, Cell } from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -64,7 +57,6 @@ function greeting() {
 
 export default function Dashboard({ salonId, ownerName }: { salonId: string; ownerName?: string }) {
   const qc = useQueryClient();
-  const seed = useServerFn(seedDemoData);
 
   // Today's bookings
   const { data: bookings = [] } = useQuery({
@@ -260,41 +252,6 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
     statusDonutData.map((d) => [d.status, { label: d.status, color: d.fill }]),
   );
 
-  const seeded = useRef(false);
-
-  // Auto-seed demo data on first mount if the dashboard is empty
-  useEffect(() => {
-    if (seeded.current) return;
-    const check = async () => {
-      const start = new Date();
-      start.setHours(0, 0, 0, 0);
-      const end = new Date();
-      end.setHours(23, 59, 59, 999);
-      const { count } = await supabase
-        .from("bookings")
-        .select("*", { count: "exact", head: true })
-        .eq("salon_id", salonId)
-        .gte("start_time", start.toISOString())
-        .lte("start_time", end.toISOString());
-      if (count === 0) {
-        seeded.current = true;
-        try {
-          const r = await seed();
-          if (r?.ok) {
-            toast.success(
-              `Loaded ${r.bookings || 0} sample bookings and ${r.commissions || 0} commission records for you to explore`,
-              { duration: 4000 },
-            );
-            qc.invalidateQueries();
-          }
-        } catch {
-          // seed may fail if data already exists or permissions aren't ready
-        }
-      }
-    };
-    check();
-  }, []);
-
   const greet = greeting();
 
   return (
@@ -453,27 +410,11 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
 
       {/* Today's schedule */}
       <div className="rounded-2xl bg-surface">
-        <div className="flex items-center justify-between p-5">
-          <div>
-            <h3 className="font-semibold">Today's schedule</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {bookings.length} booking{bookings.length !== 1 ? "s" : ""}
-            </p>
-          </div>
-          <button
-            onClick={async () => {
-              try {
-                const r = await seed();
-                toast.success(`Seeded ${r?.bookings || 0} bookings`);
-                qc.invalidateQueries();
-              } catch (e: unknown) {
-                toast.error(getErrorMessage(e, "Failed to seed"));
-              }
-            }}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-surface-2 px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Sparkles className="h-3.5 w-3.5" /> Seed demo
-          </button>
+        <div className="p-5">
+          <h3 className="font-semibold">Today's schedule</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {bookings.length} booking{bookings.length !== 1 ? "s" : ""}
+          </p>
         </div>
         <ul className="divide-y divide-border">
           {bookings.length === 0 && (
