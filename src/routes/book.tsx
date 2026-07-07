@@ -62,6 +62,7 @@ function Book() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const stepRef = useRef<HTMLDivElement>(null);
+  const submittingRef = useRef(false);
   const [announcement, setAnnouncement] = useState("");
   const [disabledHint, setDisabledHint] = useState<string | null>(null);
   const dateDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -103,11 +104,11 @@ function Book() {
     dateDebounceRef.current = setTimeout(() => {
       setDate(d);
       setSlot(null);
-    }, 300);
+    }, 0);
   };
 
-  // Unsaved progress warning
-  const hasSelection = step > 1 || serviceId || staffId || slot || name || phone || email;
+  // Unsaved progress warning — only fires when user has actual data entered
+  const hasSelection = !!serviceId || !!staffId || !!slot || !!name || !!phone || !!email;
 
   useEffect(() => {
     if (!hasSelection) return;
@@ -194,9 +195,9 @@ function Book() {
   const create = useServerFn(createPublicBooking);
   const mutation = useMutation({
     mutationFn: create,
-    onSuccess: () => {
+    onSuccess: (result) => {
       toast.success("Booking confirmed!");
-      navigate({ to: "/appointments", search: { phone } as { phone: string } });
+      navigate({ to: "/booking-confirmed", search: { bookingId: result.bookingId } });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -217,18 +218,27 @@ function Book() {
     tech != null;
 
   const handleSubmit = () => {
+    if (submittingRef.current || mutation.isPending) return;
     if (!salon || !service || !tech || !slot) return;
-    mutation.mutate({
-      data: {
-        salonId: salon.id,
-        serviceId: service.id,
-        staffId: tech.id,
-        startTime: slot.toISOString(),
-        clientName: name,
-        clientPhone: phone,
-        clientEmail: email,
+    submittingRef.current = true;
+    mutation.mutate(
+      {
+        data: {
+          salonId: salon.id,
+          serviceId: service.id,
+          staffId: tech.id,
+          startTime: slot.toISOString(),
+          clientName: name,
+          clientPhone: phone,
+          clientEmail: email,
+        },
       },
-    });
+      {
+        onSettled: () => {
+          submittingRef.current = false;
+        },
+      },
+    );
   };
 
   return (
@@ -313,7 +323,7 @@ function Book() {
               {announcement}
             </div>
 
-            <div key={step} className="animate-in fade-in duration-200">
+            <div key={step} className="animate-in fade-in slide-in-from-right-4 duration-300">
               {step === 1 && (
                 <StepService
                   services={services}

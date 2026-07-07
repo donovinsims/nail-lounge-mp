@@ -197,6 +197,30 @@ export const deleteService = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ── Commission Paid Toggle ──────────────────────────────────────────────
+
+export const toggleBookingPaid = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const salonId = SALON_ID_FILTER();
+    const { data: booking } = await context.supabase
+      .from("bookings")
+      .select("paid")
+      .eq("id", data.id)
+      .eq("salon_id", salonId)
+      .single();
+    if (!booking) throw new Error("Booking not found");
+
+    const { error } = await context.supabase
+      .from("bookings")
+      .update({ paid: !booking.paid })
+      .eq("id", data.id)
+      .eq("salon_id", salonId);
+    if (error) throw new Error(error.message);
+    return { ok: true, paid: !booking.paid };
+  });
+
 // ── Salon Settings ──────────────────────────────────────────────────────
 
 export const updateSalonHours = createServerFn({ method: "POST" })

@@ -33,7 +33,8 @@ export default function CalendarView({ salonId }: { salonId: string }) {
       const { data } = await supabase
         .from("staff")
         .select("id, name, avatar_color")
-        .eq("salon_id", salonId);
+        .eq("salon_id", salonId)
+        .eq("is_active", true);
       return data ?? [];
     },
   });
@@ -59,15 +60,15 @@ export default function CalendarView({ salonId }: { salonId: string }) {
     },
   });
 
-  // Filter staff to only those with bookings today
-  const staffIdsWithBookings = new Set(bookings.map((b: CalendarBooking) => b.staff_id));
-  const staffWithBookings = staffList.filter((s: CalendarStaff) => staffIdsWithBookings.has(s.id));
+  // Use ALL active staff — even those with no bookings today,
+  // so owners can see who's on the clock vs. off.
+  const displayedStaff = staffList;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   // Build flat grid: corner + staff headers, then hour rows
-  const gridCols = `80px repeat(${Math.max(staffWithBookings.length, 1)}, minmax(180px, 1fr))`;
+  const gridCols = `80px repeat(${Math.max(displayedStaff.length, 1)}, minmax(180px, 1fr))`;
 
   const gridItems: React.ReactNode[] = [];
 
@@ -80,7 +81,7 @@ export default function CalendarView({ salonId }: { salonId: string }) {
   );
 
   // Staff column headers
-  if (staffWithBookings.length === 0) {
+  if (displayedStaff.length === 0) {
     gridItems.push(
       <div
         key="no-staff-header"
@@ -90,7 +91,7 @@ export default function CalendarView({ salonId }: { salonId: string }) {
       </div>,
     );
   } else {
-    staffWithBookings.forEach((s: CalendarStaff) => {
+    displayedStaff.forEach((s: CalendarStaff) => {
       gridItems.push(
         <div
           key={`h-${s.id}`}
@@ -118,8 +119,8 @@ export default function CalendarView({ salonId }: { salonId: string }) {
       </div>,
     );
 
-    if (staffWithBookings.length === 0) {
-      // Single "Bookings" column when no staff with bookings
+    if (displayedStaff.length === 0) {
+      // Single "Bookings" column when no staff at all
       const items = bookings.filter(
         (b: CalendarBooking) => new Date(b.start_time).getHours() === hour,
       );
@@ -136,7 +137,7 @@ export default function CalendarView({ salonId }: { salonId: string }) {
         </div>,
       );
     } else {
-      staffWithBookings.forEach((staff: CalendarStaff) => {
+      displayedStaff.forEach((staff: CalendarStaff) => {
         const items = bookings.filter(
           (b: CalendarBooking) =>
             b.staff_id === staff.id && new Date(b.start_time).getHours() === hour,
@@ -196,7 +197,7 @@ export default function CalendarView({ salonId }: { salonId: string }) {
         </h2>
         <span className="text-xs text-muted-foreground">
           {bookings.length} booking{bookings.length !== 1 ? "s" : ""}
-          {staffWithBookings.length > 0 && ` · ${staffWithBookings.length} staff`}
+          {displayedStaff.length > 0 && ` · ${displayedStaff.length} staff`}
         </span>
       </div>
 
@@ -207,7 +208,7 @@ export default function CalendarView({ salonId }: { salonId: string }) {
           style={{
             gridTemplateColumns: gridCols,
             minWidth:
-              staffWithBookings.length > 0 ? `${80 + staffWithBookings.length * 200}px` : undefined,
+              displayedStaff.length > 0 ? `${80 + displayedStaff.length * 200}px` : undefined,
           }}
         >
           {gridItems}

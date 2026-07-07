@@ -9,6 +9,7 @@ import {
   type CustomerHistoryEntry,
 } from "@/lib/owner-alerts.functions";
 import { fmtDate, fmtMoney } from "@/lib/utils";
+import { BottomSheet } from "@/components/bottom-sheet";
 import { AlertTriangle, Check, Phone, Search, Users } from "lucide-react";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/error-handler";
@@ -40,6 +41,10 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
   const ackAlert = useServerFn(acknowledgeAlert);
   const fetchHistory = useServerFn(getCustomerHistory);
 
+  const [search, setSearch] = useState("");
+  const [alertSheetId, setAlertSheetId] = useState<string | null>(null);
+  const [custSheetId, setCustSheetId] = useState<string | null>(null);
+
   const { data: alerts = [] } = useQuery({
     queryKey: ["owner-alerts"],
     queryFn: () => fetchAlerts(),
@@ -49,8 +54,6 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
     queryKey: ["customer-history"],
     queryFn: () => fetchHistory(),
   });
-
-  const [search, setSearch] = useState("");
 
   const unacknowledged = alerts.filter((a: OwnerAlertRow) => !a.acknowledged_at);
 
@@ -95,7 +98,8 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
                 key={a.id}
                 className="rounded-2xl bg-surface p-5 transition-colors hover:bg-surface-2/30"
               >
-                <div className="flex items-start justify-between gap-4">
+                {/* Desktop: static card with inline acknowledge */}
+                <div className="hidden md:flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className={`text-lg font-bold ${ratingColor(a.rating)}`}>
@@ -127,6 +131,75 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
                     <Check className="h-4 w-4" /> Acknowledge
                   </button>
                 </div>
+
+                {/* Mobile: trigger button */}
+                <button
+                  onClick={() => setAlertSheetId(a.id)}
+                  className="md:hidden w-full text-left"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-lg font-bold ${ratingColor(a.rating)}`}>
+                          {a.rating}/5
+                        </span>
+                        <span className="text-xs text-muted-foreground">·</span>
+                        <span className="inline-flex items-center gap-1 text-sm text-muted-foreground font-mono">
+                          <Phone className="h-3 w-3" />
+                          {a.client_phone}
+                        </span>
+                        <span className="text-xs text-muted-foreground">·</span>
+                        <span className="text-[10px] font-mono text-muted-foreground">
+                          {fmtDate(a.created_at)}
+                        </span>
+                        <span className="text-[10px] font-mono text-muted-foreground/60">
+                          ({timeSince(a.created_at)})
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm text-muted-foreground">{ratingLabel(a.rating)}</p>
+                    </div>
+                  </div>
+                </button>
+
+                <BottomSheet
+                  open={alertSheetId === a.id}
+                  onOpenChange={(o) => !o && setAlertSheetId(null)}
+                  title={<span className={ratingColor(a.rating)}>Rating: {a.rating}/5</span>}
+                  footer={
+                    <button
+                      onClick={() => handleAcknowledge(a.id)}
+                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all"
+                    >
+                      <Check className="h-4 w-4" /> Acknowledge
+                    </button>
+                  }
+                >
+                  <div className="space-y-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <a
+                        href={`tel:${a.client_phone}`}
+                        className="font-mono text-primary hover:underline"
+                      >
+                        {a.client_phone}
+                      </a>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Date</span>
+                      <span className="font-mono text-xs">{fmtDate(a.created_at)}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Time since</span>
+                      <span className="font-mono text-xs">{timeSince(a.created_at)}</span>
+                    </div>
+
+                    <div className="rounded-lg bg-surface-2 px-3 py-2.5">
+                      <p className="text-sm text-muted-foreground">{ratingLabel(a.rating)}</p>
+                    </div>
+                  </div>
+                </BottomSheet>
               </div>
             ))}
           </div>
@@ -240,36 +313,139 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
               {/* Mobile cards */}
               <div className="md:hidden grid gap-2">
                 {filtered.map((c: CustomerHistoryEntry) => (
-                  <div key={c.id} className="rounded-xl bg-surface-2 p-4 text-sm space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{c.name}</span>
-                      <span className="text-xs font-mono text-muted-foreground">{c.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span>{c.totalVisits} visits</span>
-                      <span>{fmtMoney(c.totalSpent)} spent</span>
-                      <span>{fmtMoney(c.totalTips)} tips</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      {c.lastVisit && <span>Last: {fmtDate(c.lastVisit)}</span>}
-                      {c.lastStaff && <span>· {c.lastStaff}</span>}
-                      {c.lastRating != null && (
-                        <span
-                          className={
-                            c.lastRating <= 2
-                              ? "text-destructive font-semibold"
-                              : c.lastRating <= 3
-                                ? "text-warning font-semibold"
-                                : "text-green-600 font-semibold"
-                          }
-                        >
-                          {c.lastRating}/5
-                        </span>
+                  <div key={c.id}>
+                    <button
+                      onClick={() => setCustSheetId(c.id)}
+                      className="w-full text-left rounded-xl bg-surface-2 p-4 text-sm space-y-1.5"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{c.name}</span>
+                        <span className="text-xs font-mono text-muted-foreground">{c.phone}</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <span>{c.totalVisits} visits</span>
+                        <span>{fmtMoney(c.totalSpent)} spent</span>
+                        <span>{fmtMoney(c.totalTips)} tips</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        {c.lastVisit && <span>Last: {fmtDate(c.lastVisit)}</span>}
+                        {c.lastStaff && <span>· {c.lastStaff}</span>}
+                        {c.lastRating != null && (
+                          <span
+                            className={
+                              c.lastRating <= 2
+                                ? "text-destructive font-semibold"
+                                : c.lastRating <= 3
+                                  ? "text-warning font-semibold"
+                                  : "text-green-600 font-semibold"
+                            }
+                          >
+                            {c.lastRating}/5
+                          </span>
+                        )}
+                      </div>
+                      {c.lastNotes && (
+                        <p className="text-xs text-muted-foreground italic">"{c.lastNotes}"</p>
                       )}
-                    </div>
-                    {c.lastNotes && (
-                      <p className="text-xs text-muted-foreground italic">"{c.lastNotes}"</p>
-                    )}
+                    </button>
+
+                    <BottomSheet
+                      open={custSheetId === c.id}
+                      onOpenChange={(o) => !o && setCustSheetId(null)}
+                      title={c.name}
+                      footer={
+                        <a
+                          href={`tel:${c.phone}`}
+                          className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all"
+                        >
+                          <Phone className="h-4 w-4" /> Call {c.phone}
+                        </a>
+                      }
+                    >
+                      <div className="space-y-4 text-sm">
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <a
+                            href={`tel:${c.phone}`}
+                            className="font-mono text-primary hover:underline"
+                          >
+                            {c.phone}
+                          </a>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="rounded-lg bg-surface-2 p-3 text-center">
+                            <p className="text-lg font-bold tabular-nums">{c.totalVisits}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">
+                              Visits
+                            </p>
+                            <p className="text-[10px] text-muted-foreground/60">
+                              ({c.completedVisits} done)
+                            </p>
+                          </div>
+                          <div className="rounded-lg bg-surface-2 p-3 text-center">
+                            <p className="text-lg font-bold tabular-nums">
+                              {fmtMoney(c.totalSpent)}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">
+                              Spent
+                            </p>
+                          </div>
+                          <div className="rounded-lg bg-surface-2 p-3 text-center">
+                            <p className="text-lg font-bold tabular-nums">
+                              {fmtMoney(c.totalTips)}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">
+                              Tips
+                            </p>
+                          </div>
+                        </div>
+
+                        {c.lastVisit && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Last visit</span>
+                            <span className="font-mono text-xs">{fmtDate(c.lastVisit)}</span>
+                          </div>
+                        )}
+
+                        {c.lastStaff && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Staff</span>
+                            <span className="text-xs">{c.lastStaff}</span>
+                          </div>
+                        )}
+
+                        {c.lastService && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Service</span>
+                            <span className="text-xs">{c.lastService}</span>
+                          </div>
+                        )}
+
+                        {c.lastRating != null && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Rating</span>
+                            <span
+                              className={
+                                c.lastRating <= 2
+                                  ? "text-destructive font-bold"
+                                  : c.lastRating <= 3
+                                    ? "text-warning font-bold"
+                                    : "text-green-600 font-bold"
+                              }
+                            >
+                              {c.lastRating}/5
+                            </span>
+                          </div>
+                        )}
+
+                        {c.lastNotes && (
+                          <div className="rounded-lg bg-surface-2 px-3 py-2.5">
+                            <p className="text-xs text-muted-foreground italic">"{c.lastNotes}"</p>
+                          </div>
+                        )}
+                      </div>
+                    </BottomSheet>
                   </div>
                 ))}
               </div>

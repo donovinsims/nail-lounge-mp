@@ -171,12 +171,15 @@ export const lookupAppointments = createServerFn({ method: "POST" })
 /**
  * Get bookings that need staff completion (completed_at is null but status is "confirmed").
  * Called when staff route mounts to check for pending modal.
+ * Only returns bookings from the last 48 hours to prevent old stale data
+ * from permanently bricking the staff dashboard.
  */
 export const getPendingCompletions = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ staffId: z.string() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const now = new Date();
+    const recencyCutoff = new Date(now.getTime() - 48 * 60 * 60 * 1000);
 
     const { data: bookings } = await supabaseAdmin
       .from("bookings")
@@ -184,6 +187,7 @@ export const getPendingCompletions = createServerFn({ method: "GET" })
       .eq("staff_id", data.staffId)
       .eq("status", "confirmed")
       .is("completed_at", null)
+      .gte("start_time", recencyCutoff.toISOString())
       .lte("start_time", now.toISOString())
       .order("start_time", { ascending: true });
 
@@ -330,4 +334,34 @@ export const cancelPublicBooking = createServerFn({ method: "POST" })
       .eq("id", data.bookingId);
     if (error) throw new Error("Could not cancel");
     return { ok: true };
+  });
+
+/**
+ * Fetch booking details for the confirmation page.
+ */
+export const getBookingDetails = createServerFn({ method: "GET" })
+  .inputValidator((d) => z.object({ bookingId: z.string().uuid() }).parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: booking } = await supabaseAdmin
+      .from("bookings")
+      .select(
+        "id, start_time, end_time, status, services(id, name, price), staff(id, name), clients(name, phone)",
+      )
+      .eq("id", data.bookingId)
+      .single();
+
+    if (!booking) throw new Error("Booking not found");
+
+    return {
+      id: booking.id,
+      startTime: booking.start_time,
+      endTime: booking.end_time,
+      status: booking.status,
+      serviceName: booking.services?.name ?? "Unknown",
+      servicePrice: booking.services?.price ?? 0,
+      staffName: booking.staff?.name ?? "Unknown",
+      clientName: booking.clients?.name ?? "Unknown",
+      clientPhone: booking.clients?.phone ?? "",
+    };
   });

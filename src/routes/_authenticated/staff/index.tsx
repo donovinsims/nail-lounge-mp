@@ -3,9 +3,16 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyStaff } from "@/lib/admin.functions";
 import { getPendingCompletions, completeStaffModal } from "@/lib/booking.functions";
+import { getSalonName } from "@/lib/env";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/staff/")({
+  head: () => ({
+    meta: [
+      { title: `Staff Dashboard — ${getSalonName()}` },
+      { name: "description", content: "Complete appointments and manage your schedule." },
+    ],
+  }),
   component: StaffDashboard,
 });
 

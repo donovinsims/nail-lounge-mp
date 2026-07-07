@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { BookingRow, CommissionRecordRow } from "@/integrations/supabase/rows";
 import { supabase } from "@/integrations/supabase/client";
 import { fmtMoney, fmtTime } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Calendar,
   DollarSign,
@@ -56,7 +57,7 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
   const qc = useQueryClient();
 
   // Today's bookings
-  const { data: bookings = [] } = useQuery({
+  const { data: bookings = [], isFetching: bookingsLoading } = useQuery({
     queryKey: ["admin-bookings", salonId],
     queryFn: async () => {
       const start = new Date();
@@ -268,38 +269,52 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
 
       {/* KPI Widget Row */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard
-          label="Today's bookings"
-          value={String(bookings.length)}
-          icon={Calendar}
-          sub={`${confirmed} confirmed`}
-        />
-        <KpiCard
-          label="Revenue today"
-          value={fmtMoney(todayRev)}
-          icon={DollarSign}
-          trend={{
-            direction: todayRev >= yesterdayRev ? "up" : "down",
-            value: trendVal,
-          }}
-          sub={`${cr.length} checkouts`}
-        />
-        <KpiCard
-          label="Confirmed"
-          value={String(confirmed)}
-          icon={Users}
-          sub={
-            bookings.length > 0
-              ? `${((confirmed / bookings.length) * 100).toFixed(0)}% of total`
-              : "No bookings yet"
-          }
-        />
-        <KpiCard
-          label="Avg ticket"
-          value={cr.length > 0 ? fmtMoney(todayRev / cr.length) : "$0"}
-          icon={TrendingUp}
-          sub={`${cr.length} transactions`}
-        />
+        {bookingsLoading ? (
+          <>
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="rounded-2xl bg-surface p-5 space-y-3">
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-3 w-28" />
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            <KpiCard
+              label="Today's bookings"
+              value={String(bookings.length)}
+              icon={Calendar}
+              sub={`${confirmed} confirmed`}
+            />
+            <KpiCard
+              label="Revenue today"
+              value={fmtMoney(todayRev)}
+              icon={DollarSign}
+              trend={{
+                direction: todayRev >= yesterdayRev ? "up" : "down",
+                value: trendVal,
+              }}
+              sub={`${cr.length} checkouts`}
+            />
+            <KpiCard
+              label="Confirmed"
+              value={String(confirmed)}
+              icon={Users}
+              sub={
+                bookings.length > 0
+                  ? `${((confirmed / bookings.length) * 100).toFixed(0)}% of total`
+                  : "No bookings yet"
+              }
+            />
+            <KpiCard
+              label="Avg ticket"
+              value={cr.length > 0 ? fmtMoney(todayRev / cr.length) : "$0"}
+              icon={TrendingUp}
+              sub={`${cr.length} transactions`}
+            />
+          </>
+        )}
       </div>
 
       {/* Chart Row */}

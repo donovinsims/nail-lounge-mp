@@ -19,30 +19,33 @@ DECLARE
   v_day_start TIMESTAMPTZ;
   v_day_end TIMESTAMPTZ;
   v_min_lead_time TIMESTAMPTZ;
-  v_busy RECORD;
 BEGIN
   v_min_lead_time := NOW() + INTERVAL '30 minutes';
   v_day_start := p_date::TIMESTAMPTZ;
   v_day_end := (p_date + INTERVAL '1 day')::TIMESTAMPTZ;
   v_day_name := LOWER(TRIM(TO_CHAR(p_date, 'day')));
 
-  -- Get staff working hours
-  SELECT start_time::TIME, end_time::TIME
+  -- Get staff working hours from JSONB working_hours column
+  -- Shape: {"mon": {"open": "09:00", "close": "17:00"}, ...}
+  -- Note: working_hours is a JSONB object (NOT array), so we use -> key access
+  SELECT
+    (working_hours->v_day_name->>'open')::TIME,
+    (working_hours->v_day_name->>'close')::TIME
   INTO v_staff_start, v_staff_end
   FROM staff
   WHERE id = p_staff_id;
 
-  -- Get salon business hours for this day from JSONB
-  SELECT 
-    MIN((h.value->>'open')::TIME),
-    MIN((h.value->>'close')::TIME)
+  -- Get salon business hours from JSONB business_hours column
+  -- Shape: {"mon": {"open": "09:30", "close": "19:30"}, ...}
+  -- Note: business_hours is a JSONB object (NOT array), so we use -> key access
+  SELECT
+    (business_hours->v_day_name->>'open')::TIME,
+    (business_hours->v_day_name->>'close')::TIME
   INTO v_business_open, v_business_close
-  FROM salons s
-  CROSS JOIN LATERAL jsonb_array_elements(s.business_hours) AS h
-  WHERE s.id = p_salon_id
-    AND LOWER(TRIM(h.value->>'day')) = v_day_name;
+  FROM salons
+  WHERE id = p_salon_id;
 
-  -- Fallback if no hours set
+  -- Fallback if no hours set for this day
   IF v_business_open IS NULL THEN v_business_open := '09:00'; END IF;
   IF v_business_close IS NULL THEN v_business_close := '19:00'; END IF;
   IF v_staff_start IS NULL THEN v_staff_start := '09:00'; END IF;
@@ -63,14 +66,15 @@ BEGIN
 
     -- Check minimum lead time (30 min)
     IF v_slot >= v_min_lead_time THEN
-      -- Check no booking conflict (exclude the booking being rescheduled if applicable)
+      -- Check no booking conflict using the stored end_time column
+      -- (bookings has end_time TIMESTAMPTZ, NOT a duration_minutes column)
       IF NOT EXISTS (
         SELECT 1
         FROM bookings b
         WHERE b.staff_id = p_staff_id
           AND b.status IN ('confirmed', 'completed')
           AND b.start_time < v_slot_end
-          AND (b.start_time + (COALESCE(b.duration_minutes, p_service_duration_minutes) || ' minutes')::INTERVAL) > v_slot
+          AND b.end_time > v_slot
       ) THEN
         start_time := v_slot;
         RETURN NEXT;

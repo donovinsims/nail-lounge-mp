@@ -2,7 +2,7 @@
  * DB-backed sliding-window rate limiter.
  *
  * Uses the `check_rate_limit` Postgres RPC for atomic,
- * cross-instance rate limiting. Falls open (allows request)
+ * cross-instance rate limiting. Falls closed (denies request)
  * if the RPC call fails.
  *
  * @example
@@ -36,7 +36,11 @@ export class RateLimiter {
     });
 
     if (error || !data || data.length === 0) {
-      return { allowed: true, remaining: this.maxRequests, resetAt: null };
+      console.error(
+        "[RateLimiter] RPC failed — denying request:",
+        error?.message ?? "null data or empty result",
+      );
+      return { allowed: false, remaining: 0, resetAt: null };
     }
 
     return {

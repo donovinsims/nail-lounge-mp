@@ -1,0 +1,1 @@
+ALTER TABLE public.bookings ADD COLUMN paid BOOLEAN NOT NULL DEFAULT false;

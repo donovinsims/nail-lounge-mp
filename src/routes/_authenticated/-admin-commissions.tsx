@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { fmtMoney, fmtDate } from "@/lib/utils";
-import { Download, Search, ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
+import { Download, Search, ArrowUpDown, ChevronDown, ChevronUp, Check, X } from "lucide-react";
 import { KpiCard } from "./-admin-components/kpi-card";
+import { toggleBookingPaid } from "@/lib/admin-crud.functions";
 
 type SortField = "date" | "staffName" | "tip";
 type SortDir = "asc" | "desc";
@@ -13,6 +14,7 @@ type BookingWithStaffService = {
   id: string;
   completed_at: string | null;
   tip_amount: number | null;
+  paid: boolean;
   payment_method: Database["public"]["Enums"]["payment_method"] | null;
   staff: { name: string };
   services: { name: string };
@@ -29,13 +31,22 @@ export default function Commissions({ salonId }: { salonId: string }) {
   const [page, setPage] = useState(0);
   const perPage = 20;
 
+  const queryClient = useQueryClient();
+
+  const payMutation = useMutation({
+    mutationFn: toggleBookingPaid,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["payroll-ledger", salonId] });
+    },
+  });
+
   const { data: rows = [] } = useQuery({
     queryKey: ["payroll-ledger", salonId],
     queryFn: async () => {
       const { data } = await supabase
         .from("bookings")
         .select(
-          "id, completed_at, tip_amount, payment_method, staff!inner(name), services!inner(name)",
+          "id, completed_at, tip_amount, paid, payment_method, staff!inner(name), services!inner(name)",
         )
         .eq("salon_id", salonId)
         .not("completed_at", "is", null)
@@ -170,6 +181,8 @@ export default function Commissions({ salonId }: { salonId: string }) {
                   { key: null, label: "Service Provided" },
                   { key: "tip" as SortField, label: "Tip Amount" },
                   { key: null, label: "Payment Method" },
+                  { key: null, label: "Paid" },
+                  { key: null, label: "Action" },
                 ].map(({ key, label }) => (
                   <th
                     key={label}
@@ -196,11 +209,38 @@ export default function Commissions({ salonId }: { salonId: string }) {
                     {r.tip_amount != null ? fmtMoney(Number(r.tip_amount)) : "—"}
                   </td>
                   <td className="text-muted-foreground">{r.payment_method || "—"}</td>
+                  <td className="p-4">
+                    {r.paid ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600">
+                        <Check className="h-3.5 w-3.5" /> Paid
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </td>
+                  <td className="p-4">
+                    <button
+                      onClick={() => {
+                        const label = r.paid ? "Mark Unpaid" : "Mark Paid";
+                        if (
+                          window.confirm(
+                            `Are you sure you want to ${label.toLowerCase()} this commission?`,
+                          )
+                        ) {
+                          payMutation.mutate({ id: r.id });
+                        }
+                      }}
+                      disabled={payMutation.isPending}
+                      className="tap-target rounded-lg bg-surface px-3 py-1.5 text-xs font-medium hover:bg-surface-2 transition-colors disabled:opacity-50"
+                    >
+                      {r.paid ? "Mark Unpaid" : "Mark Paid"}
+                    </button>
+                  </td>
                 </tr>
               ))}
               {pageRows.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                  <td colSpan={7} className="p-8 text-center text-muted-foreground">
                     No completed bookings yet.
                   </td>
                 </tr>

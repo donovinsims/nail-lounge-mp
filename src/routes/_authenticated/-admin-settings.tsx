@@ -70,6 +70,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
   };
 
   const handleDeleteStaff = async (id: string) => {
+    if (!window.confirm("Permanently deactivate this staff member?")) return;
     try {
       await deleteStaff({ data: { id } });
       toast.success("Staff deactivated");
@@ -115,6 +116,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
   };
 
   const handleDeleteService = async (id: string) => {
+    if (!window.confirm("Permanently deactivate this service?")) return;
     try {
       await deleteService({ data: { id } });
       toast.success("Service deactivated");

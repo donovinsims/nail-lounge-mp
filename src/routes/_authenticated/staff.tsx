@@ -2,10 +2,17 @@ import { createFileRoute, Outlet, Link, redirect, useNavigate } from "@tanstack/
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyStaff } from "@/lib/admin.functions";
+import { getSalonName } from "@/lib/env";
 import { LogOut } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/staff")({
   ssr: false,
+  head: () => ({
+    meta: [
+      { title: `Staff — ${getSalonName()}` },
+      { name: "description", content: "Staff portal for managing appointments and services." },
+    ],
+  }),
   beforeLoad: async () => {
     const {
       data: { user },

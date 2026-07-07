@@ -100,8 +100,8 @@ describe("RateLimiter", () => {
       windowMs: 60_000,
     });
     const result = await limiter.check("error-user");
-    expect(result.allowed).toBe(true);
-    expect(result.remaining).toBe(3);
+    expect(result.allowed).toBe(false);
+    expect(result.remaining).toBe(0);
     expect(result.resetAt).toBeNull();
   });
 });

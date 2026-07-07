@@ -254,25 +254,33 @@ function Admin() {
         </div>
       </aside>
 
-      {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-border bg-background/95 backdrop-blur safe-pb pt-2">
-        {NAV.slice(0, 4).map((n) => (
-          <button
-            key={n.id}
-            onClick={() => setTab(n.id)}
-            className={`relative flex flex-col items-center gap-1 py-2 text-[10px] transition-colors ${
-              tab === n.id ? "text-foreground" : "text-muted-foreground"
-            }`}
-          >
-            <div className="relative">
-              <n.icon className="h-5 w-5" />
-              {n.id === "alerts" && unacknowledgedCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-destructive" />
-              )}
-            </div>
-            {n.label}
-          </button>
-        ))}
+      {/* Mobile bottom nav — horizontally scrollable to fit all 8 tabs */}
+      <nav className="md:hidden fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur safe-pb">
+        <div className="flex overflow-x-auto hide-scrollbar gap-1 px-2 pt-2">
+          {NAV.map((n) => {
+            const isActive = tab === n.id;
+            const showBadge = n.id === "alerts" && unacknowledgedCount > 0;
+            return (
+              <button
+                key={n.id}
+                onClick={() => setTab(n.id)}
+                className={`relative flex shrink-0 flex-col items-center gap-1 rounded-lg px-3 py-2 text-[10px] transition-colors ${
+                  isActive
+                    ? "bg-muted text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <div className="relative">
+                  <n.icon className="h-5 w-5" />
+                  {showBadge && (
+                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-destructive" />
+                  )}
+                </div>
+                {n.label}
+              </button>
+            );
+          })}
+        </div>
       </nav>
 
       {/* Main content */}

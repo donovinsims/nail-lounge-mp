@@ -174,3 +174,10 @@
   min-height: 44px;
   min-width: 44px;
 }
+@utility hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

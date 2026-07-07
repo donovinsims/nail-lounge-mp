@@ -110,7 +110,9 @@ export default function StepConfirm({
             disabled={isPending}
             aria-invalid={showNameError || undefined}
             aria-describedby={showNameError ? "name-error" : undefined}
-            className="mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+            className={`mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none transition-all focus:ring-2 focus:ring-ring disabled:opacity-50 ${
+              showNameError ? "ring-2 ring-red-400" : ""
+            }`}
           />
           {showNameError && (
             <p id="name-error" role="alert" className="mt-1 text-xs text-red-500">
@@ -135,7 +137,9 @@ export default function StepConfirm({
             disabled={isPending}
             aria-invalid={showPhoneError || undefined}
             aria-describedby={showPhoneError ? "phone-error" : undefined}
-            className="mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+            className={`mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none transition-all focus:ring-2 focus:ring-ring disabled:opacity-50 ${
+              showPhoneError || showPhoneFormatError ? "ring-2 ring-red-400" : ""
+            }`}
           />
           {showPhoneError && (
             <p id="phone-error" role="alert" className="mt-1 text-xs text-red-500">

@@ -5,7 +5,18 @@ import { useState } from "react";
 import { lookupAppointments, cancelPublicBooking } from "@/lib/booking.functions";
 import { fmtDate, fmtTime, fmtMoney } from "@/lib/utils";
 import { getSalonId, getSalonName } from "@/lib/env";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
+import { ChevronLeft, Loader2, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/appointments")({
@@ -24,6 +35,7 @@ type BookingLookup = {
 
 function Appointments() {
   const [phone, setPhone] = useState("");
+  const [cancelTarget, setCancelTarget] = useState<string | null>(null);
   const lookup = useServerFn(lookupAppointments);
   const cancel = useServerFn(cancelPublicBooking);
   const lookupMutation = useMutation({ mutationFn: lookup });
@@ -102,16 +114,40 @@ function Appointments() {
                 {fmtMoney(Number(b.services?.price ?? 0))}
               </p>
               {b.status === "confirmed" && (
-                <button
-                  onClick={() => {
-                    if (window.confirm("Cancel this appointment?")) {
-                      cancelMutation.mutate({ data: { bookingId: b.id, phone } });
-                    }
-                  }}
-                  className="mt-3 text-sm font-medium text-destructive underline-offset-4 hover:underline"
+                <AlertDialog
+                  open={cancelTarget === b.id}
+                  onOpenChange={(open) => setCancelTarget(open ? b.id : null)}
                 >
-                  Cancel appointment
-                </button>
+                  <AlertDialogTrigger asChild>
+                    <button className="mt-3 text-sm font-medium text-destructive underline-offset-4 hover:underline">
+                      Cancel appointment
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="flex items-center gap-2">
+                        <TriangleAlert className="h-5 w-5 text-destructive" />
+                        Cancel this appointment?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will cancel your {b.services?.name} appointment with {b.staff?.name} on{" "}
+                        {fmtDate(b.start_time)} at {fmtTime(b.start_time)}. This action cannot be
+                        undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Keep it</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          cancelMutation.mutate({ data: { bookingId: b.id, phone } });
+                        }}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Yes, cancel
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               )}
             </li>
           ))}

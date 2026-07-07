@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSalon, fetchStaff, type BusinessHours } from "@/lib/salon";
+import { fetchSalon, fetchStaff, fetchServices, type BusinessHours } from "@/lib/salon";
+import { fmtMoney } from "@/lib/utils";
 import type { StaffRow } from "@/integrations/supabase/rows";
 import {
   getSalonName,
@@ -16,6 +17,7 @@ import art2 from "@/assets/art2.jpg";
 import art3 from "@/assets/art3.jpg";
 import g1 from "@/assets/gallery1.jpg";
 import { SiteHeader, SiteFooter, MapEmbed } from "@/components/site-chrome";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Staff = Pick<
   StaffRow,
@@ -53,15 +55,6 @@ const DAY_SHORT: Record<string, string> = {
   sun: "Sun",
 };
 
-const FEATURED_SERVICES: [string, string, string, string][] = [
-  ["Basic Manicure", "Shape, cuticle, polish.", "30 min", "$25"],
-  ["Gel Manicure", "Two-week wear, mirror finish.", "45 min", "$40"],
-  ["Spa Pedicure", "Soak, exfoliate, massage.", "55 min", "$50"],
-  ["Deluxe Pedicure", "The full reset — hot stone, paraffin.", "75 min", "$58"],
-  ["Acrylic Full Set", "Custom length & shape.", "75 min", "$45"],
-  ["Dip Powder Full Set", "Lightweight, long-wear colour.", "75 min", "$53"],
-];
-
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -93,9 +86,14 @@ function Ornament({ className = "" }: { className?: string }) {
 
 function Home() {
   const { data: salon } = useQuery({ queryKey: ["salon"], queryFn: fetchSalon });
-  const { data: staff = [] } = useQuery({
+  const { data: staff = [], isFetching: staffLoading } = useQuery({
     queryKey: ["staff", salon?.id],
     queryFn: () => fetchStaff(salon!.id),
+    enabled: !!salon,
+  });
+  const { data: services = [], isFetching: servicesLoading } = useQuery({
+    queryKey: ["services", salon?.id],
+    queryFn: () => fetchServices(salon!.id),
     enabled: !!salon,
   });
 
@@ -108,11 +106,7 @@ function Home() {
         <div className="mx-auto grid max-w-7xl gap-10 px-6 pt-16 pb-20 sm:px-10 sm:pt-24 md:grid-cols-12 md:gap-12 md:pt-32">
           <div className="md:col-span-6 md:pt-8">
             <p className="text-[11px] uppercase tracking-[0.35em] text-accent">
-              Est.{" "}
-              {getSalonAddress()
-                ?.split(",")
-                .map((s) => s.trim())
-                .filter(Boolean)[1] || ""}
+              Est. {salon?.created_at ? new Date(salon.created_at).getFullYear() : ""}
             </p>
             <h1 className="mt-6 font-display text-6xl leading-[0.92] tracking-[-0.02em] sm:text-7xl lg:text-8xl">
               The quiet
@@ -241,17 +235,23 @@ function Home() {
             </Link>
           </div>
           <ul className="mt-12 divide-y divide-border">
-            {FEATURED_SERVICES.map(([name, desc, dur, price]) => (
+            {services.slice(0, 6).map((s) => (
               <li
-                key={name}
+                key={s.id}
                 className="grid grid-cols-[1fr_auto] items-baseline gap-x-6 gap-y-1 py-6 sm:grid-cols-[2fr_1fr_auto]"
               >
-                <p className="font-display text-2xl sm:text-3xl">{name}</p>
-                <p className="hidden text-sm text-muted-foreground sm:block">{desc}</p>
-                <p className="text-right font-mono text-sm tracking-wider">{price}</p>
-                <p className="text-sm text-muted-foreground sm:hidden">{desc}</p>
+                <p className="font-display text-2xl sm:text-3xl">{s.name}</p>
+                {s.category && (
+                  <p className="hidden text-sm text-muted-foreground sm:block">{s.category}</p>
+                )}
+                <p className="text-right font-mono text-sm tracking-wider">
+                  {fmtMoney(Number(s.price))}
+                </p>
+                {s.category && (
+                  <p className="text-sm text-muted-foreground sm:hidden">{s.category}</p>
+                )}
                 <p className="hidden font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground sm:col-start-3 sm:block">
-                  {dur}
+                  {s.duration_minutes} min
                 </p>
               </li>
             ))}
@@ -276,59 +276,74 @@ function Home() {
           </div>
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {staff.map((s: Staff) => {
-            const wh = s.working_hours as Record<
-              string,
-              { open: string; close: string } | undefined
-            >;
-            const openDays = DAYS.map(([, k]) => k).filter((k) => wh?.[k]);
-            return (
-              <article
-                key={s.id}
-                className="group rounded-3xl bg-surface overflow-hidden flex flex-col"
-              >
-                <div className="relative aspect-[4/5] bg-muted overflow-hidden">
-                  <div
-                    className="h-full w-full grid place-items-center text-5xl font-display text-white"
-                    style={{ background: s.avatar_color || "#7a3b52" }}
-                  >
-                    {s.name?.[0]}
+          {staffLoading ? (
+            <>
+              {[1, 2, 3, 4].map((i) => (
+                <article key={i} className="rounded-3xl bg-surface overflow-hidden flex flex-col">
+                  <Skeleton className="aspect-[4/5] w-full rounded-none" />
+                  <div className="p-6 space-y-3">
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                    <Skeleton className="h-10 w-full" />
                   </div>
-                </div>
-                <div className="p-6 flex-1 flex flex-col">
-                  <p className="font-display text-2xl">{s.name}</p>
-                  <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-accent">
-                    {s.title}
-                  </p>
-                  {s.bio && (
-                    <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.bio}</p>
-                  )}
-                  {Array.isArray(s.specialties) && s.specialties.length > 0 && (
-                    <div className="mt-4 flex flex-wrap gap-1.5">
-                      {s.specialties.map((sp: string) => (
-                        <span
-                          key={sp}
-                          className="rounded-full bg-card px-2.5 py-1 text-[10px] uppercase tracking-[0.15em] text-muted-foreground"
-                        >
-                          {sp}
-                        </span>
-                      ))}
+                </article>
+              ))}
+            </>
+          ) : (
+            staff.map((s: Staff) => {
+              const wh = s.working_hours as Record<
+                string,
+                { open: string; close: string } | undefined
+              >;
+              const openDays = DAYS.map(([, k]) => k).filter((k) => wh?.[k]);
+              return (
+                <article
+                  key={s.id}
+                  className="group rounded-3xl bg-surface overflow-hidden flex flex-col"
+                >
+                  <div className="relative aspect-[4/5] bg-muted overflow-hidden">
+                    <div
+                      className="h-full w-full grid place-items-center text-5xl font-display text-white"
+                      style={{ background: s.avatar_color || "#7a3b52" }}
+                    >
+                      {s.name?.[0]}
                     </div>
-                  )}
-                  <div className="mt-4 text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-                    {openDays.map((k) => DAY_SHORT[k]).join(" · ") || "By appointment"}
                   </div>
-                  <Link
-                    to="/book"
-                    search={{ staff: s.id }}
-                    className="mt-6 inline-flex tap-target items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
-                  >
-                    Book with {s.name.split(" ")[0]}
-                  </Link>
-                </div>
-              </article>
-            );
-          })}
+                  <div className="p-6 flex-1 flex flex-col">
+                    <p className="font-display text-2xl">{s.name}</p>
+                    <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-accent">
+                      {s.title}
+                    </p>
+                    {s.bio && (
+                      <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.bio}</p>
+                    )}
+                    {Array.isArray(s.specialties) && s.specialties.length > 0 && (
+                      <div className="mt-4 flex flex-wrap gap-1.5">
+                        {s.specialties.map((sp: string) => (
+                          <span
+                            key={sp}
+                            className="rounded-full bg-card px-2.5 py-1 text-[10px] uppercase tracking-[0.15em] text-muted-foreground"
+                          >
+                            {sp}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="mt-4 text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+                      {openDays.map((k) => DAY_SHORT[k]).join(" · ") || "By appointment"}
+                    </div>
+                    <Link
+                      to="/book"
+                      search={{ staff: s.id }}
+                      className="mt-6 inline-flex tap-target items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
+                    >
+                      Book with {s.name.split(" ")[0]}
+                    </Link>
+                  </div>
+                </article>
+              );
+            })
+          )}
         </div>
       </section>
 

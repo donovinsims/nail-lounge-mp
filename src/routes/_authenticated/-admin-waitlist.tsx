@@ -3,12 +3,15 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { WaitlistEntryRow } from "@/integrations/supabase/rows";
 import { StatusBadge } from "./-admin-components/status-badge";
+import { BottomSheet } from "@/components/bottom-sheet";
 import { Phone, User, Plus, Clock, Zap } from "lucide-react";
+import { fmtDate } from "@/lib/utils";
 
 export default function Waitlist({ salonId }: { salonId: string }) {
   const qc = useQueryClient();
   const [form, setForm] = useState({ client_name: "", client_phone: "" });
   const [adding, setAdding] = useState(false);
+  const [sheetId, setSheetId] = useState<string | null>(null);
 
   const { data: rows = [] } = useQuery({
     queryKey: ["wl", salonId],
@@ -30,6 +33,16 @@ export default function Waitlist({ salonId }: { salonId: string }) {
       .insert({ salon_id: salonId, ...form, preferred_time_windows: [] });
     setForm({ client_name: "", client_phone: "" });
     setAdding(false);
+    qc.invalidateQueries();
+  };
+
+  const fulfillEntry = async (id: string) => {
+    await supabase.from("waitlist_entries").update({ status: "fulfilled" }).eq("id", id);
+    qc.invalidateQueries();
+  };
+
+  const cancelEntry = async (id: string) => {
+    await supabase.from("waitlist_entries").update({ status: "cancelled" }).eq("id", id);
     qc.invalidateQueries();
   };
 
@@ -92,7 +105,8 @@ export default function Waitlist({ salonId }: { salonId: string }) {
               r.flagged_booking_id ? "ring-1 ring-success/20" : ""
             }`}
           >
-            <div className="flex items-start justify-between gap-3">
+            {/* Desktop: static card */}
+            <div className="hidden md:flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="font-medium truncate">{r.client_name}</p>
@@ -106,6 +120,59 @@ export default function Waitlist({ salonId }: { salonId: string }) {
               </div>
               <StatusBadge status={r.status} />
             </div>
+
+            {/* Mobile: trigger button */}
+            <button onClick={() => setSheetId(r.id)} className="md:hidden w-full text-left">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium truncate">{r.client_name}</p>
+                    {r.flagged_booking_id && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-mono text-success">
+                        <Zap className="h-3 w-3" /> Slot opened
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">{r.client_phone}</p>
+                </div>
+                <StatusBadge status={r.status} />
+              </div>
+            </button>
+
+            <BottomSheet
+              open={sheetId === r.id}
+              onOpenChange={(o) => !o && setSheetId(null)}
+              title={r.client_name}
+            >
+              <div className="space-y-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <a
+                    href={`tel:${r.client_phone}`}
+                    className="font-mono text-primary hover:underline"
+                  >
+                    {r.client_phone}
+                  </a>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Status</span>
+                  <StatusBadge status={r.status} />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Added</span>
+                  <span className="font-mono text-xs">{fmtDate(r.created_at)}</span>
+                </div>
+
+                {r.flagged_booking_id && (
+                  <div className="flex items-center gap-2 rounded-lg bg-success/10 px-3 py-2 text-xs text-success">
+                    <Zap className="h-3.5 w-3.5 shrink-0" />
+                    <span>Opened by booking cancellation</span>
+                  </div>
+                )}
+              </div>
+            </BottomSheet>
           </li>
         ))}
       </ul>

@@ -47,7 +47,7 @@ export const seedDemoData = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     // Adds demo data — bookings spread across this week + commission records + AI calls
-    // First-run safety: refuse to seed if the salon already has real data.
+    // Idempotent: deletes existing bookings/commissions/calls for the salon before re-seeding.
     const { data: staff } = await context.supabase
       .from("staff")
       .select("id, salon_id")
@@ -55,16 +55,12 @@ export const seedDemoData = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!staff) throw new Error("Not linked to salon");
 
-    // Guard: only seed if the salon has zero existing data (first-run).
-    const { count: existingBookings } = await context.supabase
-      .from("bookings")
-      .select("*", { count: "exact", head: true })
-      .eq("salon_id", staff.salon_id);
-    if (existingBookings && existingBookings > 0) {
-      throw new Error("Salon already has data — seed skipped");
-    }
-
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Idempotent: delete existing demo data for this salon so re-seed is safe.
+    await supabaseAdmin.from("commission_records").delete().eq("salon_id", staff.salon_id);
+    await supabaseAdmin.from("ai_calls").delete().eq("salon_id", staff.salon_id);
+    await supabaseAdmin.from("bookings").delete().eq("salon_id", staff.salon_id);
     const { data: services } = await supabaseAdmin
       .from("services")
       .select("id, name, price, duration_minutes")

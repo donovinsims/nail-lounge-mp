@@ -2,9 +2,16 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { getMyStaff } from "@/lib/admin.functions";
 import { getStaffAppointments } from "@/lib/booking.functions";
+import { getSalonName } from "@/lib/env";
 import { Loader2, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/staff/appointments")({
+  head: () => ({
+    meta: [
+      { title: `My Appointments — ${getSalonName()}` },
+      { name: "description", content: "View your upcoming and past appointments." },
+    ],
+  }),
   component: StaffAppointments,
 });
 

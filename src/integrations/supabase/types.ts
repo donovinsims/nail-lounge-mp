@@ -97,6 +97,7 @@ export type Database = {
           end_time: string;
           id: string;
           notes: string | null;
+          paid: boolean;
           payment_method: Database["public"]["Enums"]["payment_method"] | null;
           rating_sent_at: string | null;
           salon_id: string;
@@ -116,6 +117,7 @@ export type Database = {
           end_time: string;
           id?: string;
           notes?: string | null;
+          paid?: boolean;
           payment_method?: Database["public"]["Enums"]["payment_method"] | null;
           rating_sent_at?: string | null;
           salon_id: string;
@@ -135,6 +137,7 @@ export type Database = {
           end_time?: string;
           id?: string;
           notes?: string | null;
+          paid?: boolean;
           payment_method?: Database["public"]["Enums"]["payment_method"] | null;
           rating_sent_at?: string | null;
           salon_id?: string;
