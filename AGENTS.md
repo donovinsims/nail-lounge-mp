@@ -168,3 +168,19 @@ Server-only values (without `VITE_` prefix) must be read inside a function/handl
 - Per-salon env vars: `VITE_SALON_ID`, `VITE_SALON_NAME`, etc. must be set per deployment
 - Stripe webhook endpoint must point to `{APP_URL}/api/stripe-webhook`
 - Twilio webhook endpoint must point to `{APP_URL}/api/twilio-webhook`
+
+## Projects (DO NOT USE DEPRECATED PROJECTS)
+
+### Correct Project (this repo)
+- **GitHub:** `donovinsims/nail-lounge-mp` (`git@github.com:donovinsims/nail-lounge-mp.git`)
+- **Vercel:** `teamdonovin/nail-lounge-mp` → https://vercel.com/teamdonovin/nail-lounge-mp
+- **Temp Domain:** https://nails815.vercel.app
+
+### DEPRECATED — Do Not Use
+- **GitHub:** `donovinsims/nail-lounge.git` (old repo — deleted/irrelevant)
+- **Vercel:** `teamdonovin/old-nail-lounge` → https://vercel.com/teamdonovin/old-nail-lounge
+- **Old URL:** `nail-lounge-demo.vercel.app`
+
+> **CRITICAL:** The Vercel CLI `.vercel/project.json` now points to `teamdonovin/nail-lounge-mp`.
+> Always run `vercel link --project nail-lounge-mp --yes` first if you ever switch projects.
+> Never modify `old-nail-lounge` project — it is deprecated.
