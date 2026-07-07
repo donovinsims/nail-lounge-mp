@@ -57,8 +57,8 @@ export async function handleRatingReply(params: {
   // Update the booking with the rating
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   await supabaseAdmin
-    .from("bookings" as any)
-    .update({ client_rating: rating } as any)
+    .from("bookings")
+    .update({ client_rating: rating })
     .eq("id", params.bookingId);
 
   if (rating >= 4) {
@@ -90,13 +90,13 @@ export async function handleRatingReply(params: {
     }
 
     // Record the alert in the owner_alerts table
-    const { data: booking } = await (supabaseAdmin as any)
+    const { data: booking } = await supabaseAdmin
       .from("bookings")
       .select("client_phone")
       .eq("id", params.bookingId)
       .single();
 
-    await (supabaseAdmin as any).from("owner_alerts").insert({
+    await supabaseAdmin.from("owner_alerts").insert({
       booking_id: params.bookingId,
       client_phone: booking?.client_phone || params.from,
       rating,

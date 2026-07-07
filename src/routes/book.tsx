@@ -12,6 +12,7 @@ import {
   fmtTime,
   fmtDate,
 } from "@/lib/salon";
+import { supabase } from "@/integrations/supabase/client";
 import { createPublicBooking } from "@/lib/booking.functions";
 import { getSalonName } from "@/lib/env";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
@@ -194,15 +195,7 @@ function Book() {
     enabled: !!salon && !!service && !!tech,
     staleTime: 60_000,
     queryFn: () =>
-      computeAvailableSlots({
-        salonId: salon!.id,
-        staffId: tech!.id,
-        serviceDurationMin: service!.duration_minutes,
-        bufferAfterMin: service!.buffer_after_minutes,
-        date,
-        workingHours: (tech!.working_hours as any) || {}, // eslint-disable-line @typescript-eslint/no-explicit-any
-        salonHours: (salon!.business_hours as any) || {}, // eslint-disable-line @typescript-eslint/no-explicit-any
-      }),
+      computeAvailableSlots(supabase, tech!.id, date, service!.duration_minutes, salon!.id),
   });
 
   const create = useServerFn(createPublicBooking);

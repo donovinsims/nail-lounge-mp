@@ -1,4 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import { getSalonId } from "@/lib/env";
 
 export type DayKey = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
@@ -61,64 +63,31 @@ export async function fetchStaff(salonId: string) {
 
 /**
  * Compute available 15-min start slots for a given staff/service on a date.
- * Subtracts existing bookings + buffer.
+ * Delegates to get_available_slots Postgres RPC.
  */
-export async function computeAvailableSlots(opts: {
-  salonId: string;
-  staffId: string;
-  serviceDurationMin: number;
-  bufferAfterMin: number;
-  date: Date;
-  workingHours: BusinessHours;
-  salonHours: BusinessHours;
-}) {
-  const dk = dayKey(opts.date);
-  const wh = opts.workingHours?.[dk];
-  const sh = opts.salonHours?.[dk];
-  if (!wh || !sh) return [];
-  const open = parseHM(opts.date, max(wh.open, sh.open));
-  const close = parseHM(opts.date, min(wh.close, sh.close));
+export async function computeAvailableSlots(
+  supabase: SupabaseClient<Database>,
+  staffId: string,
+  date: Date,
+  durationMinutes: number,
+  salonId?: string,
+): Promise<Date[]> {
+  const sid = salonId ?? getSalonId();
+  if (!sid) throw new Error("VITE_SALON_ID is not set");
 
-  // Fetch existing bookings on this date for this staff
-  const dayStart = new Date(opts.date);
-  dayStart.setHours(0, 0, 0, 0);
-  const dayEnd = new Date(opts.date);
-  dayEnd.setHours(23, 59, 59, 999);
-  const { data: bookings } = await supabase.rpc("get_busy_slots", {
-    p_staff_id: opts.staffId,
-    p_day_start: dayStart.toISOString(),
-    p_day_end: dayEnd.toISOString(),
+  const { data, error } = await supabase.rpc("get_available_slots", {
+    p_staff_id: staffId,
+    p_date: date.toISOString().split("T")[0],
+    p_service_duration_minutes: durationMinutes,
+    p_salon_id: sid,
   });
 
-  const blocked = (bookings ?? []).map((b: any) => ({
-    s: new Date(b.start_time).getTime(),
-    e: new Date(b.end_time).getTime() + (b.buffer_after_minutes ?? 0) * 60_000,
-  }));
-
-  const slots: Date[] = [];
-  const stepMs = 15 * 60_000;
-  const needMs = (opts.serviceDurationMin + opts.bufferAfterMin) * 60_000;
-  const now = Date.now();
-  for (let t = open.getTime(); t + needMs <= close.getTime(); t += stepMs) {
-    if (t < now + 30 * 60_000) continue; // 30min lead time
-    const end = t + needMs;
-    const overlaps = blocked.some((b) => t < b.e && end > b.s);
-    if (!overlaps) slots.push(new Date(t));
+  if (error) {
+    console.error("get_available_slots RPC failed:", error);
+    return [];
   }
-  return slots;
-}
 
-function parseHM(date: Date, hm: string) {
-  const [h, m] = hm.split(":").map(Number);
-  const d = new Date(date);
-  d.setHours(h, m, 0, 0);
-  return d;
-}
-function max(a: string, b: string) {
-  return a > b ? a : b;
-}
-function min(a: string, b: string) {
-  return a < b ? a : b;
+  return (data ?? []).map((row) => new Date(row.start_time));
 }
 
 export function fmtMoney(n: number) {

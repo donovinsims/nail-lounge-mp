@@ -90,6 +90,7 @@ export type Database = {
       bookings: {
         Row: {
           client_id: string;
+          client_phone: string | null;
           client_rating: number | null;
           completed_at: string | null;
           created_at: string;
@@ -108,6 +109,7 @@ export type Database = {
         };
         Insert: {
           client_id: string;
+          client_phone?: string | null;
           client_rating?: number | null;
           completed_at?: string | null;
           created_at?: string;
@@ -126,6 +128,7 @@ export type Database = {
         };
         Update: {
           client_id?: string;
+          client_phone?: string | null;
           client_rating?: number | null;
           completed_at?: string | null;
           created_at?: string;
@@ -598,7 +601,28 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      check_rate_limit: {
+        Args: {
+          p_key: string;
+          p_max_requests?: number;
+          p_window_seconds?: number;
+        };
+        Returns: { allowed: boolean; remaining: number; reset_at: string }[];
+      };
+      cleanup_rate_limits: {
+        Args: Record<string, never>;
+        Returns: undefined;
+      };
       current_user_salon_ids: { Args: never; Returns: string[] };
+      get_available_slots: {
+        Args: {
+          p_staff_id: string;
+          p_date: string;
+          p_service_duration_minutes: number;
+          p_salon_id: string;
+        };
+        Returns: { start_time: string }[];
+      };
       get_busy_slots: {
         Args: { p_day_end: string; p_day_start: string; p_staff_id: string };
         Returns: {

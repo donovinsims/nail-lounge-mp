@@ -1,58 +1,48 @@
 /**
- * Simple per-key sliding-window rate limiter.
+ * DB-backed sliding-window rate limiter.
  *
- * Intended as a first-line abuse guard on public endpoints (e.g.
- * createPublicBooking). Works in-memory per server process — on
- * Vercel/Nitro each cold-start gets its own window. For stricter
- * cross-instance enforcement, replace with a DB-backed limiter.
+ * Uses the `check_rate_limit` Postgres RPC for atomic,
+ * cross-instance rate limiting. Falls open (allows request)
+ * if the RPC call fails.
  *
  * @example
  * ```ts
- * const limiter = rateLimiter({ windowMs: 60_000, max: 5 });
- * if (!limiter.check(phone)) throw new Error("Too many requests");
+ * const limiter = new RateLimiter({ key: "booking", maxRequests: 3, windowMs: 300_000 });
+ * const { allowed } = await limiter.check(phone);
+ * if (!allowed) throw new Error("Too many requests");
  * ```
  */
 
-interface RateLimiterConfig {
-  windowMs: number;
-  max: number;
-}
+export class RateLimiter {
+  private key: string;
+  private maxRequests: number;
+  private windowSeconds: number;
 
-interface Entry {
-  timestamps: number[];
-}
+  constructor(options: { key?: string; maxRequests: number; windowMs: number }) {
+    this.key = options.key ?? "default";
+    this.maxRequests = options.maxRequests;
+    this.windowSeconds = Math.ceil(options.windowMs / 1000);
+  }
 
-export function rateLimiter({ windowMs, max }: RateLimiterConfig) {
-  const store = new Map<string, Entry>();
+  async check(
+    key?: string,
+  ): Promise<{ allowed: boolean; remaining: number; resetAt: Date | null }> {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  // Periodically prune stale entries to avoid unbounded memory growth
-  const pruneInterval = setInterval(() => {
-    const cutoff = Date.now() - windowMs;
-    for (const [key, entry] of store) {
-      entry.timestamps = entry.timestamps.filter((t) => t > cutoff);
-      if (entry.timestamps.length === 0) store.delete(key);
+    const { data, error } = await supabaseAdmin.rpc("check_rate_limit", {
+      p_key: key ?? this.key,
+      p_max_requests: this.maxRequests,
+      p_window_seconds: this.windowSeconds,
+    });
+
+    if (error || !data || data.length === 0) {
+      return { allowed: true, remaining: this.maxRequests, resetAt: null };
     }
-  }, windowMs).unref();
 
-  return {
-    /** Returns `true` if the key is under the limit. */
-    check(key: string): boolean {
-      const cutoff = Date.now() - windowMs;
-      let entry = store.get(key);
-      if (!entry) {
-        entry = { timestamps: [] };
-        store.set(key, entry);
-      }
-      // Remove expired timestamps
-      entry.timestamps = entry.timestamps.filter((t) => t > cutoff);
-      if (entry.timestamps.length >= max) return false;
-      entry.timestamps.push(Date.now());
-      return true;
-    },
-    /** Cleanup — call on graceful shutdown if needed. */
-    dispose() {
-      clearInterval(pruneInterval);
-      store.clear();
-    },
-  };
+    return {
+      allowed: data[0].allowed,
+      remaining: data[0].remaining,
+      resetAt: data[0].reset_at ? new Date(data[0].reset_at) : null,
+    };
+  }
 }

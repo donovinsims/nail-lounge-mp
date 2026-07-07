@@ -5,7 +5,7 @@ import { z } from "zod";
 export const getOwnerAlerts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: alerts, error } = await (context.supabase as any)
+    const { data: alerts, error } = await context.supabase
       .from("owner_alerts")
       .select("id, client_phone, rating, acknowledged_at, created_at, booking_id")
       .order("created_at", { ascending: false })
@@ -26,7 +26,7 @@ export const acknowledgeAlert = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ alertId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await (context.supabase as any)
+    await context.supabase
       .from("owner_alerts")
       .update({ acknowledged_at: new Date().toISOString() })
       .eq("id", data.alertId);

@@ -2,6 +2,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getSalonId } from "@/lib/env";
 import { z } from "zod";
+import type { Database } from "@/integrations/supabase/types";
+
+type StaffUpdate = Database["public"]["Tables"]["staff"]["Update"];
+type ServiceUpdate = Database["public"]["Tables"]["services"]["Update"];
+type SalonUpdate = Database["public"]["Tables"]["salons"]["Update"];
 
 const SALON_ID_FILTER = () => {
   const id = getSalonId();
@@ -68,7 +73,7 @@ export const updateStaff = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const salonId = SALON_ID_FILTER();
-    const update: Record<string, unknown> = {};
+    const update: StaffUpdate = {};
     if (data.name !== undefined) update.name = data.name;
     if (data.role !== undefined) update.role = data.role;
     if (data.workingHours !== undefined) update.working_hours = data.workingHours;
@@ -77,7 +82,7 @@ export const updateStaff = createServerFn({ method: "POST" })
 
     const { data: staff, error } = await context.supabase
       .from("staff")
-      .update(update as any)
+      .update(update)
       .eq("id", data.id)
       .eq("salon_id", salonId)
       .select("id, name, role, working_hours, is_active, avatar_color")
@@ -162,7 +167,7 @@ export const updateService = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const salonId = SALON_ID_FILTER();
-    const update: Record<string, unknown> = {};
+    const update: ServiceUpdate = {};
     if (data.name !== undefined) update.name = data.name;
     if (data.category !== undefined) update.category = data.category || null;
     if (data.durationMinutes !== undefined) update.duration_minutes = data.durationMinutes;
@@ -173,7 +178,7 @@ export const updateService = createServerFn({ method: "POST" })
 
     const { data: service, error } = await context.supabase
       .from("services")
-      .update(update as any)
+      .update(update)
       .eq("id", data.id)
       .eq("salon_id", salonId)
       .select("id, name, category, duration_minutes, price, buffer_after_minutes, is_active")
@@ -210,13 +215,10 @@ export const updateSalonHours = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const salonId = SALON_ID_FILTER();
-    const update: Record<string, unknown> = { business_hours: data.businessHours };
+    const update: SalonUpdate = { business_hours: data.businessHours };
     if (data.holidaySchedule !== undefined) update.holiday_schedule = data.holidaySchedule;
 
-    const { error } = await context.supabase
-      .from("salons")
-      .update(update as any)
-      .eq("id", salonId);
+    const { error } = await context.supabase.from("salons").update(update).eq("id", salonId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
