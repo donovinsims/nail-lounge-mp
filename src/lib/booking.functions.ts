@@ -165,7 +165,16 @@ export const lookupAppointments = createServerFn({ method: "POST" })
       .eq("salons.id", data.salonId)
       .order("start_time", { ascending: false })
       .limit(50);
-    return rows ?? [];
+    return (rows ?? []) as Array<{
+      id: string;
+      start_time: string;
+      end_time: string;
+      status: string;
+      services: { name: string; price: number } | null;
+      staff: { name: string } | null;
+      clients: { name: string; phone: string; salon_id: string };
+      salons: { name: string; address: string | null } | null;
+    }>;
   });
 
 /**

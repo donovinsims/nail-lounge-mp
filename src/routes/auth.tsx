@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getSalonName } from "@/lib/env";
+import { getErrorMessage } from "@/lib/error-handler";
 import { toast } from "sonner";
 import { Loader2, ChevronLeft, Mail } from "lucide-react";
 
@@ -26,8 +27,8 @@ function AuthPage() {
       });
       if (error) throw error;
       setMagicLinkSent(true);
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, "Failed to send magic link"));
     } finally {
       setLoading(false);
     }

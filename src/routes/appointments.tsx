@@ -73,7 +73,7 @@ function Appointments() {
           <p className="pt-4 text-sm text-muted-foreground">No appointments found.</p>
         )}
         {!lookupMutation.isPending &&
-          lookupMutation.data?.map((b: any) => (
+          lookupMutation.data?.map((b) => (
             <li key={b.id} className="rounded-2xl bg-surface p-4">
               <div className="flex items-baseline justify-between gap-3">
                 <div className="min-w-0">

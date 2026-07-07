@@ -12,6 +12,14 @@ export interface Hours {
 }
 export type BusinessHours = Partial<Record<DayKey, Hours>>;
 
+/**
+ * Narrow a Supabase `Json` column (salon.business_hours, staff.working_hours)
+ * to the BusinessHours shape without resorting to `any`.
+ */
+export function asBusinessHours(value: unknown): BusinessHours {
+  return (value ?? {}) as BusinessHours;
+}
+
 export function dayKey(d: Date): DayKey {
   return dayKeys[d.getDay()];
 }

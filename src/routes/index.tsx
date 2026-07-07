@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSalon, fetchStaff } from "@/lib/salon";
+import { fetchSalon, fetchStaff, asBusinessHours, type DayKey } from "@/lib/salon";
 import {
   getSalonName,
   getSalonAddress,
@@ -16,7 +16,7 @@ import art3 from "@/assets/art3.jpg";
 import g1 from "@/assets/gallery1.jpg";
 import { SiteHeader, SiteFooter, MapEmbed } from "@/components/site-chrome";
 
-const DAYS: [string, string][] = [
+const DAYS: [string, DayKey][] = [
   ["Monday", "mon"],
   ["Tuesday", "tue"],
   ["Wednesday", "wed"],
@@ -259,11 +259,8 @@ function Home() {
           </div>
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {staff.map((s: any) => {
-            const wh = s.working_hours as Record<
-              string,
-              { open: string; close: string } | undefined
-            >;
+          {staff.map((s) => {
+            const wh = asBusinessHours(s.working_hours);
             const openDays = DAYS.map(([, k]) => k).filter((k) => wh?.[k]);
             return (
               <article
@@ -281,14 +278,14 @@ function Home() {
                 <div className="p-6 flex-1 flex flex-col">
                   <p className="font-display text-2xl">{s.name}</p>
                   <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-accent">
-                    {s.title || s.role}
+                    {s.title}
                   </p>
                   {s.bio && (
                     <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.bio}</p>
                   )}
                   {Array.isArray(s.specialties) && s.specialties.length > 0 && (
                     <div className="mt-4 flex flex-wrap gap-1.5">
-                      {s.specialties.map((sp: string) => (
+                      {(s.specialties as string[]).map((sp) => (
                         <span
                           key={sp}
                           className="rounded-full bg-card px-2.5 py-1 text-[10px] uppercase tracking-[0.15em] text-muted-foreground"
@@ -303,7 +300,7 @@ function Home() {
                   </div>
                   <Link
                     to="/book"
-                    search={{ staff: s.id } as any}
+                    search={{ staff: s.id }}
                     className="mt-6 inline-flex tap-target items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
                   >
                     Book with {s.name.split(" ")[0]}
@@ -431,7 +428,7 @@ function Home() {
             </h3>
             <ul className="mt-8 space-y-2.5 text-sm">
               {DAYS.map(([label, key]) => {
-                const h = (salon?.business_hours as any)?.[key];
+                const h = asBusinessHours(salon?.business_hours)[key];
                 return (
                   <li
                     key={key}
