@@ -4,7 +4,7 @@
 
 - **Name:** mynails-generic
 - **Framework:** TanStack Start (`@tanstack/react-start`) + Vite 7 + React 19
-- **Stack:** Tailwind CSS v4, shadcn/ui (new-york, no RSC), Supabase Auth + PostgreSQL, Stripe, Twilio, Resend
+- **Stack:** Tailwind CSS v4, shadcn/ui (new-york, no RSC), Supabase Auth + PostgreSQL, Twilio
 - **Multi-tenant capable:** One deployment per salon (SALON_ID in env). Full isolation — every DB query filters by SALON_ID.
 - **No hardcoded branding:** All salon-specific values come from env helpers in `src/lib/env.ts`. The `BUSINESS` constant no longer exists.
 
@@ -27,7 +27,7 @@ bun run format       # prettier --write .
 | `/` | `index.tsx` | Home — featured services, staff cards, hours, map |
 | `/services` | `services.tsx` | Full menu (grouped by category dynamically) |
 | `/book` | `book.tsx` | Multi-step booking flow (service → staff → time → confirm) |
-| `/booking-confirmed` | `booking-confirmed.tsx` | Post-Stripe-checkout landing page |
+| `/booking-confirmed` | `booking-confirmed.tsx` | Post-booking confirmation landing page |
 | `/appointments` | `appointments.tsx` | Phone-based appointment lookup |
 | `/auth` | `auth.tsx` | Sign-in |
 | `/_authenticated/` | `admin.tsx` + sub-views | Admin area (gated by supabase auth) |
@@ -41,7 +41,12 @@ bun run format       # prettier --write .
 - `/_authenticated/-admin-floor.tsx` — floor status management
 - `/_authenticated/-admin-alerts.tsx` — low-rating owner alerts
 - `/_authenticated/-admin-calls.tsx` — AI call log
-- `/_authenticated/-admin-calendar.tsx` — calendar view
+- `/_authenticated/-admin-calendar.tsx` — multi-staff calendar grid view
+
+### Staff Sub-Views (mounted at `/staff` by staff.tsx layout)
+
+- `/staff` — forced lockout modal if pending completions exist; empty state otherwise
+- `/staff/appointments` — staff's upcoming appointments
 
 Generated file (do not edit by hand): `src/routeTree.gen.ts`
 
@@ -55,7 +60,7 @@ Generated file (do not edit by hand): `src/routeTree.gen.ts`
 | `src/lib/twilio-webhook.server.ts` | `handleTwilioWebhook` — parses Twilio form-encoded webhook, looks up booking by phone, delegates to `handleRatingReply`. |
 | `src/lib/booking.functions.ts` | `createPublicBooking`, `lookupAppointments`, `getPendingCompletions`, `completeStaffModal`, `getStaffAppointments`, `cancelPublicBooking`. Validates input (Zod), checks slot availability via RPC, upserts client, creates booking with `confirmed` status, sends Twilio SMS + Resend email. Staff modal flow captures tip/payment/notes, then triggers rating SMS. Rate-limited: 3 per 5min per phone. |
 | `src/lib/admin-crud.functions.ts` | CRUD server fns for staff (`getAllStaffForSalon`, `createStaff`, `updateStaff`, `deleteStaff`), services (`getAllServicesForSalon`, `createService`, `updateService`, `deleteService`), and `updateSalonHours`. All gated by `requireSupabaseAuth`. |
-| `src/lib/admin.functions.ts` | `getMyStaff`, `linkSelfToFirstSalon`, `completeBookingWithPayment` (POS), `seedDemoData`. |
+| `src/lib/admin.functions.ts` | `getMyStaff`, `linkSelfToFirstSalon`, `seedDemoData`. |
 | `src/lib/rate-limiter.ts` | Generic sliding-window rate limiter class. |
 | `src/lib/email.server.ts` | `sendBookingConfirmation` via Resend. |
 | `src/lib/salon.ts` | `computeAvailableSlots` — 15-min slots, 30-min lead time, subtracts busy slots via RPC. |
@@ -83,9 +88,6 @@ Generated file (do not edit by hand): `src/routeTree.gen.ts`
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only | For admin ops |
 | `VITE_SALON_ID` | Public | Yes |
 | `VITE_SALON_NAME` | Public | Yes |
-| `STRIPE_SECRET_KEY` | Server-only | For payments |
-| `VITE_STRIPE_PUBLISHABLE_KEY` | Public | For payments |
-| `STRIPE_WEBHOOK_SECRET` | Server-only | For webhooks |
 | `TWILIO_ACCOUNT_SID` | Server-only | For SMS |
 | `TWILIO_AUTH_TOKEN` | Server-only | For SMS |
 | `TWILIO_PHONE_NUMBER` | Server-only | For SMS |
@@ -97,11 +99,11 @@ Generated file (do not edit by hand): `src/routeTree.gen.ts`
 
 Server-only values (without `VITE_` prefix) must be read inside a function/handler, not at module scope.
 
-### Supabase Schema (6 migrations)
+### Supabase Schema (8 migrations)
 
-**Tables:** `salons`, `staff`, `services`, `clients`, `bookings`, `commission_records`, `waitlist_entries`, `floor_status`, `ai_calls`, `profiles`
+**Tables:** `salons`, `staff`, `services`, `clients`, `bookings`, `commission_records`, `waitlist_entries`, `floor_status`, `ai_calls`, `profiles`, `owner_alerts`
 
-**Enums:** `app_role` (owner|staff), `booking_status` (confirmed|completed|cancelled|no_show), `floor_state` (with_client|available|offline), `waitlist_status` (active|fulfilled|cancelled)
+**Enums:** `app_role` (owner|staff), `booking_status` (confirmed|completed|cancelled|no_show), `payment_method` (Credit/Debit|Cash|Venmo|Cash App), `floor_state` (with_client|available|offline), `waitlist_status` (active|fulfilled|cancelled)
 
 **Migrations:**
 1. Initial schema + RLS + triggers + seed data
@@ -110,6 +112,8 @@ Server-only values (without `VITE_` prefix) must be read inside a function/handl
 4. RPC-based bookings read + column-level grants refinement
 5. Booking overlap exclusion constraint (exclude booking id from conflict check)
 6. Add `stripe_session_id` column to bookings
+7. Unique partial index on `staff.auth_user_id`
+8. Pivot: drop Stripe/deposit columns, add `payment_method` enum, staff modal fields (`tip_amount`, `payment_method`, `service_notes`, `completed_at`), Twilio rating fields (`client_rating`, `rating_sent_at`), `owner_alerts` table
 
 ### RLS Key Points
 
@@ -123,8 +127,6 @@ Server-only values (without `VITE_` prefix) must be read inside a function/handl
 - **Single-tenant isolation:** Every DB query filters by SALON_ID from env vars. One deployment per salon.
 - **Server functions:** All data mutations use `createServerFn`. Public ones use supabaseAdmin (service role). Authenticated ones use `requireSupabaseAuth` middleware.
 - **Dynamic imports for server-only modules:** `const { supabaseAdmin } = await import(...)` inside handlers — never top-level.
-- **Stripe Checkout flow:** `createPublicBooking` creates CheckoutSession when deposit > 0, stores `session_id` on booking, returns `checkoutUrl`. Booking-confirmed page verifies payment on mount.
-- **In-person POS:** `createPOSPaymentIntent` (Stripe Elements via CardElement component).
 - **Rate limiting:** Sliding-window limiter keyed by phone number — 3 requests per 5 minutes.
 - **Env var pattern:** `VITE_*` for public/client-safe vars. Non-`VITE_` for server-only secrets.
 
@@ -146,7 +148,7 @@ Server-only values (without `VITE_` prefix) must be read inside a function/handl
 
 ### Public Booking
 
-`/book` → `createPublicBooking` (`src/lib/booking.functions.ts`): validates input (Zod), checks slot availability via `get_busy_slots` RPC, upserts client by phone, creates booking with `pending_payment` status. If deposit > 0 and Stripe configured, creates CheckoutSession and returns `checkoutUrl`. Sends Twilio SMS + Resend email confirmation. Uses supabaseAdmin (service role) for writes.
+`/book` → `createPublicBooking` (`src/lib/booking.functions.ts`): validates input (Zod), checks slot availability via `get_busy_slots` RPC, upserts client by phone, creates booking with `confirmed` status. Sends Twilio SMS + Resend email confirmation. Uses supabaseAdmin (service role) for writes. All payments collected in-studio — no digital payment processing.
 
 ### Admin Functions
 
@@ -166,7 +168,6 @@ Server-only values (without `VITE_` prefix) must be read inside a function/handl
 
 - Deploy via `bun build` (Vite build with Nitro, Cloudflare target)
 - Per-salon env vars: `VITE_SALON_ID`, `VITE_SALON_NAME`, etc. must be set per deployment
-- Stripe webhook endpoint must point to `{APP_URL}/api/stripe-webhook`
 - Twilio webhook endpoint must point to `{APP_URL}/api/twilio-webhook`
 
 ## Projects (DO NOT USE DEPRECATED PROJECTS)

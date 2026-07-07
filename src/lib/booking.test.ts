@@ -15,7 +15,6 @@ const createBookingSchema = z.object({
   clientName: z.string().trim().min(1).max(100),
   clientPhone: z.string().regex(PHONE_RE),
   clientEmail: z.string().email().optional().or(z.literal("")),
-  depositPaid: z.number().min(0),
 });
 
 const lookupSchema = z.object({
@@ -29,8 +28,15 @@ const cancelSchema = z.object({
   salonId: z.string().uuid(),
 });
 
-const verifySchema = z.object({
-  sessionId: z.string(),
+const completeStaffModalSchema = z.object({
+  bookingId: z.string().uuid(),
+  tipAmount: z.number().min(0).default(0),
+  paymentMethod: z.enum(["Credit/Debit", "Cash", "Venmo", "Cash App"]),
+  serviceNotes: z.string().default(""),
+});
+
+const staffQuerySchema = z.object({
+  staffId: z.string(),
 });
 
 // ---------------------------------------------------------------------------
@@ -45,7 +51,13 @@ const validBookingData = {
   clientName: "Jane Doe",
   clientPhone: "+1 555-123-4567",
   clientEmail: "jane@example.com",
-  depositPaid: 25.0,
+};
+
+const validStaffModalData = {
+  bookingId: "d4e5f6a7-b8c9-0123-defa-1234567890ab",
+  tipAmount: 15.0,
+  paymentMethod: "Cash" as const,
+  serviceNotes: "Great client, requested extra shaping",
 };
 
 // ---------------------------------------------------------------------------
@@ -119,22 +131,6 @@ describe("createBookingSchema", () => {
     });
     expect(result.success).toBe(false);
   });
-
-  it("rejects negative depositPaid", () => {
-    const result = createBookingSchema.safeParse({
-      ...validBookingData,
-      depositPaid: -1,
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects string value for depositPaid (no coercion)", () => {
-    const result = createBookingSchema.safeParse({
-      ...validBookingData,
-      depositPaid: "25",
-    });
-    expect(result.success).toBe(false);
-  });
 });
 
 // ---------------------------------------------------------------------------
@@ -192,19 +188,100 @@ describe("cancelSchema", () => {
 });
 
 // ---------------------------------------------------------------------------
-// verifySchema
+// completeStaffModalSchema
 // ---------------------------------------------------------------------------
 
-describe("verifySchema", () => {
-  it("accepts valid sessionId string", () => {
-    const result = verifySchema.safeParse({
-      sessionId: "cs_test_a1b2c3d4e5f6",
+describe("completeStaffModalSchema", () => {
+  it("accepts valid completion data", () => {
+    const result = completeStaffModalSchema.safeParse(validStaffModalData);
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts zero tip amount", () => {
+    const result = completeStaffModalSchema.safeParse({
+      ...validStaffModalData,
+      tipAmount: 0,
     });
     expect(result.success).toBe(true);
   });
 
-  it("rejects missing sessionId", () => {
-    const result = verifySchema.safeParse({});
+  it("accepts all payment methods", () => {
+    for (const method of ["Credit/Debit", "Cash", "Venmo", "Cash App"] as const) {
+      const result = completeStaffModalSchema.safeParse({
+        ...validStaffModalData,
+        paymentMethod: method,
+      });
+      expect(result.success).toBe(true);
+    }
+  });
+
+  it("rejects invalid payment method", () => {
+    const result = completeStaffModalSchema.safeParse({
+      ...validStaffModalData,
+      paymentMethod: "Bitcoin",
+    });
     expect(result.success).toBe(false);
+  });
+
+  it("rejects negative tip amount", () => {
+    const result = completeStaffModalSchema.safeParse({
+      ...validStaffModalData,
+      tipAmount: -1,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects non-UUID bookingId", () => {
+    const result = completeStaffModalSchema.safeParse({
+      ...validStaffModalData,
+      bookingId: "not-a-uuid",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("defaults tipAmount to 0 when missing", () => {
+    const { tipAmount: _, ...withoutTip } = validStaffModalData;
+    const result = completeStaffModalSchema.safeParse(withoutTip);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.tipAmount).toBe(0);
+    }
+  });
+
+  it("defaults serviceNotes to empty string when missing", () => {
+    const { serviceNotes: _, ...withoutNotes } = validStaffModalData;
+    const result = completeStaffModalSchema.safeParse(withoutNotes);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.serviceNotes).toBe("");
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// staffQuerySchema (used by getPendingCompletions, getStaffAppointments)
+// ---------------------------------------------------------------------------
+
+describe("staffQuerySchema", () => {
+  it("accepts valid staffId string", () => {
+    const result = staffQuerySchema.safeParse({ staffId: "some-staff-id" });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts UUID staffId", () => {
+    const result = staffQuerySchema.safeParse({
+      staffId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects missing staffId", () => {
+    const result = staffQuerySchema.safeParse({});
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts non-empty staffId string", () => {
+    const result = staffQuerySchema.safeParse({ staffId: "abc" });
+    expect(result.success).toBe(true);
   });
 });
