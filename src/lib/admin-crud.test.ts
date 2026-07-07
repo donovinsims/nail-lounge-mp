@@ -194,7 +194,6 @@ describe("createService", () => {
     });
     expect(result.success).toBe(false);
   });
-
 });
 
 describe("updateService", () => {
@@ -236,14 +235,12 @@ describe("updateSalonHours", () => {
       businessHours: {
         wednesday: { open: "10:00", close: "16:00" },
       },
-      holidaySchedule: [
-        { date: "2026-12-25", name: "Christmas Day", closed: true },
-      ],
+      holidaySchedule: [{ date: "2026-12-25", name: "Christmas Day", closed: true }],
     });
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.data.holidaySchedule).toHaveLength(1);
-      expect(result.data.holidaySchedule[0].date).toBe("2026-12-25");
+      expect(result.data!.holidaySchedule![0].date).toBe("2026-12-25");
     }
   });
 });

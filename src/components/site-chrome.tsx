@@ -1,5 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { getSalonAddress, getSalonName, getSalonPhone, getSalonPhoneHref, getSalonSocial, getSalonTagline } from "@/lib/env";
+import {
+  getSalonAddress,
+  getSalonName,
+  getSalonPhone,
+  getSalonPhoneHref,
+  getSalonSocial,
+  getSalonTagline,
+} from "@/lib/env";
 import { Instagram, Facebook } from "lucide-react";
 
 export function SiteHeader() {
@@ -55,9 +62,7 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-10 px-6 py-16 sm:grid-cols-4 sm:px-10">
         <div className="sm:col-span-2">
           <p className="font-display text-2xl italic">{getSalonName()}</p>
-          <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-            {getSalonTagline()}
-          </p>
+          <p className="mt-3 max-w-xs text-sm text-muted-foreground">{getSalonTagline()}</p>
           <p className="mt-4 text-xs text-muted-foreground">{getSalonAddress()}</p>
           <p className="text-xs text-muted-foreground">
             <a href={`tel:${getSalonPhoneHref()}`} className="hover:text-foreground">
@@ -133,7 +138,12 @@ export function SiteFooter() {
               </a>
             </li>
             <li>
-              <a href={getSalonSocial().yelp} target="_blank" rel="noreferrer" className="hover:underline">
+              <a
+                href={getSalonSocial().yelp}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:underline"
+              >
                 Yelp
               </a>
             </li>

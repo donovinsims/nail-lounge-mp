@@ -5,7 +5,9 @@ import { getMyStaff } from "@/lib/admin.functions";
 export const Route = createFileRoute("/_authenticated/staff")({
   ssr: false,
   beforeLoad: async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw redirect({ to: "/auth" });
 
     // Verify the user is linked to a staff record

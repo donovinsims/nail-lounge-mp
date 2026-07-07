@@ -41,67 +41,84 @@ The application had a full Stripe integration spanning the booking flow, admin P
 ### Changes Made
 
 **`src/lib/booking.functions.ts`**
+
 - Removed the Stripe Checkout Session creation block inside `createPublicBooking` (import, Stripe client init, session creation, `checkoutUrl` return).
 - Removed the `verifyCheckoutSession` server function entirely.
 - Removed `deposit_amount` and `deposit_paid` from Zod input schemas, Supabase select queries, and insert payloads.
 - Simplified `createPublicBooking` to always create bookings at `confirmed` status and return `{ success: true }` instead of `{ checkoutUrl }`.
 
 **`src/lib/admin.functions.ts`**
+
 - Removed `createPOSPaymentIntent` server function (Stripe PaymentIntent creation).
 - Removed `completeBookingWithPayment` server function.
 - Removed `deposit_amount` and `deposit_paid` from seed data insertions.
 
 **`src/lib/admin-crud.functions.ts`**
+
 - Removed `depositAmount` from `createServiceSchema` and `updateServiceSchema` Zod schemas.
 - Removed `deposit_amount` from service select queries and insert/update payloads.
 
 **`src/lib/config.server.ts`**
+
 - Removed `stripeSecretKey`, `stripeWebhookSecret`, and `hasStripe()` config getters.
 - Removed the dynamic `import('stripe')` call.
 - Removed the `stripe` import path entirely.
 
 **`src/lib/env.ts`**
+
 - Removed `getStripePublishableKey()` env helper.
 
 **`src/lib/email.server.ts`**
+
 - Removed `price` and `depositPaid` parameters from `sendBookingConfirmation`.
 - Removed the deposit row from the HTML email template.
 
 **`src/routes/_authenticated/-admin-pos.tsx`**
+
 - **File deleted entirely.** This contained the POS terminal UI with Stripe Elements `CardElement`.
 
 **`src/routes/_authenticated/admin.tsx`**
+
 - Removed the `-admin-pos` import.
 - Removed the POS tab from the sidebar navigation.
 - Removed the POS route rendering from the admin layout.
 
 **`src/routes/book.tsx`**
+
 - Removed `checkoutUrl` redirect logic — booking result no longer returns a URL.
 - Changed post-booking flow to always navigate to `/appointments` instead of conditionally redirecting to Stripe Checkout.
 
 **`src/routes/booking-confirmed.tsx`**
+
 - **File rewritten entirely.** Removed Stripe session verification on mount, removed deposit display. Now a clean static confirmation page.
 
 **`src/routes/_authenticated/-step-confirm.tsx`**
+
 - Removed deposit amount display from the booking confirmation step UI.
 
 **`src/components/-booking-summary.tsx`**
+
 - Removed the deposit row from the booking summary component.
 
 **`src/routes/_authenticated/-admin-dashboard.tsx`**
+
 - Removed `deposit_paid` from the booking stats aggregation query.
 
 **`src/routes/appointments.tsx`**
+
 - Removed deposit display from appointment lookup results.
 
 **`src/routes/_authenticated/-admin-settings.tsx`**
+
 - Removed `depositAmount` field from the service CRUD form.
 - Removed "Deposit Required" badge from service list items.
 
 **`package.json`**
+
 - Removed `@stripe/react-stripe-js`, `@stripe/stripe-js`, and `stripe` from dependencies.
 
 **Test files**
+
 - **`env.test.ts`** — Removed test cases for `getStripePublishableKey`.
 - **`config.server.test.ts`** — Removed test cases for `hasStripe()`, `stripeSecretKey`, and `stripeWebhookSecret`.
 - **`admin-crud.test.ts`** — Removed test cases involving `depositAmount` in service schemas.
@@ -133,25 +150,25 @@ Remove the legacy Stripe/deposit payment columns from the `bookings` table (no m
 
 Seven Supabase migrations existed before this workstream, evolving the schema from initial creation through security cleanup, RPC-based availability reads, booking overlap constraints, and the final Stripe session ID column:
 
-| # | Migration | Purpose |
-|---|---|---|
-| 1 | `20260617030841_...` | Initial schema — salons, staff, services, clients, bookings, commission_records, waitlist_entries, floor_status, ai_calls, profiles; enums; RLS; triggers |
-| 2 | `20260617062401_...` | Seed data (1 salon, 4 staff, ~70 services); staff title/bio/specialties columns |
-| 3 | `20260617104256_...` | Revoke EXECUTE on trigger functions from public/anon |
-| 4 | `20260617140532_...` | RPC-based `get_busy_slots` read path; revoke public SELECT on sensitive columns |
-| 5 | `20260618180000_...` | Unique partial index on `staff.auth_user_id` |
-| 6 | `20260619000000_...` | Booking overlap exclusion constraint via `btree_gist` |
-| 7 | `20260620000000_...` | Add `stripe_session_id TEXT` column to bookings |
+| #   | Migration            | Purpose                                                                                                                                                   |
+| --- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `20260617030841_...` | Initial schema — salons, staff, services, clients, bookings, commission_records, waitlist_entries, floor_status, ai_calls, profiles; enums; RLS; triggers |
+| 2   | `20260617062401_...` | Seed data (1 salon, 4 staff, ~70 services); staff title/bio/specialties columns                                                                           |
+| 3   | `20260617104256_...` | Revoke EXECUTE on trigger functions from public/anon                                                                                                      |
+| 4   | `20260617140532_...` | RPC-based `get_busy_slots` read path; revoke public SELECT on sensitive columns                                                                           |
+| 5   | `20260618180000_...` | Unique partial index on `staff.auth_user_id`                                                                                                              |
+| 6   | `20260619000000_...` | Booking overlap exclusion constraint via `btree_gist`                                                                                                     |
+| 7   | `20260620000000_...` | Add `stripe_session_id TEXT` column to bookings                                                                                                           |
 
 The `bookings` table had these relevant columns before the pivot:
 
-| Column | Type | Default |
-|---|---|---|
-| `deposit_amount` | `NUMERIC(10,2)` | — |
-| `deposit_paid` | `BOOLEAN` | `false` |
-| `stripe_session_id` | `TEXT` | — |
-| `status` | `booking_status` enum | `'confirmed'` |
-| `notes` | `TEXT` | — |
+| Column              | Type                  | Default       |
+| ------------------- | --------------------- | ------------- |
+| `deposit_amount`    | `NUMERIC(10,2)`       | —             |
+| `deposit_paid`      | `BOOLEAN`             | `false`       |
+| `stripe_session_id` | `TEXT`                | —             |
+| `status`            | `booking_status` enum | `'confirmed'` |
+| `notes`             | `TEXT`                | —             |
 
 The `booking_status` enum contained four values: `confirmed`, `completed`, `cancelled`, `no_show`. There was no `payment_method` enum type. No `owner_alerts` table existed. The `bookings` table lacked any columns for tip capture, in-store payment method, service notes, completion timestamps, client ratings, or rating-sent tracking.
 
@@ -171,25 +188,25 @@ A new migration file was created at `supabase/migrations/20260621000000_pivot_re
 
 **Added (7 new columns to `bookings`):**
 
-| Column | Type | Default | Purpose |
-|---|---|---|---|
-| `tip_amount` | `NUMERIC(10,2)` | `0` | Gratuity amount captured in staff completion modal |
-| `payment_method` | `payment_method` | — | In-store payment type selected by staff at checkout |
-| `service_notes` | `TEXT` | — | Free-form notes about the service (entered by staff) |
-| `completed_at` | `TIMESTAMPTZ` | — | Timestamp when staff marks the booking as complete; drives the staff lockout mechanism |
-| `client_rating` | `SMALLINT` | — | 1–5 rating collected via Twilio SMS feedback loop (CHECK constraint enforces range) |
-| `rating_sent_at` | `TIMESTAMPTZ` | — | Timestamp the rating SMS was sent; used to avoid re-sending |
+| Column           | Type             | Default | Purpose                                                                                |
+| ---------------- | ---------------- | ------- | -------------------------------------------------------------------------------------- |
+| `tip_amount`     | `NUMERIC(10,2)`  | `0`     | Gratuity amount captured in staff completion modal                                     |
+| `payment_method` | `payment_method` | —       | In-store payment type selected by staff at checkout                                    |
+| `service_notes`  | `TEXT`           | —       | Free-form notes about the service (entered by staff)                                   |
+| `completed_at`   | `TIMESTAMPTZ`    | —       | Timestamp when staff marks the booking as complete; drives the staff lockout mechanism |
+| `client_rating`  | `SMALLINT`       | —       | 1–5 rating collected via Twilio SMS feedback loop (CHECK constraint enforces range)    |
+| `rating_sent_at` | `TIMESTAMPTZ`    | —       | Timestamp the rating SMS was sent; used to avoid re-sending                            |
 
 **Created (new `owner_alerts` table):**
 
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `UUID` | Primary key, defaults to `gen_random_uuid()` |
-| `booking_id` | `UUID` | Foreign key to `bookings(id)` with `ON DELETE CASCADE`, NOT NULL |
-| `client_phone` | `TEXT` | NOT NULL — phone of the client who left the low rating |
-| `rating` | `SMALLINT` | NOT NULL, CHECK (1–3) — only low ratings trigger alerts |
-| `acknowledged_at` | `TIMESTAMPTZ` | Null until the owner marks the alert as seen |
-| `created_at` | `TIMESTAMPTZ` | NOT NULL, defaults to `NOW()` |
+| Column            | Type          | Notes                                                            |
+| ----------------- | ------------- | ---------------------------------------------------------------- |
+| `id`              | `UUID`        | Primary key, defaults to `gen_random_uuid()`                     |
+| `booking_id`      | `UUID`        | Foreign key to `bookings(id)` with `ON DELETE CASCADE`, NOT NULL |
+| `client_phone`    | `TEXT`        | NOT NULL — phone of the client who left the low rating           |
+| `rating`          | `SMALLINT`    | NOT NULL, CHECK (1–3) — only low ratings trigger alerts          |
+| `acknowledged_at` | `TIMESTAMPTZ` | Null until the owner marks the alert as seen                     |
+| `created_at`      | `TIMESTAMPTZ` | NOT NULL, defaults to `NOW()`                                    |
 
 **Row-Level Security on `owner_alerts`:**
 
@@ -198,11 +215,11 @@ A new migration file was created at `supabase/migrations/20260621000000_pivot_re
 
 **Indexes created (3):**
 
-| Index | Columns | Filter | Purpose |
-|---|---|---|---|
-| `idx_bookings_completed_at_null` | `staff_id` | `completed_at IS NULL AND status = 'completed'` | Fast lookup for staff lockout — find bookings that need the completion modal |
-| `idx_bookings_rating_sent_at_null` | `id` | `rating_sent_at IS NULL AND completed_at IS NOT NULL` | Find bookings eligible for rating SMS (completed but not yet rated) |
-| `idx_owner_alerts_unacknowledged` | `created_at DESC` | `acknowledged_at IS NULL` | Quick retrieval of unread owner alerts, newest first |
+| Index                              | Columns           | Filter                                                | Purpose                                                                      |
+| ---------------------------------- | ----------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `idx_bookings_completed_at_null`   | `staff_id`        | `completed_at IS NULL AND status = 'completed'`       | Fast lookup for staff lockout — find bookings that need the completion modal |
+| `idx_bookings_rating_sent_at_null` | `id`              | `rating_sent_at IS NULL AND completed_at IS NOT NULL` | Find bookings eligible for rating SMS (completed but not yet rated)          |
+| `idx_owner_alerts_unacknowledged`  | `created_at DESC` | `acknowledged_at IS NULL`                             | Quick retrieval of unread owner alerts, newest first                         |
 
 ### Rationale
 
@@ -318,18 +335,18 @@ Eliminate all references to Stripe, POS, deposits, and digital payments from the
 
 Ten markdown files lived in `docs/` — a mixture of architecture records, developer onboarding guides, deployment runbooks, AI context files, and planning documents. Every single file contained live references to Stripe, POS, or deposit-based booking flows.
 
-| File | Stripe/POS/Deposit Footprint |
-|---|---|
-| `PIVOT-PLAN.md` | Already rewritten as the comprehensive single source of truth; left untouched |
-| `TECHNICAL_SPEC.md` | ~35 references across 553 lines — the most heavily affected document |
-| `AI-BLUEPRINT.md` | ~25 references — Quick Start showed Stripe env vars, Architecture DNA described Stripe dual flow |
-| `ARCHITECTURE.md` | ADR-005 "Stripe Dual Flow (Checkout + POS)", architecture diagram included Stripe webhook path |
-| `LLM_SALES_CONTEXT.md` | Positioned Stripe POS as a key differentiator |
-| `COLD_EMAIL_TEMPLATES.md` | Deposit-based booking hooks, POS mention |
-| `DEPLOYMENT_RUNBOOK.md` | Full "Stripe Setup" section with Stripe env vars table |
-| `GENERICIZATION_ROADMAP.md` | Phase 4.1 documented Stripe as a completed milestone |
-| `onboarding-new-salon.md` | Stripe listed as a prerequisite, Stripe env vars in table |
-| `TEST-PATTERNS.md` | POS schema examples, deposit amount assertions, Stripe webhook future work |
+| File                        | Stripe/POS/Deposit Footprint                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------------------------ |
+| `PIVOT-PLAN.md`             | Already rewritten as the comprehensive single source of truth; left untouched                    |
+| `TECHNICAL_SPEC.md`         | ~35 references across 553 lines — the most heavily affected document                             |
+| `AI-BLUEPRINT.md`           | ~25 references — Quick Start showed Stripe env vars, Architecture DNA described Stripe dual flow |
+| `ARCHITECTURE.md`           | ADR-005 "Stripe Dual Flow (Checkout + POS)", architecture diagram included Stripe webhook path   |
+| `LLM_SALES_CONTEXT.md`      | Positioned Stripe POS as a key differentiator                                                    |
+| `COLD_EMAIL_TEMPLATES.md`   | Deposit-based booking hooks, POS mention                                                         |
+| `DEPLOYMENT_RUNBOOK.md`     | Full "Stripe Setup" section with Stripe env vars table                                           |
+| `GENERICIZATION_ROADMAP.md` | Phase 4.1 documented Stripe as a completed milestone                                             |
+| `onboarding-new-salon.md`   | Stripe listed as a prerequisite, Stripe env vars in table                                        |
+| `TEST-PATTERNS.md`          | POS schema examples, deposit amount assertions, Stripe webhook future work                       |
 
 ### Changes Made
 
@@ -369,18 +386,18 @@ All ten documentation files are consistent with the post-pivot architecture. The
 
 ## Summary
 
-| Metric | Value |
-|---|---|
-| Files changed (modified + new) | 34 |
-| Lines added | 2,498 |
-| Lines removed | 1,787 |
-| New files created | 13 |
-| Files deleted | 4 |
-| Build status | ✅ Passes (15–18s) |
-| Test results | ✅ 71/71 passing |
-| NPM packages removed | 3 (`stripe`, `@stripe/stripe-js`, `@stripe/react-stripe-js`) |
-| Migration files | 8 (existing 7 + 1 new) |
-| New admin tabs | 1 (Alerts) |
-| New staff routes | 3 (`/staff`, `/staff/`, `/staff/appointments`) |
-| New Twilio webhook route | 1 (`POST /api/twilio-webhook`) |
-| Documentation rewritten | 9 files + PIVOT-PLAN.md (already in place) |
+| Metric                         | Value                                                        |
+| ------------------------------ | ------------------------------------------------------------ |
+| Files changed (modified + new) | 34                                                           |
+| Lines added                    | 2,498                                                        |
+| Lines removed                  | 1,787                                                        |
+| New files created              | 13                                                           |
+| Files deleted                  | 4                                                            |
+| Build status                   | ✅ Passes (15–18s)                                           |
+| Test results                   | ✅ 71/71 passing                                             |
+| NPM packages removed           | 3 (`stripe`, `@stripe/stripe-js`, `@stripe/react-stripe-js`) |
+| Migration files                | 8 (existing 7 + 1 new)                                       |
+| New admin tabs                 | 1 (Alerts)                                                   |
+| New staff routes               | 3 (`/staff`, `/staff/`, `/staff/appointments`)               |
+| New Twilio webhook route       | 1 (`POST /api/twilio-webhook`)                               |
+| Documentation rewritten        | 9 files + PIVOT-PLAN.md (already in place)                   |

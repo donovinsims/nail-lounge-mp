@@ -7,9 +7,15 @@ export const Route = createFileRoute("/gift-cards")({
   head: () => ({
     meta: [
       { title: `Gift Cards & Parties — ${getSalonName()}` },
-      { name: "description", content: `Gift cards and private salon parties at ${getSalonName()} — bridal, birthdays, bachelorettes, mother-daughter days.` },
+      {
+        name: "description",
+        content: `Gift cards and private salon parties at ${getSalonName()} — bridal, birthdays, bachelorettes, mother-daughter days.`,
+      },
       { property: "og:title", content: `Gift Cards & Parties — ${getSalonName()}` },
-      { property: "og:description", content: `Gift cards and private salon parties at ${getSalonName()} — bridal, birthdays, mother-daughter days.` },
+      {
+        property: "og:description",
+        content: `Gift cards and private salon parties at ${getSalonName()} — bridal, birthdays, mother-daughter days.`,
+      },
       { property: "og:url", content: "/gift-cards" },
     ],
     links: [{ rel: "canonical", href: "/gift-cards" }],
@@ -136,7 +142,8 @@ function GiftCardsPage() {
                 assign artists, and share a quote.
               </li>
               <li>
-                <span className="font-mono text-foreground">03</span> &nbsp; Payment is collected in-studio.
+                <span className="font-mono text-foreground">03</span> &nbsp; Payment is collected
+                in-studio.
               </li>
               <li>
                 <span className="font-mono text-foreground">04</span> &nbsp; Arrive 10 minutes early

@@ -17,14 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import {
-  Bar,
-  BarChart,
-  Pie,
-  PieChart as RePieChart,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
+import { Bar, BarChart, Pie, PieChart as RePieChart, ResponsiveContainer, Cell } from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -72,9 +65,7 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
       end.setHours(23, 59, 59, 999);
       const { data } = await supabase
         .from("bookings")
-        .select(
-          "id, start_time, status, services(name, price), staff(name), clients(name)",
-        )
+        .select("id, start_time, status, services(name, price), staff(name), clients(name)")
         .eq("salon_id", salonId)
         .gte("start_time", start.toISOString())
         .lte("start_time", end.toISOString())
@@ -178,9 +169,7 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
   );
   const confirmed = bookings.filter((b: any) => b.status === "confirmed").length;
   const trendVal =
-    yesterdayRev > 0
-      ? `${(((todayRev - yesterdayRev) / yesterdayRev) * 100).toFixed(0)}%`
-      : "—";
+    yesterdayRev > 0 ? `${(((todayRev - yesterdayRev) / yesterdayRev) * 100).toFixed(0)}%` : "—";
 
   // Weekly revenue by day (bar chart data)
   const weekRevenueData = WEEKDAYS.map((day, i) => {
@@ -431,10 +420,7 @@ export default function Dashboard({ salonId, ownerName }: { salonId: string; own
         {todayCompletedBookings.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {Object.entries(paymentMethodBreakdown).map(([method, data]) => (
-              <div
-                key={method}
-                className="rounded-xl bg-surface-2 px-4 py-3 flex-1 min-w-[140px]"
-              >
+              <div key={method} className="rounded-xl bg-surface-2 px-4 py-3 flex-1 min-w-[140px]">
                 <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                   {method}
                 </p>

@@ -10,9 +10,15 @@ export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
       { title: `Services & Pricing — ${getSalonName()}` },
-      { name: "description", content: `Full service menu at ${getSalonName()}. Transparent pricing, no surprises.` },
+      {
+        name: "description",
+        content: `Full service menu at ${getSalonName()}. Transparent pricing, no surprises.`,
+      },
       { property: "og:title", content: `Services & Pricing — ${getSalonName()}` },
-      { property: "og:description", content: `Full menu and prices for all services at ${getSalonName()}.` },
+      {
+        property: "og:description",
+        content: `Full menu and prices for all services at ${getSalonName()}.`,
+      },
       { property: "og:url", content: "/services" },
     ],
     links: [{ rel: "canonical", href: "/services" }],

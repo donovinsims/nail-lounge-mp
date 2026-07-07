@@ -11,6 +11,7 @@ These are the 5 most impactful issues to fix in priority order. Each fix is inde
 **Problem:** On step 4, `useEffect` in `book.tsx:90-96` autofocuses the name input, triggering the mobile keyboard. The fixed sticky bottom bar and page content don't account for the iOS viewport shrink, so the name/phone/email inputs and the Pay Deposit button are likely covered by the keyboard. User can't see what they're typing or reach the CTA.
 
 **Fix A — Remove mobile autofocus (in `book.tsx`):**
+
 ```tsx
 // book.tsx lines 90-96 — replace the autofocus effect:
 useEffect(() => {
@@ -35,11 +36,11 @@ useEffect(() => {
   const handleResize = () => {
     const vv = window.visualViewport;
     if (vv) {
-      document.documentElement.style.setProperty('--visual-viewport-height', `${vv.height}px`);
+      document.documentElement.style.setProperty("--visual-viewport-height", `${vv.height}px`);
     }
   };
-  window.visualViewport?.addEventListener('resize', handleResize);
-  return () => window.visualViewport?.removeEventListener('resize', handleResize);
+  window.visualViewport?.addEventListener("resize", handleResize);
+  return () => window.visualViewport?.removeEventListener("resize", handleResize);
 }, []);
 ```
 
@@ -65,14 +66,16 @@ className={`h-0.5 w-6 sm:w-12 mx-1 sm:mx-2 rounded-full ${...}`}
 ```
 
 Optionally also shrink the step circles on mobile (line 36, 45, 54):
+
 ```tsx
 // BEFORE:
-className="w-9 h-9 rounded-full ..."
+className = "w-9 h-9 rounded-full ...";
 // AFTER:
-className="w-8 h-8 sm:w-9 sm:h-9 rounded-full ..."
+className = "w-8 h-8 sm:w-9 sm:h-9 rounded-full ...";
 ```
 
 **Alternative** (if you prefer scroll over shrink): Wrap the nav container in `overflow-x-auto` + `scrollbar-hidden`:
+
 ```tsx
 // Line 13 — change the flex container:
 <nav role="navigation" aria-label="Booking progress">
@@ -94,7 +97,9 @@ Create a new mobile summary component or modify the existing flow. The simplest 
 In `src/routes/book.tsx`, after the step progress section (around line 163), add:
 
 ```tsx
-{/* Mobile booking summary chips — visible below md */}
+{
+  /* Mobile booking summary chips — visible below md */
+}
 <div className="md:hidden -mt-4 mb-4">
   {(service || tech || slot) && (
     <div className="flex flex-wrap gap-2">
@@ -115,7 +120,7 @@ In `src/routes/book.tsx`, after the step progress section (around line 163), add
       )}
     </div>
   )}
-</div>
+</div>;
 ```
 
 You'll need to thread `fmtTime` and `fmtDate` up to the Book component scope (they're currently only passed to StepConfirm and BookingSummary). The `BUSINESS` helpers are in `@/lib/salon` — import `fmtTime, fmtDate` at the top of `book.tsx`.
@@ -133,7 +138,9 @@ You'll need to thread `fmtTime` and `fmtDate` up to the Book component scope (th
 In `src/routes/book.tsx`, modify the mobile sticky bar section (lines 284-307):
 
 ```tsx
-{/* Mobile sticky bottom bar */}
+{
+  /* Mobile sticky bottom bar */
+}
 <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur-xl px-4 py-3 safe-pb sm:hidden">
   <div className="flex items-center gap-3">
     {step > 1 && (
@@ -147,9 +154,7 @@ In `src/routes/book.tsx`, modify the mobile sticky bar section (lines 284-307):
     )}
     {step < 4 ? (
       <button
-        disabled={
-          (step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)
-        }
+        disabled={(step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)}
         onClick={next}
         className="flex-1 tap-target rounded-full bg-primary py-3.5 text-sm font-semibold text-primary-foreground disabled:opacity-40 transition"
       >
@@ -172,7 +177,7 @@ In `src/routes/book.tsx`, modify the mobile sticky bar section (lines 284-307):
       </button>
     )}
   </div>
-</div>
+</div>;
 ```
 
 This requires exposing `canSubmit`, `isPending`, `onSubmit`, and the deposit amount to the sticky bar scope. You'll need to extract the `canSubmit` logic (currently in `StepConfirm` line 55-61) up to the `Book` component, or move the submit button rendering to where it has access to those values. The cleanest approach: compute `canSubmit` and `onSubmit` in `Book` and pass them down, then the sticky bar and inline button both reference the same state.
@@ -190,6 +195,7 @@ Also remove duplicate `onSubmit` from `StepConfirm`'s inline button if it's redu
 **Problem:** Labels render at `text-[10px]` on mobile — custom arbitrary value, well below legibility threshold. Combined with `text-muted-foreground`, they're nearly invisible as wayfinding.
 
 **Fix:**
+
 ```tsx
 // Line 60 — change:
 className={`text-[10px] sm:text-xs font-medium whitespace-nowrap ${...}`}
@@ -198,6 +204,7 @@ className={`text-[11px] sm:text-xs font-medium whitespace-nowrap ${...}`}
 ```
 
 Or better, switch to responsive with a higher base:
+
 ```tsx
 className={`text-xs font-medium whitespace-nowrap ${...}`}
 ```
@@ -228,7 +235,8 @@ const MOBILE_LABELS = ["Service", "Artist", "Date/Time", "Confirm"];
 ```tsx
 // After the phone field declarations (around line 114-128), add:
 const PHONE_RE = /^[\d\s\-()]{7,20}$/;
-const showPhoneFormatError = touched.phone && phone.trim().length > 0 && !PHONE_RE.test(phone.trim());
+const showPhoneFormatError =
+  touched.phone && phone.trim().length > 0 && !PHONE_RE.test(phone.trim());
 
 // Update canSubmit (line 55-61):
 const canSubmit =
@@ -241,17 +249,18 @@ const canSubmit =
   staff != null;
 
 // Add the format error message after the existing phone error (after line 128):
-{showPhoneFormatError && (
-  <p className="mt-1 text-xs text-amber-600">
-    Enter a valid phone number (e.g., (815) 555-0123)
-  </p>
-)}
+{
+  showPhoneFormatError && (
+    <p className="mt-1 text-xs text-amber-600">Enter a valid phone number (e.g., (815) 555-0123)</p>
+  );
+}
 ```
 
 Also add a persistent format hint below the phone input that doesn't disappear when typing:
+
 ```tsx
-{/* After the phone input error messages */}
-<p className="mt-1 text-[11px] text-muted-foreground">
-  Format: (555) 123-4567
-</p>
+{
+  /* After the phone input error messages */
+}
+<p className="mt-1 text-[11px] text-muted-foreground">Format: (555) 123-4567</p>;
 ```

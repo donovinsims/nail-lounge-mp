@@ -26,7 +26,9 @@ function StaffDashboard() {
 
   // Form state
   const [tipAmount, setTipAmount] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState<"Credit/Debit" | "Cash" | "Venmo" | "Cash App">("Cash");
+  const [paymentMethod, setPaymentMethod] = useState<
+    "Credit/Debit" | "Cash" | "Venmo" | "Cash App"
+  >("Cash");
   const [serviceNotes, setServiceNotes] = useState("");
 
   useEffect(() => {

@@ -172,10 +172,7 @@ export const lookupAppointments = createServerFn({ method: "POST" })
  * Called when staff route mounts to check for pending modal.
  */
 export const getPendingCompletions = createServerFn({ method: "GET" })
-  .validator((data: unknown) => {
-    const schema = z.object({ staffId: z.string() });
-    return schema.parse(data);
-  })
+  .inputValidator((d) => z.object({ staffId: z.string() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const now = new Date();
@@ -202,15 +199,16 @@ export const getPendingCompletions = createServerFn({ method: "GET" })
  * Staff fills in the completion modal — records tip, payment method, notes, marks completed.
  */
 export const completeStaffModal = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    const schema = z.object({
-      bookingId: z.string().uuid(),
-      tipAmount: z.number().min(0).default(0),
-      paymentMethod: z.enum(["Credit/Debit", "Cash", "Venmo", "Cash App"]),
-      serviceNotes: z.string().default(""),
-    });
-    return schema.parse(data);
-  })
+  .inputValidator((d) =>
+    z
+      .object({
+        bookingId: z.string().uuid(),
+        tipAmount: z.number().min(0).default(0),
+        paymentMethod: z.enum(["Credit/Debit", "Cash", "Venmo", "Cash App"]),
+        serviceNotes: z.string().default(""),
+      })
+      .parse(d),
+  )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -260,17 +258,12 @@ export const completeStaffModal = createServerFn({ method: "POST" })
  * Get upcoming appointments for a staff member.
  */
 export const getStaffAppointments = createServerFn({ method: "GET" })
-  .validator((data: unknown) => {
-    const schema = z.object({ staffId: z.string() });
-    return schema.parse(data);
-  })
+  .inputValidator((d) => z.object({ staffId: z.string() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows } = await (supabaseAdmin as any)
       .from("bookings")
-      .select(
-        "id, start_time, end_time, status, services(name), clients(name, phone)",
-      )
+      .select("id, start_time, end_time, status, services(name), clients(name, phone)")
       .eq("staff_id", data.staffId)
       .in("status", ["confirmed", "completed"])
       .gte("start_time", new Date().toISOString())

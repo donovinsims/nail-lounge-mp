@@ -21,9 +21,18 @@ export default function StepStaff({ staff, selectedId, onSelect, isLoading }: St
       <div className="grid place-items-center py-10">
         <div className="flex flex-col items-center gap-3">
           <div className="flex gap-1">
-            <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "0ms" }} />
-            <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "150ms" }} />
-            <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "300ms" }} />
+            <span
+              className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40"
+              style={{ animationDelay: "0ms" }}
+            />
+            <span
+              className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40"
+              style={{ animationDelay: "150ms" }}
+            />
+            <span
+              className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40"
+              style={{ animationDelay: "300ms" }}
+            />
           </div>
           <span className="text-sm text-muted-foreground">Loading artists…</span>
         </div>
@@ -51,9 +60,7 @@ export default function StepStaff({ staff, selectedId, onSelect, isLoading }: St
                 aria-checked={isSelected}
                 onClick={() => onSelect(member.id)}
                 className={`flex w-full tap-target items-center gap-4 rounded-2xl bg-surface p-4 text-left active:scale-[0.98] transition-transform duration-75 ${
-                  isSelected
-                    ? "ring-2 ring-ring bg-primary/5 shadow-sm"
-                    : "hover:bg-surface-2"
+                  isSelected ? "ring-2 ring-ring bg-primary/5 shadow-sm" : "hover:bg-surface-2"
                 }`}
               >
                 <div

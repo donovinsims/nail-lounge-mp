@@ -72,39 +72,40 @@ function Appointments() {
         {!lookupMutation.isPending && lookupMutation.data?.length === 0 && (
           <p className="pt-4 text-sm text-muted-foreground">No appointments found.</p>
         )}
-        {!lookupMutation.isPending && lookupMutation.data?.map((b: any) => (
-          <li key={b.id} className="rounded-2xl bg-surface p-4">
-            <div className="flex items-baseline justify-between gap-3">
-              <div className="min-w-0">
-                <p className="font-semibold truncate">{b.services?.name}</p>
-                <p className="text-xs text-muted-foreground">with {b.staff?.name}</p>
+        {!lookupMutation.isPending &&
+          lookupMutation.data?.map((b: any) => (
+            <li key={b.id} className="rounded-2xl bg-surface p-4">
+              <div className="flex items-baseline justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-semibold truncate">{b.services?.name}</p>
+                  <p className="text-xs text-muted-foreground">with {b.staff?.name}</p>
+                </div>
+                <span
+                  className={`text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded-full ${b.status === "cancelled" ? "bg-destructive/10 text-destructive" : b.status === "completed" ? "bg-success/10 text-success" : "bg-surface-2"}`}
+                >
+                  {b.status}
+                </span>
               </div>
-              <span
-                className={`text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded-full ${b.status === "cancelled" ? "bg-destructive/10 text-destructive" : b.status === "completed" ? "bg-success/10 text-success" : "bg-surface-2"}`}
-              >
-                {b.status}
-              </span>
-            </div>
-            <p className="mt-2 text-sm">
-              {fmtDate(b.start_time)} · {fmtTime(b.start_time)}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {fmtMoney(Number(b.services?.price ?? 0))}
-            </p>
-            {b.status === "confirmed" && (
-              <button
-                onClick={() => {
-                  if (window.confirm("Cancel this appointment?")) {
-                    cancelMutation.mutate({ data: { bookingId: b.id, phone } });
-                  }
-                }}
-                className="mt-3 text-sm font-medium text-destructive underline-offset-4 hover:underline"
-              >
-                Cancel appointment
-              </button>
-            )}
-          </li>
-        ))}
+              <p className="mt-2 text-sm">
+                {fmtDate(b.start_time)} · {fmtTime(b.start_time)}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {fmtMoney(Number(b.services?.price ?? 0))}
+              </p>
+              {b.status === "confirmed" && (
+                <button
+                  onClick={() => {
+                    if (window.confirm("Cancel this appointment?")) {
+                      cancelMutation.mutate({ data: { bookingId: b.id, phone } });
+                    }
+                  }}
+                  className="mt-3 text-sm font-medium text-destructive underline-offset-4 hover:underline"
+                >
+                  Cancel appointment
+                </button>
+              )}
+            </li>
+          ))}
       </div>
     </div>
   );

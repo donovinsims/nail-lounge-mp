@@ -21,13 +21,13 @@ This template (`~/mynails-generic`) is a **single-tenant** web app: one deployme
 
 ## Prerequisites
 
-| What you need | Why |
-|---|---|
-| A computer with `git`, `node` (≥22), `bun` | To clone and build the project |
-| A [Supabase](https://supabase.com) account (free tier works) | Database, auth, storage |
-| (Optional) A [Twilio](https://twilio.com) account | SMS confirmation messages + rating loop |
-| (Optional) A [Resend](https://resend.com) account | Email notifications |
-| A domain name (e.g. `nails-by-ana.com`) | Where the site lives |
+| What you need                                                | Why                                     |
+| ------------------------------------------------------------ | --------------------------------------- |
+| A computer with `git`, `node` (≥22), `bun`                   | To clone and build the project          |
+| A [Supabase](https://supabase.com) account (free tier works) | Database, auth, storage                 |
+| (Optional) A [Twilio](https://twilio.com) account            | SMS confirmation messages + rating loop |
+| (Optional) A [Resend](https://resend.com) account            | Email notifications                     |
+| A domain name (e.g. `nails-by-ana.com`)                      | Where the site lives                    |
 
 Time estimate: **2–4 hours** first time, faster on repeat.
 
@@ -159,16 +159,17 @@ VITE_ALLOW_SEED_DATA=false
 
 ### Key env var rules
 
-| Var | Rule |
-|---|---|
-| `VITE_SALON_ID` | Must match the `id` column in the `salons` table. Never change after launch. |
-| `VITE_SALON_NAME` | Appears in the header, footer, page titles, OG tags, JSON-LD schema. Keep it short. |
-| `VITE_ADMIN_ONBOARD` | Set to `true` to allow the first admin sign-in to auto-link to the salon. Turn to `false` after. |
-| `VITE_OG_IMAGE` | 1200×630px JPEG/PNG. Hosted somewhere accessible (R2, Supabase storage, etc). |
-| `TWILIO_ACCOUNT_SID` + `TWILIO_AUTH_TOKEN` + `TWILIO_PHONE_NUMBER` | Required for SMS confirmations + rating loop. Omit to skip SMS entirely. |
-| `GOOGLE_REVIEW_URL` | Full URL to the salon's Google review page. Used for high-rating (4-5) SMS follow-ups. |
+| Var                                                                | Rule                                                                                             |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `VITE_SALON_ID`                                                    | Must match the `id` column in the `salons` table. Never change after launch.                     |
+| `VITE_SALON_NAME`                                                  | Appears in the header, footer, page titles, OG tags, JSON-LD schema. Keep it short.              |
+| `VITE_ADMIN_ONBOARD`                                               | Set to `true` to allow the first admin sign-in to auto-link to the salon. Turn to `false` after. |
+| `VITE_OG_IMAGE`                                                    | 1200×630px JPEG/PNG. Hosted somewhere accessible (R2, Supabase storage, etc).                    |
+| `TWILIO_ACCOUNT_SID` + `TWILIO_AUTH_TOKEN` + `TWILIO_PHONE_NUMBER` | Required for SMS confirmations + rating loop. Omit to skip SMS entirely.                         |
+| `GOOGLE_REVIEW_URL`                                                | Full URL to the salon's Google review page. Used for high-rating (4-5) SMS follow-ups.           |
 
 > **Two key sets of Supabase credentials:**
+>
 > - `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` — client-side anon key (safe in browser)
 > - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` — server-side admin key (never exposed to client)
 
@@ -245,6 +246,7 @@ Configure the DNS A record at your domain registrar to point to `76.76.21.21`.
 ### Option B: Netlify
 
 Push to GitHub, connect repo in Netlify dashboard:
+
 - **Build command:** `bun run build`
 - **Publish directory:** `dist`
 - **Environment variables:** Add all from `.env`
@@ -322,10 +324,10 @@ Integrations (gated via env)
 
 ## File you'll touch most
 
-| File | What it controls |
-|---|---|
-| `.env` | The actual secrets per deployment |
-| `src/lib/env.ts` | All salon-branded values (name, address, phone, social, OG image) |
-| `src/routes/index.tsx` | Hero section, "about us" text, CTAs |
-| `src/routes/gallery.tsx` | Gallery images and layout |
+| File                                            | What it controls                                                  |
+| ----------------------------------------------- | ----------------------------------------------------------------- |
+| `.env`                                          | The actual secrets per deployment                                 |
+| `src/lib/env.ts`                                | All salon-branded values (name, address, phone, social, OG image) |
+| `src/routes/index.tsx`                          | Hero section, "about us" text, CTAs                               |
+| `src/routes/gallery.tsx`                        | Gallery images and layout                                         |
 | `src/routes/_authenticated/-admin-settings.tsx` | Staff CRUD, Services CRUD, Hours editor (manage via UI, not file) |

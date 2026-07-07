@@ -74,7 +74,11 @@ export default function StepDateTime({
             No availability this day. Try another date.
           </p>
         ) : (
-          <div role="radiogroup" aria-label="Available time slots" className="flex flex-col gap-2 w-full">
+          <div
+            role="radiogroup"
+            aria-label="Available time slots"
+            className="flex flex-col gap-2 w-full"
+          >
             {slots.map((t) => {
               const selected = slot !== null && slot.getTime() === t.getTime();
               return (

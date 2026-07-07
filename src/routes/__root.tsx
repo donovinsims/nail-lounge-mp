@@ -13,7 +13,14 @@ import appCss from "../styles.css?url";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
-import { getSalonName, getSalonPhone, getSalonSocial, getOGImage, getUmamiWebsiteId, getUmamiHost } from "@/lib/env";
+import {
+  getSalonName,
+  getSalonPhone,
+  getSalonSocial,
+  getOGImage,
+  getUmamiWebsiteId,
+  getUmamiHost,
+} from "@/lib/env";
 
 const OG_IMAGE = getOGImage();
 

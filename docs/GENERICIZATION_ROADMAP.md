@@ -8,18 +8,22 @@
 ## Phase 0: Prerequisites & Safety ✅
 
 ### P0.1 — Rotate Compromised Secrets
+
 - `.env` added to `.gitignore`
 - `.env.template` created with all production keys (no secrets)
 
 ### P0.2 — Clean Up Duplicate Tree
+
 - Redundant `mynails/` subdirectory does not exist in this repo — clean single tree.
 
 ### P0.3 — Gate Seed Demo Data
+
 - `VITE_ALLOW_SEED_DATA` env var (default `false`) controls seed access
 - `isSeedAllowed()` in `src/lib/env.ts` reads `VITE_ALLOW_SEED_DATA`
 - Auto-seed on dashboard mount removed — replaced with explicit gate check for existing bookings
 
 ### P0.4 — Disable Dangerous Defaults
+
 - `linkSelfToFirstSalon()` toggles off by default (controlled by `VITE_ADMIN_ONBOARD`)
 - Auto-seed on dashboard mount removed — checks if bookings already exist
 
@@ -28,17 +32,21 @@
 ## Phase 1: Database-Backed Salon Configuration ✅
 
 ### 1.1 — Salon Config from DB
+
 - `fetchSalon()` queries `salons` table via `salon_id` filter — no hardcoded `BUSINESS` constant
 - `salons` table `settings` jsonb column available for brand/social/gallery config
 
 ### 1.2 — SALON_ID Env Var
+
 ```env
 SALON_ID=11111111-1111-1111-1111-111111111111
 ```
+
 - `getSalonId()` in `src/lib/env.ts` reads `VITE_SALON_ID` / `SALON_ID` env var
 - All `fetchSalon()` and related queries filter by this ID
 
 ### 1.3 — Admin Onboarding Flow
+
 - First admin sign-in with `VITE_ADMIN_ONBOARD=true` auto-links via `linkSelfToFirstSalon()`
 - Admin wizard not needed — env var controls the behavior
 
@@ -49,6 +57,7 @@ SALON_ID=11111111-1111-1111-1111-111111111111
 All 15 BLOCKER and 18 HIGH items resolved. Zero hardcoded brand references remain in `src/`. Every route file uses `getSalonName()`, `getSalonAddress()`, `getSalonPhone()`, `getSocialLinks()` from `src/lib/env.ts`.
 
 ### Key changes:
+
 - **`BUSINESS` constant eliminated** — all salon data from DB via `fetchSalon()`
 - **`__root.tsx`** — JSON-LD, meta tags, OG tags all template-driven from env helpers
 - **`index.tsx`** — hero, testimonials, hours, contact, social links all from DB/env
@@ -56,36 +65,42 @@ All 15 BLOCKER and 18 HIGH items resolved. Zero hardcoded brand references remai
 - **Stale example comments** — e.g. `"Nail Lounge" → "NL"` — cleaned up
 
 ### Remaining MEDIUM/LOW items (non-blocking):
-| # | Item | Status |
-|---|------|--------|
-| M1 | `fetchSalon()` called in each route vs. context/provider | Acceptable — server functions fetch independently |
-| M2 | Loading/skeleton states | Present in most routes |
-| M3-M5 | Gallery/staff image management | Can be added; not blocking |
-| M6-M10 | Email templates, logo config, colors | Future enhancements |
-| L1-L11 | Alt texts, sitemap, robots.txt, footer | Minor polish items |
+
+| #      | Item                                                     | Status                                            |
+| ------ | -------------------------------------------------------- | ------------------------------------------------- |
+| M1     | `fetchSalon()` called in each route vs. context/provider | Acceptable — server functions fetch independently |
+| M2     | Loading/skeleton states                                  | Present in most routes                            |
+| M3-M5  | Gallery/staff image management                           | Can be added; not blocking                        |
+| M6-M10 | Email templates, logo config, colors                     | Future enhancements                               |
+| L1-L11 | Alt texts, sitemap, robots.txt, footer                   | Minor polish items                                |
 
 ---
 
 ## Phase 3: Admin Console Enhancements ✅
 
 ### 3.1 — Staff CRUD ✅
+
 - **Server functions:** `getAllStaffForSalon`, `createStaff`, `updateStaff`, `deleteStaff` in `src/lib/admin-crud.functions.ts`
 - **Admin UI:** List all staff with active toggle, soft-delete (is_active toggle), inline add form with name/title/bio/commission/hrly rate/image
 
 ### 3.2 — Services CRUD ✅
+
 - **Server functions:** `getAllServicesForSalon`, `createService`, `updateService`, `deleteService` in same module
 - **Admin UI:** List services grouped by category, inline add form with name/duration/price/category/description, active toggle, soft-delete
 
 ### 3.3 — Gallery Management ⏳
+
 - Not yet implemented — images remain in source code
 
 ### 3.4 — Settings Expansion ✅
+
 - **Hours editor:** Day-by-day open/close time inputs, saves `business_hours` JSONB on `salons` table
 - **Social links editor:** Hints that social is env-managed (future: DB-backed)
 - **Brand/colors:** CSS variables via Tailwind theme — per-deployment config
 - **Cancellation policy:** Not yet editable from UI
 
 ### 3.5 — Data Isolation Verification ✅
+
 - ✅ Every server function filters by `salon_id` via `getSalonId()` from env
 - ✅ `lookupAppointments` scoped to salon (takes `salonId` parameter)
 - ✅ `cancelPublicBooking` verifies salon ownership
@@ -96,6 +111,7 @@ All 15 BLOCKER and 18 HIGH items resolved. Zero hardcoded brand references remai
 ## Phase 4: Integration Points ✅
 
 ### 4.1 — Payment & Feedback Pivot ✅
+
 - Stripe intentionally removed — no digital payments, no Stripe SDK, no Checkout Sessions, no POS
 - All payments processed in-store: Credit/Debit, Cash, Venmo, Cash App
 - Staff lockout modal captures payment method, tip, service notes after each completed booking
@@ -109,17 +125,20 @@ All 15 BLOCKER and 18 HIGH items resolved. Zero hardcoded brand references remai
 - **New migration:** `0008_pivot.sql` drops Stripe columns, adds `payment_method` enum, `tip_amount`, `completed_at`, `service_notes`, `client_rating`, `rating_sent_at`
 
 ### 4.2 — SMS Notifications ✅
+
 - Twilio SDK (`twilio@5`) installed
 - `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` in env (gated by `hasTwilio()`)
 - Booking confirmation SMS sent after successful booking creation
 - Soft-fail: logs error if Twilio is misconfigured, doesn't block booking
 
 ### 4.3 — AI Receptionist 🔲
+
 - Schema ready (`ai_calls` table)
 - Stub log viewer in admin
 - Not yet integrated with Twilio Voice / LLM providers
 
 ### 4.4 — Waitlist → Booking Conversion 🔲
+
 - Waitlist CRUD in admin panel
 - Real-time subscription and auto-notify not yet implemented
 
@@ -128,17 +147,21 @@ All 15 BLOCKER and 18 HIGH items resolved. Zero hardcoded brand references remai
 ## Phase 5: Quality & Testing ✅
 
 ### 5.1 — Test Infrastructure ✅
+
 - **Vitest@4** installed (fits Vite ecosystem)
 - `vitest.config.ts` with path aliases matching tsconfig
 - `package.json` scripts: `test`, `test:watch`
 
 ### 5.2 — Unit Tests ✅
+
 - `src/lib/rate-limiter.test.ts` — 4 tests covering: under limit, over limit, independent keys, window expiry — all passing
 
 ### 5.3 — Integration Tests 🔲
+
 - Not yet implemented beyond rate limit tests
 
 ### 5.4 — CI/CD Pipeline ✅
+
 - `.github/workflows/ci.yml` with `lint-and-typecheck` and `build` jobs
 - Runs on push/PR to `main`
 - Concurrency group prevents duplicate runs
@@ -148,12 +171,15 @@ All 15 BLOCKER and 18 HIGH items resolved. Zero hardcoded brand references remai
 ## Phase 6: Production Hardening ✅
 
 ### 6.1 — Rate Limiting ✅
+
 - Generic sliding-window rate limiter in `src/lib/rate-limiter.ts`
 - Applied to `createPublicBooking`: max 3 bookings per phone per 5 minutes
 - Includes prune interval and `.dispose()` cleanup
 
 ### 6.2 — Race Condition Fix ✅
+
 - Database exclusion constraint migration prevents overlapping bookings:
+
 ```sql
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 ALTER TABLE bookings ADD CONSTRAINT no_overlapping_bookings
@@ -165,10 +191,12 @@ ALTER TABLE bookings ADD CONSTRAINT no_overlapping_bookings
 ```
 
 ### 6.3 — Realtime Security ✅
+
 - Supabase Realtime channels restricted to authenticated users for admin data
 - Public Realtime only for floor_status with column-level restrictions
 
 ### 6.4 — .env.template ✅
+
 ```env
 # === Required ===
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -210,6 +238,7 @@ VITE_ALLOW_SEED_DATA=false
 ```
 
 ### 6.5 — Error Page Review ✅
+
 - `__root.tsx` NotFoundComponent + ErrorComponent — fully generic (no brand references)
 - `src/server.ts` — custom error normalization for SSR
 
@@ -217,17 +246,18 @@ VITE_ALLOW_SEED_DATA=false
 
 ## Implementation Summary
 
-| Phase | Effort | Status |
-|-------|--------|--------|
-| Phase 0: Prerequisites | 1-2 hrs | ✅ |
-| Phase 1: DB-backed Config | 4-6 hrs | ✅ |
-| Phase 2: Ref Sweep | 2-3 hrs | ✅ |
-| Phase 3: Admin Console | 8-12 hrs | ✅ (Staff, Services, Hours, Social) |
-| Phase 4: Integrations | 10-20 hrs | ✅ (Twilio SMS, Rating loop, Staff modal) |
-| Phase 5: Quality/Testing | 8-16 hrs | ✅ (Vitest, CI/CD, unit tests) |
-| Phase 6: Hardening | 4-8 hrs | ✅ (Rate limiting, constraint, error review) |
+| Phase                     | Effort    | Status                                       |
+| ------------------------- | --------- | -------------------------------------------- |
+| Phase 0: Prerequisites    | 1-2 hrs   | ✅                                           |
+| Phase 1: DB-backed Config | 4-6 hrs   | ✅                                           |
+| Phase 2: Ref Sweep        | 2-3 hrs   | ✅                                           |
+| Phase 3: Admin Console    | 8-12 hrs  | ✅ (Staff, Services, Hours, Social)          |
+| Phase 4: Integrations     | 10-20 hrs | ✅ (Twilio SMS, Rating loop, Staff modal)    |
+| Phase 5: Quality/Testing  | 8-16 hrs  | ✅ (Vitest, CI/CD, unit tests)               |
+| Phase 6: Hardening        | 4-8 hrs   | ✅ (Rate limiting, constraint, error review) |
 
 **Remaining gaps for future iterations:**
+
 - Gallery management (Supabase Storage + admin upload)
 - AI receptionist (Twilio Voice + LLM)
 - Waitlist → booking auto-conversion
@@ -275,6 +305,7 @@ vercel --prod
 ## Appendix: Current State of Hardcoded References
 
 ### Fully Resolved
+
 - `src/lib/salon.ts` — `BUSINESS` constant eliminated ✅
 - All 15 BLOCKER items ✅ — JSON-LD, meta tags, hero text, testimonials, page titles, seed SQL
 - All 18 HIGH items ✅ — hours, address, phone, email, social links, CTA text
@@ -282,6 +313,7 @@ vercel --prod
 - All Stripe/POS references removed ✅ — no digital payment dependency
 
 ### Still in Source (Intentional)
+
 - `supabase/seed.sql` — still seeds example salon data (used for dev demo)
 - `public/images/` — stock placeholder images (should be replaced per deployment)
 - Category names in service seed data — generic "Manicure", "Pedicure" etc. (intentional)

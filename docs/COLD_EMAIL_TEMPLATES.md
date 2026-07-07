@@ -6,17 +6,17 @@
 
 ## Personalization Quick Reference — Google Maps Signals
 
-| Signal | How to Use It | Example Insert |
-|---|---|---|
-| Years in business | Credibility opener | "Been in {{area}} for {{X}} years" |
-| No website / bad website | Direct problem hook | "Your current site doesn't let customers book" |
-| No online booking | Primary value prop | "Still taking bookings by phone?" |
-| High reviews (4.5+) | Compliment + connect to opportunity | "Best-rated shop in {{area}} — should be easy to book with you" |
-| Multiple locations | Multi-location template | "{{X}} locations now" |
-| Low review count | Opportunity angle | "Getting more booked appointments means more reviews too" |
-| Specific services | Personalization | "I see you specialize in {{acrylics/gel x}}" |
-| Hours of operation | Validate business need | "Open 7 days — you need 24/7 booking" |
-| Neighborhood/Area | Local credibility | "Other salons in {{area}} are switching" |
+| Signal                   | How to Use It                       | Example Insert                                                  |
+| ------------------------ | ----------------------------------- | --------------------------------------------------------------- |
+| Years in business        | Credibility opener                  | "Been in {{area}} for {{X}} years"                              |
+| No website / bad website | Direct problem hook                 | "Your current site doesn't let customers book"                  |
+| No online booking        | Primary value prop                  | "Still taking bookings by phone?"                               |
+| High reviews (4.5+)      | Compliment + connect to opportunity | "Best-rated shop in {{area}} — should be easy to book with you" |
+| Multiple locations       | Multi-location template             | "{{X}} locations now"                                           |
+| Low review count         | Opportunity angle                   | "Getting more booked appointments means more reviews too"       |
+| Specific services        | Personalization                     | "I see you specialize in {{acrylics/gel x}}"                    |
+| Hours of operation       | Validate business need              | "Open 7 days — you need 24/7 booking"                           |
+| Neighborhood/Area        | Local credibility                   | "Other salons in {{area}} are switching"                        |
 
 ---
 
@@ -122,7 +122,7 @@ Hey {{Name}},
 
 Here's a number: if you're doing 300 appointments a month across {{X}} locations, Booksy-style marketplace fees can run $1,000–$2,500+ a year in transaction charges alone. With this system, you own the site — no per-booking fees, no transaction percentages.
 
-And your customers find *your* website, not a profile page surrounded by competitors.
+And your customers find _your_ website, not a profile page surrounded by competitors.
 
 Would it be useful to see a comparison?
 
@@ -178,14 +178,14 @@ Here's a site we built for a nail salon in {{City}}: {{link}}. Compare that to y
 
 ## Sending Guide
 
-| Detail | Recommendation |
-|---|---|
-| **Best days** | Tuesday–Thursday (Thursday peaks) |
-| **Best times** | 9–11 AM or 1–3 PM in prospect's local time |
-| **Avoid** | Monday mornings, Friday afternoons |
-| **Sequence length** | 4 emails per set (including breakup) |
-| **Cadence** | Day 0 → Day 3 → Day 7–8 → Day 14–21 |
-| **Subject lines** | 2–4 words, lowercase, no punctuation tricks, no first names |
+| Detail              | Recommendation                                              |
+| ------------------- | ----------------------------------------------------------- |
+| **Best days**       | Tuesday–Thursday (Thursday peaks)                           |
+| **Best times**      | 9–11 AM or 1–3 PM in prospect's local time                  |
+| **Avoid**           | Monday mornings, Friday afternoons                          |
+| **Sequence length** | 4 emails per set (including breakup)                        |
+| **Cadence**         | Day 0 → Day 3 → Day 7–8 → Day 14–21                         |
+| **Subject lines**   | 2–4 words, lowercase, no punctuation tricks, no first names |
 
 ### Tips for This List
 

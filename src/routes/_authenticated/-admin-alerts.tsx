@@ -68,9 +68,7 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
             <div className="min-w-0 flex-1">
               {/* Rating + client phone + time */}
               <div className="flex items-center gap-2 flex-wrap">
-                <span className={`text-lg font-bold ${ratingColor(a.rating)}`}>
-                  {a.rating}/5
-                </span>
+                <span className={`text-lg font-bold ${ratingColor(a.rating)}`}>{a.rating}/5</span>
                 <span className="text-xs text-muted-foreground">·</span>
                 <a
                   href={`tel:${a.client_phone}`}
@@ -89,9 +87,7 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
               </div>
 
               {/* Rating description */}
-              <p className="mt-2 text-sm text-muted-foreground">
-                {ratingLabel(a.rating)}
-              </p>
+              <p className="mt-2 text-sm text-muted-foreground">{ratingLabel(a.rating)}</p>
             </div>
 
             <button

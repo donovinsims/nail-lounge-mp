@@ -13,13 +13,10 @@ export async function handleTwilioWebhook(request: Request): Promise<Response> {
   const body = params.get("Body") || params.get("body") || "";
 
   if (!from) {
-    return new Response(
-      '<?xml version="1.0" encoding="UTF-8"?><Response></Response>',
-      {
-        status: 200,
-        headers: { "Content-Type": "text/xml" },
-      },
-    );
+    return new Response('<?xml version="1.0" encoding="UTF-8"?><Response></Response>', {
+      status: 200,
+      headers: { "Content-Type": "text/xml" },
+    });
   }
 
   // Look up the booking by phone number where rating_sent_at IS NOT NULL AND client_rating IS NULL
@@ -35,13 +32,10 @@ export async function handleTwilioWebhook(request: Request): Promise<Response> {
     .maybeSingle();
 
   if (!booking) {
-    return new Response(
-      '<?xml version="1.0" encoding="UTF-8"?><Response></Response>',
-      {
-        status: 200,
-        headers: { "Content-Type": "text/xml" },
-      },
-    );
+    return new Response('<?xml version="1.0" encoding="UTF-8"?><Response></Response>', {
+      status: 200,
+      headers: { "Content-Type": "text/xml" },
+    });
   }
 
   const { getSalonPhone } = await import("@/lib/env");
@@ -53,11 +47,8 @@ export async function handleTwilioWebhook(request: Request): Promise<Response> {
     salonPhone: getSalonPhone(),
   });
 
-  return new Response(
-    '<?xml version="1.0" encoding="UTF-8"?><Response></Response>',
-    {
-      status: 200,
-      headers: { "Content-Type": "text/xml" },
-    },
-  );
+  return new Response('<?xml version="1.0" encoding="UTF-8"?><Response></Response>', {
+    status: 200,
+    headers: { "Content-Type": "text/xml" },
+  });
 }

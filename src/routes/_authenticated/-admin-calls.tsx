@@ -42,7 +42,9 @@ export default function Calls({ salonId }: { salonId: string }) {
         <div className="flex flex-col items-center justify-center py-16 text-sm text-muted-foreground gap-3">
           <Phone className="h-12 w-12 text-muted-foreground/30" />
           <span>No AI calls yet.</span>
-          <span className="text-xs">Use the Seed demo button on the dashboard to generate sample data.</span>
+          <span className="text-xs">
+            Use the Seed demo button on the dashboard to generate sample data.
+          </span>
         </div>
       )}
 

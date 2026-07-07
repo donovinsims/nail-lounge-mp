@@ -6,7 +6,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.documentElement.classList.remove("dark");
     try {
       localStorage.setItem("theme", "light");
-    } catch {}
+    } catch {
+      // Ignore — localStorage may be unavailable (private browsing, etc.).
+    }
   }, []);
   return <>{children}</>;
 }

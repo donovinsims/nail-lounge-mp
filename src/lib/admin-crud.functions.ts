@@ -167,7 +167,8 @@ export const updateService = createServerFn({ method: "POST" })
     if (data.category !== undefined) update.category = data.category || null;
     if (data.durationMinutes !== undefined) update.duration_minutes = data.durationMinutes;
     if (data.price !== undefined) update.price = data.price;
-    if (data.bufferAfterMinutes !== undefined) update.buffer_after_minutes = data.bufferAfterMinutes;
+    if (data.bufferAfterMinutes !== undefined)
+      update.buffer_after_minutes = data.bufferAfterMinutes;
     if (data.isActive !== undefined) update.is_active = data.isActive;
 
     const { data: service, error } = await context.supabase

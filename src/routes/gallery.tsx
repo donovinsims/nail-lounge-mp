@@ -25,9 +25,15 @@ export const Route = createFileRoute("/gallery")({
   head: () => ({
     meta: [
       { title: `Gallery — ${getSalonName()}` },
-      { name: "description", content: `Recent work from the ${getSalonName()} studio — gel, acrylic, chrome, ombre, french, and custom nail art.` },
+      {
+        name: "description",
+        content: `Recent work from the ${getSalonName()} studio — gel, acrylic, chrome, ombre, french, and custom nail art.`,
+      },
       { property: "og:title", content: `Gallery — ${getSalonName()}` },
-      { property: "og:description", content: "Curated nail art and pedicure work from our resident artists." },
+      {
+        property: "og:description",
+        content: "Curated nail art and pedicure work from our resident artists.",
+      },
       { property: "og:image", content: g3 },
       { property: "og:url", content: "/gallery" },
     ],

@@ -27,13 +27,13 @@
 
 ## 2. High-Level Workstreams
 
-| # | Workstream | Description | Depends On |
-|---|-----------|-------------|------------|
-| **A** | **Strip Stripe & Deposits** | Remove all Stripe SDKs, env vars, types, configs, POS components, deposit logic, checkout sessions, and payment references from codebase | None |
-| **B** | **Schema Migration** | Drop Stripe/deposit columns; add `payment_method` enum, modal capture columns, rating columns to bookings | None |
-| **C** | **Staff Route Group + Lockout Modal + Twilio Rating Loop** | Build `_authenticated/staff` route group. System-auto-locks staff with forced modal capturing tip, payment method, notes. Twilio 1-5 SMS rating → Google Review link (4-5) or owner alert (1-3). | B |
-| **D** | **Owner Dashboard Overhaul + Master Calendar** | Replace FinTech KPIs with payment-method breakdown + total tips. Add alerts panel for low ratings. Build master calendar overlay showing all staff + customers in unified view. Add CRM data table. | A, C |
-| **E** | **Documentation Sweep** | Rewrite all 10 `/docs/` files to remove Stripe/POS/FinTech and reflect Scheduling/CRM/Accountability/Reputation model | All |
+| #     | Workstream                                                 | Description                                                                                                                                                                                         | Depends On |
+| ----- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| **A** | **Strip Stripe & Deposits**                                | Remove all Stripe SDKs, env vars, types, configs, POS components, deposit logic, checkout sessions, and payment references from codebase                                                            | None       |
+| **B** | **Schema Migration**                                       | Drop Stripe/deposit columns; add `payment_method` enum, modal capture columns, rating columns to bookings                                                                                           | None       |
+| **C** | **Staff Route Group + Lockout Modal + Twilio Rating Loop** | Build `_authenticated/staff` route group. System-auto-locks staff with forced modal capturing tip, payment method, notes. Twilio 1-5 SMS rating → Google Review link (4-5) or owner alert (1-3).    | B          |
+| **D** | **Owner Dashboard Overhaul + Master Calendar**             | Replace FinTech KPIs with payment-method breakdown + total tips. Add alerts panel for low ratings. Build master calendar overlay showing all staff + customers in unified view. Add CRM data table. | A, C       |
+| **E** | **Documentation Sweep**                                    | Rewrite all 10 `/docs/` files to remove Stripe/POS/FinTech and reflect Scheduling/CRM/Accountability/Reputation model                                                                               | All        |
 
 ---
 
@@ -43,22 +43,22 @@
 
 ### Files to Modify (14)
 
-| # | File | Change |
-|---|------|--------|
-| A1 | `src/lib/booking.functions.ts` | Remove `stripe` import, `createCheckoutSession`, deposit/depositToggle logic from `createPublicBooking`. Remove `verifyCheckoutSession` entirely. Booking always creates with `confirmed` status. Remove `stripeSessionId` from params & return types. |
-| A2 | `src/lib/admin.functions.ts` | Remove `completeBookingWithPayment` (POS terminal function). Remove `createPOSPaymentIntent`. |
-| A3 | `src/lib/admin-crud.functions.ts` | Check for Stripe references — remove if found (likely none). |
-| A4 | `src/lib/config.server.ts` | Remove `hasStripe()`, `getStripeSecretKey()`, `getStripePublishableKey()`, `getStripeWebhookSecret()`. Delete all `STRIPE_*` env var reads. |
-| A5 | `src/lib/email.server.ts` | Remove Stripe/payment references from email confirmation body. |
-| A6 | `src/routes/book.tsx` | Remove `depositToggle`, `depositAmount` input, `checkoutUrl` redirect logic, Stripe-related loading states. |
-| A7 | `src/routes/booking-confirmed.tsx` | Remove `verifyCheckoutSession` call and Stripe verification. Simplify to just show booking confirmation details. |
-| A8 | `src/routes/_authenticated/-admin-pos.tsx` | **DELETE** entire file. |
-| A9 | `src/routes/_authenticated/admin.tsx` | Remove POS tab import and navigation entry. |
-| A10 | `src/routes/_authenticated/-booking-step-progress.tsx` | Verify 4-step layout is clean (no deposit step). |
-| A11 | `src/lib/salon.ts` | Verify `computeAvailableSlots` has no deposit filtering (should be clean). |
-| A12 | `src/start.ts` / `src/server.ts` | Check for Stripe webhook middleware or route — remove if found. |
-| A13 | `package.json` | Remove `@stripe/stripe-js`, `stripe` from dependencies. |
-| A14 | `.env.example` | Remove all `STRIPE_*` and `VITE_STRIPE_*` vars. |
+| #   | File                                                   | Change                                                                                                                                                                                                                                                 |
+| --- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A1  | `src/lib/booking.functions.ts`                         | Remove `stripe` import, `createCheckoutSession`, deposit/depositToggle logic from `createPublicBooking`. Remove `verifyCheckoutSession` entirely. Booking always creates with `confirmed` status. Remove `stripeSessionId` from params & return types. |
+| A2  | `src/lib/admin.functions.ts`                           | Remove `completeBookingWithPayment` (POS terminal function). Remove `createPOSPaymentIntent`.                                                                                                                                                          |
+| A3  | `src/lib/admin-crud.functions.ts`                      | Check for Stripe references — remove if found (likely none).                                                                                                                                                                                           |
+| A4  | `src/lib/config.server.ts`                             | Remove `hasStripe()`, `getStripeSecretKey()`, `getStripePublishableKey()`, `getStripeWebhookSecret()`. Delete all `STRIPE_*` env var reads.                                                                                                            |
+| A5  | `src/lib/email.server.ts`                              | Remove Stripe/payment references from email confirmation body.                                                                                                                                                                                         |
+| A6  | `src/routes/book.tsx`                                  | Remove `depositToggle`, `depositAmount` input, `checkoutUrl` redirect logic, Stripe-related loading states.                                                                                                                                            |
+| A7  | `src/routes/booking-confirmed.tsx`                     | Remove `verifyCheckoutSession` call and Stripe verification. Simplify to just show booking confirmation details.                                                                                                                                       |
+| A8  | `src/routes/_authenticated/-admin-pos.tsx`             | **DELETE** entire file.                                                                                                                                                                                                                                |
+| A9  | `src/routes/_authenticated/admin.tsx`                  | Remove POS tab import and navigation entry.                                                                                                                                                                                                            |
+| A10 | `src/routes/_authenticated/-booking-step-progress.tsx` | Verify 4-step layout is clean (no deposit step).                                                                                                                                                                                                       |
+| A11 | `src/lib/salon.ts`                                     | Verify `computeAvailableSlots` has no deposit filtering (should be clean).                                                                                                                                                                             |
+| A12 | `src/start.ts` / `src/server.ts`                       | Check for Stripe webhook middleware or route — remove if found.                                                                                                                                                                                        |
+| A13 | `package.json`                                         | Remove `@stripe/stripe-js`, `stripe` from dependencies.                                                                                                                                                                                                |
+| A14 | `.env.example`                                         | Remove all `STRIPE_*` and `VITE_STRIPE_*` vars.                                                                                                                                                                                                        |
 
 ### Files to Keep (unchanged)
 
@@ -123,11 +123,11 @@ ALTER TABLE bookings ADD COLUMN rating_sent_at TIMESTAMPTZ;  -- tracks when Twil
 
 **New route group:** `src/routes/_authenticated/_staff/`
 
-| Route | File | Description |
-|-------|------|-------------|
-| `/staff` | `_staff.tsx` | Layout route, auth-gated (staff role check), applies staff layout |
-| `/staff/index` | `_staff/-staff-dashboard.tsx` | **NEW.** Main staff view. Checks pending completions → renders modal overlay or regular dashboard |
-| `/staff/appointments` | `_staff/-staff-appointments.tsx` | **NEW.** Staff's upcoming appointments list |
+| Route                 | File                             | Description                                                                                       |
+| --------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `/staff`              | `_staff.tsx`                     | Layout route, auth-gated (staff role check), applies staff layout                                 |
+| `/staff/index`        | `_staff/-staff-dashboard.tsx`    | **NEW.** Main staff view. Checks pending completions → renders modal overlay or regular dashboard |
+| `/staff/appointments` | `_staff/-staff-appointments.tsx` | **NEW.** Staff's upcoming appointments list                                                       |
 
 ### 5.3 Staff Dashboard Logic
 
@@ -150,24 +150,24 @@ on mount → call getPendingCompletions(staffId)
 
 **Files:**
 
-| # | File | Change |
-|---|------|--------|
-| C1 | `src/lib/twilio.server.ts` | **NEW.** Export `sendRatingSms(phone, bookingId)` — sends "Thanks for visiting! Reply with a number 1-5 to rate your experience." Updates `bookings.rating_sent_at`. Export `handleRatingReply(From, Body, bookingId)` — parses Body as integer. |
-| C2 | `src/routes/api/twilio-webhook.ts` | **NEW.** TanStack Start API route (`POST /api/twilio-webhook`). Receives Twilio incoming SMS. Parses `Body` (should be number 1-5). Calls `handleRatingReply()`. |
-| C3 | `src/lib/booking.functions.ts` | Add `completeStaffModal(bookingId, data)` — writes modal fields, sets `completed_at = NOW()`, calls `sendRatingSms()`. Add `getPendingCompletions(staffId)` — returns bookings with `status = 'completed' AND completed_at IS NULL`. |
-| C4 | `src/lib/admin.functions.ts` | Add `getOwnerAlerts()` — returns recent 1-3 ratings with booking context. |
+| #   | File                               | Change                                                                                                                                                                                                                                           |
+| --- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| C1  | `src/lib/twilio.server.ts`         | **NEW.** Export `sendRatingSms(phone, bookingId)` — sends "Thanks for visiting! Reply with a number 1-5 to rate your experience." Updates `bookings.rating_sent_at`. Export `handleRatingReply(From, Body, bookingId)` — parses Body as integer. |
+| C2  | `src/routes/api/twilio-webhook.ts` | **NEW.** TanStack Start API route (`POST /api/twilio-webhook`). Receives Twilio incoming SMS. Parses `Body` (should be number 1-5). Calls `handleRatingReply()`.                                                                                 |
+| C3  | `src/lib/booking.functions.ts`     | Add `completeStaffModal(bookingId, data)` — writes modal fields, sets `completed_at = NOW()`, calls `sendRatingSms()`. Add `getPendingCompletions(staffId)` — returns bookings with `status = 'completed' AND completed_at IS NULL`.             |
+| C4  | `src/lib/admin.functions.ts`       | Add `getOwnerAlerts()` — returns recent 1-3 ratings with booking context.                                                                                                                                                                        |
 
 **Twilio webhook routing logic:**
 
 ```
 Incoming SMS from client:
   Parse Body → rating (1-5)
-  
+
   IF rating >= 4:
     → Reply SMS: "Thank you! Please leave us a review here: [GOOGLE_REVIEW_URL]"
     → Update booking.client_rating = rating
     → No owner alert needed
-  
+
   IF rating <= 3:
     → Reply SMS: "We're sorry your experience wasn't perfect. We'll make it right."
     → Update booking.client_rating = rating
@@ -192,20 +192,21 @@ Incoming SMS from client:
 
 **Replace with:**
 
-| KPI | Source | Display |
-|-----|--------|---------|
+| KPI                          | Source                               | Display                                                             |
+| ---------------------------- | ------------------------------------ | ------------------------------------------------------------------- |
 | **Payment Method Breakdown** | `bookings.payment_method` aggregated | 4-card row or pie chart: Cash, Venmo, Cash App, Credit/Debit totals |
-| **Total Tips** | `SUM(bookings.tip_amount)` | Dollar amount, with trend |
-| **Low Rating Alerts** | `bookings.client_rating <= 3` | Alert count + recent entries |
-| **Total Bookings** | `COUNT(bookings.id)` | Keep existing |
-| **Today's Appointments** | bookings for today | Keep existing |
-| **Staff Stats** | per-staff breakdown | Keep existing |
+| **Total Tips**               | `SUM(bookings.tip_amount)`           | Dollar amount, with trend                                           |
+| **Low Rating Alerts**        | `bookings.client_rating <= 3`        | Alert count + recent entries                                        |
+| **Total Bookings**           | `COUNT(bookings.id)`                 | Keep existing                                                       |
+| **Today's Appointments**     | bookings for today                   | Keep existing                                                       |
+| **Staff Stats**              | per-staff breakdown                  | Keep existing                                                       |
 
 ### 6.2 Master Calendar Overlay
 
 **New requirement:** A single unified view showing all 6-7 staff members and their paired customers.
 
 **Design:**
+
 - Grid layout: columns = staff members (up to 7), rows = time slots (15-min or 30-min increments)
 - Each cell shows the client name + service booked
 - Color-coded by status (confirmed, completed, cancelled, no_show)
@@ -215,27 +216,29 @@ Incoming SMS from client:
 ### 6.3 Alerts Tab
 
 **New dedicated tab in admin navigation.** Shows:
+
 - Recent low ratings (1-3) with client name, assigned staff, booking date/time
 - Owner can mark alerts as "acknowledged" (dismisses from active view, stays in history)
 
 ### 6.4 CRM Data Table
 
 In the Alerts or a dedicated view:
+
 - Customer history (past bookings, total spent, visit frequency)
 - Staff notes from the forced modal (`service_notes`)
 - Rating feedback from Twilio loop
 
 ### Files to Modify
 
-| # | File | Change |
-|---|------|--------|
-| D1 | `src/routes/_authenticated/-admin-dashboard.tsx` | Rewrite KPIs: payment method breakdown, total tips, low rating alerts. Remove seed button + Stripe KPIs. |
-| D2 | `src/routes/_authenticated/-admin-calendar.tsx` | Add **Master Calendar Overlay** — grid view showing all staff columns + time-slot rows showing paired customers. Keep existing day view as option. |
-| D3 | `src/routes/_authenticated/-admin-alerts.tsx` | **NEW.** Low-rating alerts list with acknowledge action. CRM data table (customer history, staff notes, ratings). |
-| D4 | `src/routes/_authenticated/admin.tsx` | Replace POS tab with Alerts tab. Add Master Calendar. Tab order: Dashboard, Calendar, Commissions, Alerts, Staff/Settings, Waitlist, Floor, Calls. |
-| D5 | `src/routes/_authenticated/-admin-commissions.tsx` | Verify no Stripe dependency — already a ledger, should be clean. |
-| D6 | `src/routes/_authenticated/-admin-waitlist.tsx` | Already clean — keep. |
-| D7 | `src/routes/_authenticated/-admin-floor.tsx` | Already clean — keep. |
+| #   | File                                               | Change                                                                                                                                             |
+| --- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | `src/routes/_authenticated/-admin-dashboard.tsx`   | Rewrite KPIs: payment method breakdown, total tips, low rating alerts. Remove seed button + Stripe KPIs.                                           |
+| D2  | `src/routes/_authenticated/-admin-calendar.tsx`    | Add **Master Calendar Overlay** — grid view showing all staff columns + time-slot rows showing paired customers. Keep existing day view as option. |
+| D3  | `src/routes/_authenticated/-admin-alerts.tsx`      | **NEW.** Low-rating alerts list with acknowledge action. CRM data table (customer history, staff notes, ratings).                                  |
+| D4  | `src/routes/_authenticated/admin.tsx`              | Replace POS tab with Alerts tab. Add Master Calendar. Tab order: Dashboard, Calendar, Commissions, Alerts, Staff/Settings, Waitlist, Floor, Calls. |
+| D5  | `src/routes/_authenticated/-admin-commissions.tsx` | Verify no Stripe dependency — already a ledger, should be clean.                                                                                   |
+| D6  | `src/routes/_authenticated/-admin-waitlist.tsx`    | Already clean — keep.                                                                                                                              |
+| D7  | `src/routes/_authenticated/-admin-floor.tsx`       | Already clean — keep.                                                                                                                              |
 
 ---
 
@@ -243,18 +246,18 @@ In the Alerts or a dedicated view:
 
 Rewrite all 10 files in `/docs/` to remove Stripe/POS/FinTech references and reflect new reality.
 
-| # | File | Key Changes |
-|---|------|-------------|
-| E1 | `PIVOT-PLAN.md` | This file — single source of truth |
-| E2 | `AI-BLUEPRINT.md` | Remove FinTech positioning, add staff accountability + Twilio loop |
-| E3 | `ARCHITECTURE.md` | Remove PaymentIntent/CheckoutSession flows, update data flow diagram |
-| E4 | `COLD_EMAIL_TEMPLATES.md` | Remove Stripe/payment value props, reposition as scheduling/CRM |
-| E5 | `DEPLOYMENT_RUNBOOK.md` | Remove Stripe webhook setup, add Twilio webhook + env vars |
-| E6 | `GENERICIZATION_ROADMAP.md` | Remove Stripe template references |
-| E7 | `LLM_SALES_CONTEXT.md` | Full rewrite — scheduling, reputation, accountability engine |
-| E8 | `onboarding-new-salon.md` | Remove Stripe/FinTech setup steps |
-| E9 | `TECHNICAL_SPEC.md` | Rewrite booking flow (no checkout), remove Stripe sections, add Twilio + lockout |
-| E10 | `TEST-PATTERNS.md` | Remove Stripe test patterns, add Twilio/rating tests |
+| #   | File                        | Key Changes                                                                      |
+| --- | --------------------------- | -------------------------------------------------------------------------------- |
+| E1  | `PIVOT-PLAN.md`             | This file — single source of truth                                               |
+| E2  | `AI-BLUEPRINT.md`           | Remove FinTech positioning, add staff accountability + Twilio loop               |
+| E3  | `ARCHITECTURE.md`           | Remove PaymentIntent/CheckoutSession flows, update data flow diagram             |
+| E4  | `COLD_EMAIL_TEMPLATES.md`   | Remove Stripe/payment value props, reposition as scheduling/CRM                  |
+| E5  | `DEPLOYMENT_RUNBOOK.md`     | Remove Stripe webhook setup, add Twilio webhook + env vars                       |
+| E6  | `GENERICIZATION_ROADMAP.md` | Remove Stripe template references                                                |
+| E7  | `LLM_SALES_CONTEXT.md`      | Full rewrite — scheduling, reputation, accountability engine                     |
+| E8  | `onboarding-new-salon.md`   | Remove Stripe/FinTech setup steps                                                |
+| E9  | `TECHNICAL_SPEC.md`         | Rewrite booking flow (no checkout), remove Stripe sections, add Twilio + lockout |
+| E10 | `TEST-PATTERNS.md`          | Remove Stripe test patterns, add Twilio/rating tests                             |
 
 ---
 
@@ -279,25 +282,25 @@ Phase 4 (last):
 
 ### Validation Gates
 
-| Gate | When | Check |
-|------|------|-------|
-| G1 | After Phase 1 | `bun run build` compiles clean, `bun run lint` passes |
-| G2 | After Phase 2 | Build + lint + manual: staff modal blocks correctly, Twilio webhook responds |
-| G3 | After Phase 3 | Build + lint + manual: dashboard KPIs, master calendar, alerts |
-| G4 | Final | Build + lint + all tests + full manual walkthrough |
+| Gate | When          | Check                                                                        |
+| ---- | ------------- | ---------------------------------------------------------------------------- |
+| G1   | After Phase 1 | `bun run build` compiles clean, `bun run lint` passes                        |
+| G2   | After Phase 2 | Build + lint + manual: staff modal blocks correctly, Twilio webhook responds |
+| G3   | After Phase 3 | Build + lint + manual: dashboard KPIs, master calendar, alerts               |
+| G4   | Final         | Build + lint + all tests + full manual walkthrough                           |
 
 ---
 
 ## 9. Key Constraints
 
-| Constraint | Detail |
-|-----------|--------|
-| **No digital payments** | All payments in-store: Credit/Debit, Cash, Venmo, Cash App only |
-| **No Stripe** | Remove all Stripe SDKs, env vars, configs, types, references |
+| Constraint                            | Detail                                                              |
+| ------------------------------------- | ------------------------------------------------------------------- |
+| **No digital payments**               | All payments in-store: Credit/Debit, Cash, Venmo, Cash App only     |
+| **No Stripe**                         | Remove all Stripe SDKs, env vars, configs, types, references        |
 | **Staff lockout is system-automated** | Hard block until accountability modal is submitted; no admin toggle |
-| **Twilio loop is 1-5 rating only** | No 2-way chat; auto-reply branches on rating threshold |
-| **Demo deadline** | Wednesday — production-ready |
-| **PIVOT-PLAN.md is source of truth** | Read before any phase start or architectural decision |
+| **Twilio loop is 1-5 rating only**    | No 2-way chat; auto-reply branches on rating threshold              |
+| **Demo deadline**                     | Wednesday — production-ready                                        |
+| **PIVOT-PLAN.md is source of truth**  | Read before any phase start or architectural decision               |
 
 ---
 

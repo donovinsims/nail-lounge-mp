@@ -61,7 +61,10 @@ export default function CalendarView({ salonId }: { salonId: string }) {
 
   // Header row — corner cell
   gridItems.push(
-    <div key="corner" className="p-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground border-b border-border" />,
+    <div
+      key="corner"
+      className="p-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground border-b border-border"
+    />,
   );
 
   // Staff column headers
@@ -105,9 +108,7 @@ export default function CalendarView({ salonId }: { salonId: string }) {
 
     if (staffWithBookings.length === 0) {
       // Single "Bookings" column when no staff with bookings
-      const items = bookings.filter(
-        (b: any) => new Date(b.start_time).getHours() === hour,
-      );
+      const items = bookings.filter((b: any) => new Date(b.start_time).getHours() === hour);
       gridItems.push(
         <div
           key={`c-${hour}`}
@@ -124,8 +125,7 @@ export default function CalendarView({ salonId }: { salonId: string }) {
       staffWithBookings.forEach((staff: any) => {
         const items = bookings.filter(
           (b: any) =>
-            (b as any).staff_id === staff.id &&
-            new Date(b.start_time).getHours() === hour,
+            (b as any).staff_id === staff.id && new Date(b.start_time).getHours() === hour,
         );
         gridItems.push(
           <div
@@ -190,7 +190,11 @@ export default function CalendarView({ salonId }: { salonId: string }) {
       <div className="rounded-2xl bg-surface overflow-x-auto">
         <div
           className="grid"
-          style={{ gridTemplateColumns: gridCols, minWidth: staffWithBookings.length > 0 ? `${80 + staffWithBookings.length * 200}px` : undefined }}
+          style={{
+            gridTemplateColumns: gridCols,
+            minWidth:
+              staffWithBookings.length > 0 ? `${80 + staffWithBookings.length * 200}px` : undefined,
+          }}
         >
           {gridItems}
         </div>
@@ -224,8 +228,7 @@ function renderBookingCard(
       {isExpanded && (
         <div className="mt-2 pt-2 border-t border-border/50 text-[10px] text-muted-foreground space-y-0.5">
           <p>
-            <span className="font-medium text-foreground">Price:</span> $
-            {b.services?.price || "—"}
+            <span className="font-medium text-foreground">Price:</span> ${b.services?.price || "—"}
           </p>
           <p>
             <span className="font-medium text-foreground">Ends:</span>{" "}

@@ -47,11 +47,11 @@ export default function StepConfirm({
     const handleResize = () => {
       const vv = window.visualViewport;
       if (vv) {
-        document.documentElement.style.setProperty('--visual-viewport-height', `${vv.height}px`);
+        document.documentElement.style.setProperty("--visual-viewport-height", `${vv.height}px`);
       }
     };
-    window.visualViewport?.addEventListener('resize', handleResize);
-    return () => window.visualViewport?.removeEventListener('resize', handleResize);
+    window.visualViewport?.addEventListener("resize", handleResize);
+    return () => window.visualViewport?.removeEventListener("resize", handleResize);
   }, []);
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -61,7 +61,8 @@ export default function StepConfirm({
   };
 
   const PHONE_RE = /^[\d\s\-()]{7,20}$/;
-  const showPhoneFormatError = touched.phone && phone.trim().length > 0 && !PHONE_RE.test(phone.trim());
+  const showPhoneFormatError =
+    touched.phone && phone.trim().length > 0 && !PHONE_RE.test(phone.trim());
 
   const showNameError = touched.name && !name.trim();
   const showPhoneError = touched.phone && !phone.trim();
@@ -155,14 +156,15 @@ export default function StepConfirm({
               Enter a valid phone number (e.g., (815) 555-0123)
             </p>
           )}
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            US number: (555) 123-4567
-          </p>
+          <p className="mt-1 text-[11px] text-muted-foreground">US number: (555) 123-4567</p>
         </label>
 
         <label className="block">
           <span className="text-xs font-medium text-muted-foreground">
-            Email <span className="text-muted-foreground/60" id="email-hint">(optional)</span>
+            Email{" "}
+            <span className="text-muted-foreground/60" id="email-hint">
+              (optional)
+            </span>
           </span>
           <input
             value={email}

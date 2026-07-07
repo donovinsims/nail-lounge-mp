@@ -28,20 +28,20 @@
 
 ### Core Stack
 
-| Layer | Technology | Version | Notes |
-|-------|-----------|---------|-------|
-| Framework | TanStack Start (React 19) | ^1.114.x | SSR + file-based routing via TanStack Router |
-| UI | Tailwind CSS v4 | ^4.0.x | PostCSS-based, shadcn/ui compatible |
-| Components | shadcn/ui (Radix primitives) | latest | Button, Card, Dialog, Table, Input, Badge, etc. |
-| Icons | Lucide React | ^0.479.x | SVG icon set |
-| Charts | Recharts | ^2.x | Dashboard charts only |
-| Forms | React Hook Form + Zod | latest | Booking form and admin forms |
-| Database | Supabase (PostgreSQL 15) | hosted | Full RLS, realtime, triggers |
-| Auth | Supabase Auth (GoTrue) | hosted | Email magic link, anon + service role |
-| Hosting | Vercel / Cloudflare (Nitro serverless) | — | TanStack Start adapter |
-| Runtime | Bun | ^1.x | Build + dev |
-| Testing | Vitest | ^4.x | Unit tests |
-| CI/CD | GitHub Actions | — | Lint, typecheck, build on push/PR |
+| Layer      | Technology                             | Version  | Notes                                           |
+| ---------- | -------------------------------------- | -------- | ----------------------------------------------- |
+| Framework  | TanStack Start (React 19)              | ^1.114.x | SSR + file-based routing via TanStack Router    |
+| UI         | Tailwind CSS v4                        | ^4.0.x   | PostCSS-based, shadcn/ui compatible             |
+| Components | shadcn/ui (Radix primitives)           | latest   | Button, Card, Dialog, Table, Input, Badge, etc. |
+| Icons      | Lucide React                           | ^0.479.x | SVG icon set                                    |
+| Charts     | Recharts                               | ^2.x     | Dashboard charts only                           |
+| Forms      | React Hook Form + Zod                  | latest   | Booking form and admin forms                    |
+| Database   | Supabase (PostgreSQL 15)               | hosted   | Full RLS, realtime, triggers                    |
+| Auth       | Supabase Auth (GoTrue)                 | hosted   | Email magic link, anon + service role           |
+| Hosting    | Vercel / Cloudflare (Nitro serverless) | —        | TanStack Start adapter                          |
+| Runtime    | Bun                                    | ^1.x     | Build + dev                                     |
+| Testing    | Vitest                                 | ^4.x     | Unit tests                                      |
+| CI/CD      | GitHub Actions                         | —        | Lint, typecheck, build on push/PR               |
 
 ### Architecture Pattern
 
@@ -78,6 +78,7 @@ Integrations (gated via env):
 ```
 
 **Key architecture decisions:**
+
 - **3-tier Supabase auth:** anon key (public RLS-blessed queries) → service-role key (server functions) → RLS-session (authenticated user queries)
 - **File-based routing:** TanStack Router `src/routes/` — all routes are `.tsx` files with lazy loading support
 - **Server-only env wrapper** (`config.server.ts`): prevents client-side exposure of service role key
@@ -199,41 +200,41 @@ salons (1) ──┬── staff (N) ──┬── bookings (N)
 
 ### Table Details
 
-| Table | Columns | Key Features |
-|-------|---------|-------------|
-| **salons** | id (uuid PK), name, slug, address, phone, email, website, social_links (jsonb), settings (jsonb), business_hours (jsonb), created_at | Root entity for multi-tenancy |
-| **staff** | id (uuid PK), salon_id FK, auth_user_id FK→profiles, name, title, bio, image_url, is_active, sort_order, commission_pct, hourly_rate | Staff membership via salon_id |
-| **services** | id (uuid PK), salon_id FK, category, name, description, duration_minutes, price, is_active, sort_order | Salon-scoped services catalog |
-| **clients** | id (uuid PK), salon_id FK, name, phone (unique per salon), email, notes, total_visits, last_visit | Client registry per salon |
-| **bookings** | id (uuid PK), salon_id FK, staff_id FK, client_id FK, start_time (timestamptz), end_time, status (enum), payment_method (enum), tip_amount, service_notes, completed_at, client_rating, rating_sent_at, notes, source, is_walk_in, is_first_visit | Core booking record |
-| **booking_services** | id (int PK), booking_id FK, service_id FK, staff_id FK, price_at_time | Line items per booking |
-| **commission_records** | id (uuid PK), salon_id FK, staff_id FK, booking_id FK, service_amount, commission_amount, commission_pct, hourly_rate, hours_worked, is_paid | Commission tracking |
-| **owner_alerts** | id (uuid PK), salon_id FK, booking_id FK, client_phone, rating, acknowledged, created_at | Low-rating alerts (1-3) |
-| **waitlist_entries** | id (uuid PK), salon_id FK, client_id FK, preferred_staff_id FK, service_ids (uuid[]), party_size, notes, status (enum), position | Waitlist queue |
-| **floor_status** | id (int PK), salon_id FK, staff_id FK (unique), state (enum), current_client_name, current_service, started_at | Real-time floor board |
-| **ai_calls** | id (uuid PK), salon_id FK, caller_phone, call_time, duration_seconds, transcript_text, summary_text, intent, booking_id FK, successful | AI receptionist logs |
-| **profiles** | id (uuid PK, FK→auth.users), email, full_name, avatar_url, role (enum) | Auth user profiles |
+| Table                  | Columns                                                                                                                                                                                                                                           | Key Features                  |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| **salons**             | id (uuid PK), name, slug, address, phone, email, website, social_links (jsonb), settings (jsonb), business_hours (jsonb), created_at                                                                                                              | Root entity for multi-tenancy |
+| **staff**              | id (uuid PK), salon_id FK, auth_user_id FK→profiles, name, title, bio, image_url, is_active, sort_order, commission_pct, hourly_rate                                                                                                              | Staff membership via salon_id |
+| **services**           | id (uuid PK), salon_id FK, category, name, description, duration_minutes, price, is_active, sort_order                                                                                                                                            | Salon-scoped services catalog |
+| **clients**            | id (uuid PK), salon_id FK, name, phone (unique per salon), email, notes, total_visits, last_visit                                                                                                                                                 | Client registry per salon     |
+| **bookings**           | id (uuid PK), salon_id FK, staff_id FK, client_id FK, start_time (timestamptz), end_time, status (enum), payment_method (enum), tip_amount, service_notes, completed_at, client_rating, rating_sent_at, notes, source, is_walk_in, is_first_visit | Core booking record           |
+| **booking_services**   | id (int PK), booking_id FK, service_id FK, staff_id FK, price_at_time                                                                                                                                                                             | Line items per booking        |
+| **commission_records** | id (uuid PK), salon_id FK, staff_id FK, booking_id FK, service_amount, commission_amount, commission_pct, hourly_rate, hours_worked, is_paid                                                                                                      | Commission tracking           |
+| **owner_alerts**       | id (uuid PK), salon_id FK, booking_id FK, client_phone, rating, acknowledged, created_at                                                                                                                                                          | Low-rating alerts (1-3)       |
+| **waitlist_entries**   | id (uuid PK), salon_id FK, client_id FK, preferred_staff_id FK, service_ids (uuid[]), party_size, notes, status (enum), position                                                                                                                  | Waitlist queue                |
+| **floor_status**       | id (int PK), salon_id FK, staff_id FK (unique), state (enum), current_client_name, current_service, started_at                                                                                                                                    | Real-time floor board         |
+| **ai_calls**           | id (uuid PK), salon_id FK, caller_phone, call_time, duration_seconds, transcript_text, summary_text, intent, booking_id FK, successful                                                                                                            | AI receptionist logs          |
+| **profiles**           | id (uuid PK, FK→auth.users), email, full_name, avatar_url, role (enum)                                                                                                                                                                            | Auth user profiles            |
 
 ### Enums
 
-| Enum | Values |
-|------|--------|
-| `app_role` | `owner`, `staff` |
-| `booking_status` | `confirmed`, `completed`, `cancelled`, `no_show` |
-| `payment_method` | `Credit/Debit`, `Cash`, `Venmo`, `Cash App` |
-| `floor_state` | `with_client`, `available`, `offline` |
-| `waitlist_status` | `active`, `fulfilled`, `cancelled` |
+| Enum              | Values                                           |
+| ----------------- | ------------------------------------------------ |
+| `app_role`        | `owner`, `staff`                                 |
+| `booking_status`  | `confirmed`, `completed`, `cancelled`, `no_show` |
+| `payment_method`  | `Credit/Debit`, `Cash`, `Venmo`, `Cash App`      |
+| `floor_state`     | `with_client`, `available`, `offline`            |
+| `waitlist_status` | `active`, `fulfilled`, `cancelled`               |
 
 ### Key Migrations
 
-| Migration | Purpose |
-|-----------|---------|
-| `20240301000001_initial.sql` | Base schema + RLS + triggers |
-| `20240301000002_profiles.sql` | Profiles table + auth trigger |
-| `20240301000003_hourly_rate.sql` | Commission hourly rate |
-| `20240301000004_waitlist.sql` | Waitlist + floor status tables |
-| `20240301000005_ai_calls.sql` | AI call log table |
-| `0008_pivot.sql` | Pivot: drop Stripe cols, add `payment_method` enum, `tip_amount`, `completed_at`, `service_notes`, `client_rating`, `rating_sent_at`; add `owner_alerts` table |
+| Migration                        | Purpose                                                                                                                                                        |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20240301000001_initial.sql`     | Base schema + RLS + triggers                                                                                                                                   |
+| `20240301000002_profiles.sql`    | Profiles table + auth trigger                                                                                                                                  |
+| `20240301000003_hourly_rate.sql` | Commission hourly rate                                                                                                                                         |
+| `20240301000004_waitlist.sql`    | Waitlist + floor status tables                                                                                                                                 |
+| `20240301000005_ai_calls.sql`    | AI call log table                                                                                                                                              |
+| `0008_pivot.sql`                 | Pivot: drop Stripe cols, add `payment_method` enum, `tip_amount`, `completed_at`, `service_notes`, `client_rating`, `rating_sent_at`; add `owner_alerts` table |
 
 ### Row-Level Security (RLS)
 
@@ -249,6 +250,7 @@ is_salon_member() =
 ```
 
 **Policy patterns by operation:**
+
 - **SELECT:** anon can read public columns (salons.name, staff.name, services, etc.); logged-in staff can read all columns via `is_salon_member()`
 - **INSERT:** public can insert into bookings/clients with limited columns; staff/owner inserts via `is_salon_member()`
 - **UPDATE/DELETE:** staff/owner only via `is_salon_member()`
@@ -270,11 +272,11 @@ User → Sign-in (/auth.tsx) → Email magic link → Callback (/auth/callback.t
 
 ### Three Supabase Client Tiers
 
-| Client | Usage | Permissions | Where |
-|--------|-------|-------------|-------|
-| **sbAnon** | Public pages, public bookings | anon key — RLS grants limited SELECT/INSERT | `client.ts` |
-| **sbAdmin** | Server-side booking operations | service-role key — bypasses RLS | `config.server.ts` + `booking.functions.ts` |
-| **sbServer** | Admin panel queries | service-role key — uses `requireSupabaseAuth` middleware | `admin-crud.functions.ts`, `admin.functions.ts` |
+| Client       | Usage                          | Permissions                                              | Where                                           |
+| ------------ | ------------------------------ | -------------------------------------------------------- | ----------------------------------------------- |
+| **sbAnon**   | Public pages, public bookings  | anon key — RLS grants limited SELECT/INSERT              | `client.ts`                                     |
+| **sbAdmin**  | Server-side booking operations | service-role key — bypasses RLS                          | `config.server.ts` + `booking.functions.ts`     |
+| **sbServer** | Admin panel queries            | service-role key — uses `requireSupabaseAuth` middleware | `admin-crud.functions.ts`, `admin.functions.ts` |
 
 ### Route Protection
 
@@ -286,28 +288,28 @@ User → Sign-in (/auth.tsx) → Email magic link → Callback (/auth/callback.t
 
 ## 5. Route Map
 
-| Route | File | Auth | Purpose |
-|-------|------|------|---------|
-| `/` | `index.tsx` | Public | Landing page — hero, services, gallery, testimonials |
-| `/book` | `book.tsx` | Public | Multi-step booking wizard (no payment step — booking created as confirmed) |
-| `/booking-confirmed` | `booking-confirmed.tsx` | Public | Post-booking success page |
-| `/services` | `services.tsx` | Public | Services listing by category (dynamic grouping from DB) |
-| `/service/:id` | `service.tsx` | Public | Service detail (redirects to book) |
-| `/gallery` | `gallery.tsx` | Public | Photo gallery |
-| `/gift-cards` | `gift-cards.tsx` | Public | Gift card information |
-| `/appointments` | `appointments.tsx` | Public | Lookup by phone number |
-| `/auth` | `auth.tsx` | Public | Magic link sign-in |
-| `/auth/callback` | `auth/callback.tsx` | Public | Auth callback handler |
-| `/admin` | `admin.tsx` | Auth | Admin shell — sidebar nav with 8 tabs (Dashboard, Calendar, Commissions, Alerts, Staff/Settings, Waitlist, Floor, Calls) |
-| `/admin/dashboard` | (tab) | Auth | KPIs, charts, payment-method breakdown, alerts |
-| `/admin/calendar` | (tab) | Auth | Daily appointment calendar + master staff overlay |
-| `/admin/floor` | (tab) | Auth | Real-time floor status board |
-| `/admin/commissions` | (tab) | Auth | Commission tracking |
-| `/admin/waitlist` | (tab) | Auth | Waitlist management |
-| `/admin/alerts` | (tab) | Auth | Low-rating alerts + CRM data table |
-| `/admin/calls` | (tab) | Auth | AI call log viewer |
-| `/admin/settings` | (tab) | Auth | Full settings: Staff CRUD, Services CRUD, Hours editor, Social links |
-| `/staff` | `_staff/-staff-dashboard.tsx` | Auth (staff) | Staff dashboard with forced lockout modal |
+| Route                | File                          | Auth         | Purpose                                                                                                                  |
+| -------------------- | ----------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `/`                  | `index.tsx`                   | Public       | Landing page — hero, services, gallery, testimonials                                                                     |
+| `/book`              | `book.tsx`                    | Public       | Multi-step booking wizard (no payment step — booking created as confirmed)                                               |
+| `/booking-confirmed` | `booking-confirmed.tsx`       | Public       | Post-booking success page                                                                                                |
+| `/services`          | `services.tsx`                | Public       | Services listing by category (dynamic grouping from DB)                                                                  |
+| `/service/:id`       | `service.tsx`                 | Public       | Service detail (redirects to book)                                                                                       |
+| `/gallery`           | `gallery.tsx`                 | Public       | Photo gallery                                                                                                            |
+| `/gift-cards`        | `gift-cards.tsx`              | Public       | Gift card information                                                                                                    |
+| `/appointments`      | `appointments.tsx`            | Public       | Lookup by phone number                                                                                                   |
+| `/auth`              | `auth.tsx`                    | Public       | Magic link sign-in                                                                                                       |
+| `/auth/callback`     | `auth/callback.tsx`           | Public       | Auth callback handler                                                                                                    |
+| `/admin`             | `admin.tsx`                   | Auth         | Admin shell — sidebar nav with 8 tabs (Dashboard, Calendar, Commissions, Alerts, Staff/Settings, Waitlist, Floor, Calls) |
+| `/admin/dashboard`   | (tab)                         | Auth         | KPIs, charts, payment-method breakdown, alerts                                                                           |
+| `/admin/calendar`    | (tab)                         | Auth         | Daily appointment calendar + master staff overlay                                                                        |
+| `/admin/floor`       | (tab)                         | Auth         | Real-time floor status board                                                                                             |
+| `/admin/commissions` | (tab)                         | Auth         | Commission tracking                                                                                                      |
+| `/admin/waitlist`    | (tab)                         | Auth         | Waitlist management                                                                                                      |
+| `/admin/alerts`      | (tab)                         | Auth         | Low-rating alerts + CRM data table                                                                                       |
+| `/admin/calls`       | (tab)                         | Auth         | AI call log viewer                                                                                                       |
+| `/admin/settings`    | (tab)                         | Auth         | Full settings: Staff CRUD, Services CRUD, Hours editor, Social links                                                     |
+| `/staff`             | `_staff/-staff-dashboard.tsx` | Auth (staff) | Staff dashboard with forced lockout modal                                                                                |
 
 ---
 
@@ -316,6 +318,7 @@ User → Sign-in (/auth.tsx) → Email magic link → Callback (/auth/callback.t
 ### Key Files
 
 #### `src/lib/env.ts`
+
 - **`getSalonId()`** — Reads `VITE_SALON_ID` / `SALON_ID` env var
 - **`getSalonName()`**, **`getSalonAddress()`**, **`getSalonPhone()`** — Branding from env
 - **`getSocialLinks()`** — Returns object with Instagram, Facebook, TikTok, YouTube, Booksy, Yelp URLs
@@ -324,12 +327,14 @@ User → Sign-in (/auth.tsx) → Email magic link → Callback (/auth/callback.t
 - All values fall back from `import.meta.env` to `process.env` for SSR compatibility
 
 #### `src/lib/salon.ts`
+
 - **`fetchSalon()`** — Queries `salons` table by `SALON_ID` (single-tenant filter)
 - **`fetchServices()`** — Filters by category + active, sorted
 - **`fetchStaff()`** — Active staff list
 - **`computeAvailableSlots()`** — Computes 15-min time slots using `get_busy_slots()` RPC, 30-min lead time
 
 #### `src/lib/booking.functions.ts`
+
 - **`createPublicBooking()`** — Validates input, checks slot availability, upserts client by phone, creates booking with `confirmed` status directly (no payment step). Sends Twilio SMS confirmation if configured (soft-fail). Returns `{ bookingId }`.
 - **`completeStaffModal(bookingId, data)`** — Staff submission of forced modal. Writes `service_notes`, `tip_amount`, `payment_method`, sets `completed_at = NOW()`. Triggers Twilio 1-5 rating SMS to client.
 - **`getPendingCompletions(staffId)`** — Returns bookings with `status = 'completed' AND completed_at IS NULL` (staff lockout signal).
@@ -337,16 +342,19 @@ User → Sign-in (/auth.tsx) → Email magic link → Callback (/auth/callback.t
 - **`cancelPublicBooking()`** — Updates booking status to cancelled — verifies salon ownership
 
 #### `src/lib/twilio.server.ts`
+
 - **`sendRatingSms(phone, bookingId)`** — Sends "Thanks for visiting! Reply with a number 1-5 to rate your experience." Updates `bookings.rating_sent_at`.
 - **`handleRatingReply(From, Body, bookingId)`** — Parses Body as integer (1-5). If 4-5, sends Google Review link. If 1-3, sends apology + creates `owner_alerts` entry.
 
 #### `src/lib/admin-crud.functions.ts`
+
 - All gated by `requireSupabaseAuth` + `getSalonId()` filter
 - **Staff:** `getAllStaffForSalon`, `createStaff`, `updateStaff`, `deleteStaff` (soft-delete via `is_active`)
 - **Services:** `getAllServicesForSalon`, `createService`, `updateService`, `deleteService` (soft-delete via `is_active`)
 - **Salon:** `updateSalonHours` — saves `business_hours` JSONB
 
 #### `src/lib/rate-limiter.ts`
+
 - Generic sliding-window rate limiter
 - Constructor: `{ windowMs: number, max: number }`
 - `check(key)` returns boolean (true = allowed)
@@ -355,6 +363,7 @@ User → Sign-in (/auth.tsx) → Email magic link → Callback (/auth/callback.t
 - Applied in `createPublicBooking`: max 3 bookings per phone per 5 minutes
 
 #### `src/lib/config.server.ts`
+
 - Server-only env wrapper — exports `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `PUBLIC_SITE_URL`
 - Exports `getServerConfig()` which returns all server-side env vars
 - Exports `hasTwilio()` and `hasEmail()` to gate integrations
@@ -364,41 +373,49 @@ User → Sign-in (/auth.tsx) → Email magic link → Callback (/auth/callback.t
 ## 7. Admin Console Features
 
 ### Dashboard (Readiness: 4/5)
+
 - KPI cards: total bookings, payment method breakdown (Cash, Venmo, Cash App, Credit/Debit), total tips, low-rating alerts
 - Revenue chart (7-day + 12-month) using Recharts
 - Seed data gated by `VITE_ALLOW_SEED_DATA` — disabled in production
 - No auto-seed on mount (checks for existing bookings first)
 
 ### Calendar (Readiness: 4/5)
+
 - Daily view with hourly buckets + staff column layout
 - **Master Calendar Overlay:** Unified grid view showing all staff columns with time-slot rows, color-coded by status
 - **Missing:** Month/week view, drag-to-reschedule, edit events inline
 
 ### Floor Management (Readiness: 3/5)
+
 - Real-time via Supabase Realtime subscriptions
 - Staff cards with state badges (with_client, available, offline)
 
 ### Alerts & CRM (Readiness: 3/5)
+
 - Low-rating alerts (1-3 ratings) with booking context
 - Owner can mark alerts as acknowledged
 - CRM data table: customer history, staff notes from modal, rating feedback
 
 ### Commissions (Readiness: 4/5)
+
 - Best-implemented tab
 - Sortable table (date, staff, service, commission amount)
 - CSV export, pagination
 - Per-staff commission rate and hourly rate support
 
 ### Waitlist (Readiness: 2/5)
+
 - Add customer to waitlist
 - Queue display
 - **Missing:** Realtime updates, fulfill → booking, SMS/email notify
 
 ### AI Calls (Readiness: 2/5)
+
 - Call log viewer with search/filter
 - **Stub data only** — no actual Twilio or AI integration
 
 ### Settings (Readiness: 5/5)
+
 - **Staff CRUD:** List, add inline form (name, title, bio, commission %, hourly rate, image), active toggle, soft-delete
 - **Services CRUD:** List grouped by category, add inline form (name, duration, price, category, description), active toggle, soft-delete
 - **Hours editor:** Day-by-day open/close time inputs, saves `business_hours` JSONB
@@ -406,6 +423,7 @@ User → Sign-in (/auth.tsx) → Email magic link → Callback (/auth/callback.t
 - **Business info:** Salon name, phone, commission split, tip split
 
 ### Staff Dashboard (Readiness: 4/5)
+
 - **System-automated lockout:** Full-screen blocking modal when pending completions exist
 - Modal captures: payment method (Credit/Debit/Cash/Venmo/Cash App), tip amount, service notes
 - After modal submission: Twilio 1-5 rating SMS auto-sent to client
@@ -415,36 +433,36 @@ User → Sign-in (/auth.tsx) → Email magic link → Callback (/auth/callback.t
 
 ## 8. Security Assessment
 
-| Category | Finding | Severity | Status |
-|----------|---------|----------|--------|
-| **Secrets** | `.env` not committed — `.gitignore` in place | ✅ RESOLVED | Done |
-| **Data Isolation** | Every DB query filters by `SALON_ID` via `getSalonId()` | ✅ RESOLVED | Done |
-| **Tenant Leak** | `lookupAppointments` scoped to salon | ✅ RESOLVED | Done |
-| **Tenant Leak** | `cancelPublicBooking` verifies salon ownership | ✅ RESOLVED | Done |
-| **Tenant Confusion** | `linkSelfToFirstSalon` gated by `VITE_ADMIN_ONBOARD` env var | ✅ RESOLVED | Done |
-| **Data Safety** | Seed Demo Data gated by `VITE_ALLOW_SEED_DATA` | ✅ RESOLVED | Done |
-| **Rate Limiting** | `createPublicBooking` limited to 3/phone/5min | ✅ RESOLVED | Done |
-| **Race Condition** | Database exclusion constraint prevents booking overlap | ✅ RESOLVED | Done |
-| **RLS Gap** | `profiles` table policies require review | ⚠️ OPEN | Low risk |
-| **CSRF** | TanStack Start handles server function CSRF | ✅ OK | — |
-| **XSS** | SSR with proper escaping | ✅ OK | — |
-| **Auth** | Magic link + proper session management | ✅ OK | — |
+| Category             | Finding                                                      | Severity    | Status   |
+| -------------------- | ------------------------------------------------------------ | ----------- | -------- |
+| **Secrets**          | `.env` not committed — `.gitignore` in place                 | ✅ RESOLVED | Done     |
+| **Data Isolation**   | Every DB query filters by `SALON_ID` via `getSalonId()`      | ✅ RESOLVED | Done     |
+| **Tenant Leak**      | `lookupAppointments` scoped to salon                         | ✅ RESOLVED | Done     |
+| **Tenant Leak**      | `cancelPublicBooking` verifies salon ownership               | ✅ RESOLVED | Done     |
+| **Tenant Confusion** | `linkSelfToFirstSalon` gated by `VITE_ADMIN_ONBOARD` env var | ✅ RESOLVED | Done     |
+| **Data Safety**      | Seed Demo Data gated by `VITE_ALLOW_SEED_DATA`               | ✅ RESOLVED | Done     |
+| **Rate Limiting**    | `createPublicBooking` limited to 3/phone/5min                | ✅ RESOLVED | Done     |
+| **Race Condition**   | Database exclusion constraint prevents booking overlap       | ✅ RESOLVED | Done     |
+| **RLS Gap**          | `profiles` table policies require review                     | ⚠️ OPEN     | Low risk |
+| **CSRF**             | TanStack Start handles server function CSRF                  | ✅ OK       | —        |
+| **XSS**              | SSR with proper escaping                                     | ✅ OK       | —        |
+| **Auth**             | Magic link + proper session management                       | ✅ OK       | —        |
 
 ---
 
 ## 9. Integration Points
 
-| Integration | Current State | Production Requirement |
-|-------------|---------------|----------------------|
-| **SMS Notifications (Twilio)** | ✅ Booking confirmation SMS sent after `createPublicBooking`. `twilio@5` installed | Booking reminders, waitlist notifications |
-| **Twilio 1-5 Rating Loop** | ✅ After staff completes modal, rating SMS sent. Auto-reply: 4-5 → Google Review link, 1-3 → apology + owner alert | Google Reviews API / Yelp integration |
-| **Email (Resend)** | ✅ Booking confirmation email via Resend | Full email template customization |
-| **AI Receptionist** | 🔲 Stub call log viewer — no Twilio Voice or LLM yet | Twilio Voice + LLM (VAPI/Retell/Bland AI) |
-| **Calendar Sync** | 🔲 None | Google Calendar / iCal export |
-| **Webhooks** | ✅ Twilio webhook endpoint ready for SMS replies | Full webhook management dashboard |
-| **Social Media** | ✅ Configurable via env vars, displayed on homepage | Admin-configurable via UI |
-| **Maps** | ✅ Google Maps embed configurable via `VITE_SALON_MAPS_URL` / `VITE_SALON_MAPS_EMBED` | — |
-| **Analytics** | 🔲 None | Google Analytics / Plausible |
+| Integration                    | Current State                                                                                                      | Production Requirement                    |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| **SMS Notifications (Twilio)** | ✅ Booking confirmation SMS sent after `createPublicBooking`. `twilio@5` installed                                 | Booking reminders, waitlist notifications |
+| **Twilio 1-5 Rating Loop**     | ✅ After staff completes modal, rating SMS sent. Auto-reply: 4-5 → Google Review link, 1-3 → apology + owner alert | Google Reviews API / Yelp integration     |
+| **Email (Resend)**             | ✅ Booking confirmation email via Resend                                                                           | Full email template customization         |
+| **AI Receptionist**            | 🔲 Stub call log viewer — no Twilio Voice or LLM yet                                                               | Twilio Voice + LLM (VAPI/Retell/Bland AI) |
+| **Calendar Sync**              | 🔲 None                                                                                                            | Google Calendar / iCal export             |
+| **Webhooks**                   | ✅ Twilio webhook endpoint ready for SMS replies                                                                   | Full webhook management dashboard         |
+| **Social Media**               | ✅ Configurable via env vars, displayed on homepage                                                                | Admin-configurable via UI                 |
+| **Maps**                       | ✅ Google Maps embed configurable via `VITE_SALON_MAPS_URL` / `VITE_SALON_MAPS_EMBED`                              | —                                         |
+| **Analytics**                  | 🔲 None                                                                                                            | Google Analytics / Plausible              |
 
 ---
 
@@ -475,6 +493,7 @@ External APIs (optional, gated by env)
 ### .env Configuration
 
 See `.env.template` for the complete list. Key categories:
+
 - **Required:** Supabase URL/keys, App URL, Salon ID/Name/Address/Phone
 - **Branding:** Primary/secondary color, OG image
 - **Social:** Instagram, Facebook, TikTok, YouTube, Booksy, Yelp, Maps
@@ -483,6 +502,7 @@ See `.env.template` for the complete list. Key categories:
 - **Feature Flags:** `VITE_ALLOW_SEED_DATA`
 
 ### Deployment Steps
+
 1. `bun run build` → TanStack Start SSR bundle
 2. Deploy to Vercel/Cloudflare (detects framework automatically)
 3. Set all env vars in cloud dashboard
@@ -494,25 +514,25 @@ See `.env.template` for the complete list. Key categories:
 
 ## 11. Production Readiness Scorecard
 
-| Category | Score | Notes |
-|----------|-------|-------|
-| **Public Booking UX** | 4/5 | Clean flow, direct to confirmed, missing email confirmations |
-| **Admin Dashboard** | 4/5 | Safe seed gating, KPI charts, payment-method breakdown, alerts |
-| **Admin Calendar** | 4/5 | Daily view + master overlay, missing month/week |
-| **Floor Management** | 3/5 | Good Realtime, missing optimistic updates |
-| **Staff Lockout Modal** | 4/5 | System-enforced, captures payment/tip/notes, triggers rating loop |
-| **Twilio Rating Loop** | 4/5 | Auto-reply branching, owner alerts for low ratings |
-| **Owner Alerts** | 3/5 | Low-rating alerts with acknowledge action |
-| **Commissions** | 4/5 | Solid — nearest to production-ready |
-| **Master Calendar** | 3/5 | Unified grid overlay, color-coded by status |
-| **Waitlist** | 2/5 | Basic CRUD, missing realtime + integration |
-| **AI Calls** | 0/5 | Stub data only — no integration |
-| **Settings** | 5/5 | Full Staff/Services/Hours CRUD |
-| **Security** | 5/5 | All critical/high issues resolved |
-| **Data Model** | 5/5 | Exclusion constraint added, payment_method enum, rating columns |
-| **Multi-Tenancy** | 5/5 | Code enforces SALON_ID on every query |
-| **Testing** | 2/5 | Vitest setup, rate-limiter tests, needs more coverage |
-| **CI/CD** | 3/5 | GitHub Actions for lint/typecheck/build |
+| Category                | Score | Notes                                                             |
+| ----------------------- | ----- | ----------------------------------------------------------------- |
+| **Public Booking UX**   | 4/5   | Clean flow, direct to confirmed, missing email confirmations      |
+| **Admin Dashboard**     | 4/5   | Safe seed gating, KPI charts, payment-method breakdown, alerts    |
+| **Admin Calendar**      | 4/5   | Daily view + master overlay, missing month/week                   |
+| **Floor Management**    | 3/5   | Good Realtime, missing optimistic updates                         |
+| **Staff Lockout Modal** | 4/5   | System-enforced, captures payment/tip/notes, triggers rating loop |
+| **Twilio Rating Loop**  | 4/5   | Auto-reply branching, owner alerts for low ratings                |
+| **Owner Alerts**        | 3/5   | Low-rating alerts with acknowledge action                         |
+| **Commissions**         | 4/5   | Solid — nearest to production-ready                               |
+| **Master Calendar**     | 3/5   | Unified grid overlay, color-coded by status                       |
+| **Waitlist**            | 2/5   | Basic CRUD, missing realtime + integration                        |
+| **AI Calls**            | 0/5   | Stub data only — no integration                                   |
+| **Settings**            | 5/5   | Full Staff/Services/Hours CRUD                                    |
+| **Security**            | 5/5   | All critical/high issues resolved                                 |
+| **Data Model**          | 5/5   | Exclusion constraint added, payment_method enum, rating columns   |
+| **Multi-Tenancy**       | 5/5   | Code enforces SALON_ID on every query                             |
+| **Testing**             | 2/5   | Vitest setup, rate-limiter tests, needs more coverage             |
+| **CI/CD**               | 3/5   | GitHub Actions for lint/typecheck/build                           |
 
 **Overall: 3.6/5 — Production-ready for single-salon deployment**
 
@@ -554,18 +574,18 @@ The following items from the original technical debt have been fully resolved:
 
 ## Appendix A: Key File Paths Reference
 
-| File | Purpose | Key Content |
-|------|---------|-------------|
-| `src/lib/env.ts` | Brand config | ALL salon-specific values in one place |
-| `src/lib/booking.functions.ts` | Booking API | `createPublicBooking`, `completeStaffModal`, `getPendingCompletions`, Twilio SMS |
-| `src/lib/twilio.server.ts` | Rating loop | `sendRatingSms`, `handleRatingReply` (1-5 branching logic) |
-| `src/lib/admin-crud.functions.ts` | Admin CRUD | Staff/Services CRUD with auth gating |
-| `src/lib/rate-limiter.ts` | Rate limiter | Sliding-window, configurable window/max |
-| `src/routes/book.tsx` | Booking wizard | 4-step form, creates confirmed booking directly |
-| `src/routes/_authenticated/-admin-settings.tsx` | Admin settings | Full Staff/Services/Hours CRUD |
-| `src/routes/_authenticated/_staff/-staff-dashboard.tsx` | Staff lockout modal | Forced modal overlay, payment/tip/notes capture |
-| `src/lib/config.server.ts` | Server config | Service role key, Twilio/Resend env checks |
-| `supabase/migrations/0008_pivot.sql` | Pivot schema | Drop Stripe cols, add payment_method enum, rating columns |
+| File                                                    | Purpose             | Key Content                                                                      |
+| ------------------------------------------------------- | ------------------- | -------------------------------------------------------------------------------- |
+| `src/lib/env.ts`                                        | Brand config        | ALL salon-specific values in one place                                           |
+| `src/lib/booking.functions.ts`                          | Booking API         | `createPublicBooking`, `completeStaffModal`, `getPendingCompletions`, Twilio SMS |
+| `src/lib/twilio.server.ts`                              | Rating loop         | `sendRatingSms`, `handleRatingReply` (1-5 branching logic)                       |
+| `src/lib/admin-crud.functions.ts`                       | Admin CRUD          | Staff/Services CRUD with auth gating                                             |
+| `src/lib/rate-limiter.ts`                               | Rate limiter        | Sliding-window, configurable window/max                                          |
+| `src/routes/book.tsx`                                   | Booking wizard      | 4-step form, creates confirmed booking directly                                  |
+| `src/routes/_authenticated/-admin-settings.tsx`         | Admin settings      | Full Staff/Services/Hours CRUD                                                   |
+| `src/routes/_authenticated/_staff/-staff-dashboard.tsx` | Staff lockout modal | Forced modal overlay, payment/tip/notes capture                                  |
+| `src/lib/config.server.ts`                              | Server config       | Service role key, Twilio/Resend env checks                                       |
+| `supabase/migrations/0008_pivot.sql`                    | Pivot schema        | Drop Stripe cols, add payment_method enum, rating columns                        |
 
 ---
 

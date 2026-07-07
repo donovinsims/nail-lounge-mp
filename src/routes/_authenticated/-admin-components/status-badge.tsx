@@ -28,7 +28,8 @@ const variantStyles: Record<StatusVariant, string> = {
  */
 function inferVariant(status: string): StatusVariant {
   const s = status.toLowerCase();
-  if (s === "confirmed" || s === "completed" || s === "available" || s === "fulfilled") return "success";
+  if (s === "confirmed" || s === "completed" || s === "available" || s === "fulfilled")
+    return "success";
   if (s === "pending" || s === "with_client") return "warning";
   if (s === "cancelled" || s === "no_show" || s === "offline") return "destructive";
   if (s === "active") return "info";
@@ -42,7 +43,8 @@ export function StatusBadge({ status, variant, pulse, className }: StatusBadgePr
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-mono uppercase tracking-wider",
         variantStyles[v],
-        pulse && "before:block before:h-1.5 before:w-1.5 before:rounded-full before:bg-current before:animate-pulse",
+        pulse &&
+          "before:block before:h-1.5 before:w-1.5 before:rounded-full before:bg-current before:animate-pulse",
         className,
       )}
     >

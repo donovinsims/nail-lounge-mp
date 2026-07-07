@@ -24,6 +24,7 @@ Runtime:       Bun (build + dev)
 ### What this app does
 
 A fully branded, deploy-it-yourself salon website with:
+
 - Public site: home page, services menu, gallery, gift cards, appointment booking
 - Admin console: dashboard, calendar, staff/services/hours CRUD, waitlist, commission ledger, AI call log, alerts
 - Staff lockout modal: forced system-enforced modal capturing payment method, tip, and service notes
@@ -70,24 +71,24 @@ There is no multi-tenant branching logic. Each deployment gets its own `VITE_SAL
 
 All salon-specific display values come from `src/lib/env.ts` helpers:
 
-| Helper | Env Var | Fallback |
-|---|---|---|
-| `getSalonName()` | `VITE_SALON_NAME` | "Your Salon Name" |
-| `getSalonAddress()` | `VITE_SALON_ADDRESS` | `""` |
-| `getSalonPhone()` | `VITE_SALON_PHONE` | `""` |
-| `getSalonTagline()` | `VITE_SALON_TAGLINE` | "Precision nail care" |
-| `getOGImage()` | `VITE_OG_IMAGE` | `""` |
-| `getSalonSocial()` | `VITE_SALON_EMAIL, VITE_SALON_INSTAGRAM, ...` | `""` each |
-| `getSalonNameShort()` | (derived from `getSalonName()`) | Initials for admin nav |
+| Helper                | Env Var                                       | Fallback               |
+| --------------------- | --------------------------------------------- | ---------------------- |
+| `getSalonName()`      | `VITE_SALON_NAME`                             | "Your Salon Name"      |
+| `getSalonAddress()`   | `VITE_SALON_ADDRESS`                          | `""`                   |
+| `getSalonPhone()`     | `VITE_SALON_PHONE`                            | `""`                   |
+| `getSalonTagline()`   | `VITE_SALON_TAGLINE`                          | "Precision nail care"  |
+| `getOGImage()`        | `VITE_OG_IMAGE`                               | `""`                   |
+| `getSalonSocial()`    | `VITE_SALON_EMAIL, VITE_SALON_INSTAGRAM, ...` | `""` each              |
+| `getSalonNameShort()` | (derived from `getSalonName()`)               | Initials for admin nav |
 
 **Zero code changes needed to brand a new salon.** Set env vars, deploy. That's it.
 
 ### 2.3 Public vs Server-Only Env Convention
 
-| Prefix | Scope | Example | Risk |
-|---|---|---|---|
-| `VITE_*` | Client + server (shipped to browser) | `VITE_SALON_NAME`, `VITE_SUPABASE_PUBLISHABLE_KEY` | Safe for public values |
-| No prefix | Server-only (never in client bundle) | `TWILIO_AUTH_TOKEN`, `SUPABASE_SERVICE_ROLE_KEY` | Secrets — must use `.server.ts` files |
+| Prefix    | Scope                                | Example                                            | Risk                                  |
+| --------- | ------------------------------------ | -------------------------------------------------- | ------------------------------------- |
+| `VITE_*`  | Client + server (shipped to browser) | `VITE_SALON_NAME`, `VITE_SUPABASE_PUBLISHABLE_KEY` | Safe for public values                |
+| No prefix | Server-only (never in client bundle) | `TWILIO_AUTH_TOKEN`, `SUPABASE_SERVICE_ROLE_KEY`   | Secrets — must use `.server.ts` files |
 
 Server-only secrets are read inside handler functions (not at module scope) because Cloudflare Workers resolve env per-request:
 
@@ -109,8 +110,8 @@ Every third-party integration is optional, gated by a `has*()` helper:
 
 ```typescript
 // src/lib/config.server.ts
-hasTwilio()  // true when TWILIO_ACCOUNT_SID + TWILIO_AUTH_TOKEN + TWILIO_PHONE_NUMBER are set
-hasEmail()   // true when RESEND_API_KEY is set
+hasTwilio(); // true when TWILIO_ACCOUNT_SID + TWILIO_AUTH_TOKEN + TWILIO_PHONE_NUMBER are set
+hasEmail(); // true when RESEND_API_KEY is set
 ```
 
 **Pattern:** Check `has*()` before attempting the integration. Soft-fail on errors (log, don't throw). The booking succeeds even if notifications fail.
@@ -136,38 +137,38 @@ All data mutations use TanStack Start's `createServerFn`. No separate API router
 
 ### 2.6 Data Model — 10+ Tables
 
-| Table | Purpose | Public Access |
-|---|---|---|
-| `salons` | Business identity, hours, commission config | Anon read |
-| `staff` | Employees, roles, working hours | Anon read (active only) |
-| `services` | Menu items, prices, durations | Anon read (active only) |
-| `clients` | Customer records (phone-unique per salon) | Service role writes only |
-| `bookings` | Appointments, status, payment_method, tip_amount, rating | Anon read via RPC only |
-| `commission_records` | Per-staff commission tracking | Auth (staff/owner) |
-| `owner_alerts` | Low-ratings alerts (1-3) with booking context | Auth (owner) |
-| `waitlist_entries` | Demand capture for fully booked slots | Auth only |
-| `floor_status` | Real-time staff state (with_client/available/offline) | Auth + Realtime |
-| `ai_calls` | AI receptionist call logs | Service role only |
-| `profiles` | Auth user profiles (FK to auth.users) | Authenticated user only |
+| Table                | Purpose                                                  | Public Access            |
+| -------------------- | -------------------------------------------------------- | ------------------------ |
+| `salons`             | Business identity, hours, commission config              | Anon read                |
+| `staff`              | Employees, roles, working hours                          | Anon read (active only)  |
+| `services`           | Menu items, prices, durations                            | Anon read (active only)  |
+| `clients`            | Customer records (phone-unique per salon)                | Service role writes only |
+| `bookings`           | Appointments, status, payment_method, tip_amount, rating | Anon read via RPC only   |
+| `commission_records` | Per-staff commission tracking                            | Auth (staff/owner)       |
+| `owner_alerts`       | Low-ratings alerts (1-3) with booking context            | Auth (owner)             |
+| `waitlist_entries`   | Demand capture for fully booked slots                    | Auth only                |
+| `floor_status`       | Real-time staff state (with_client/available/offline)    | Auth + Realtime          |
+| `ai_calls`           | AI receptionist call logs                                | Service role only        |
+| `profiles`           | Auth user profiles (FK to auth.users)                    | Authenticated user only  |
 
 Key enums: `app_role` (owner|staff), `booking_status` (confirmed|completed|cancelled|no_show), `payment_method` (Credit/Debit|Cash|Venmo|Cash App), `floor_state` (with_client|available|offline), `waitlist_status` (active|fulfilled|cancelled).
 
 ### 2.7 Route Map
 
-| Route | File | Auth |
-|---|---|---|
-| `/` | `index.tsx` | Public |
-| `/services` | `services.tsx` | Public |
-| `/service` | `service.tsx` | Public |
-| `/book` | `book.tsx` (multi-step wizard) | Public |
-| `/booking-confirmed` | `booking-confirmed.tsx` | Public |
-| `/appointments` | `appointments.tsx` | Public (phone lookup) |
-| `/gift-cards` | `gift-cards.tsx` | Public |
-| `/gallery` | `gallery.tsx` | Public |
-| `/auth` | `auth.tsx` | Public |
-| `/auth/callback` | `auth/callback.tsx` | OAuth callback |
-| `/admin` | `_authenticated/admin.tsx` (8 tabs) | Auth required |
-| `/staff` | `_authenticated/_staff/-staff-dashboard.tsx` | Auth (staff only) |
+| Route                | File                                         | Auth                  |
+| -------------------- | -------------------------------------------- | --------------------- |
+| `/`                  | `index.tsx`                                  | Public                |
+| `/services`          | `services.tsx`                               | Public                |
+| `/service`           | `service.tsx`                                | Public                |
+| `/book`              | `book.tsx` (multi-step wizard)               | Public                |
+| `/booking-confirmed` | `booking-confirmed.tsx`                      | Public                |
+| `/appointments`      | `appointments.tsx`                           | Public (phone lookup) |
+| `/gift-cards`        | `gift-cards.tsx`                             | Public                |
+| `/gallery`           | `gallery.tsx`                                | Public                |
+| `/auth`              | `auth.tsx`                                   | Public                |
+| `/auth/callback`     | `auth/callback.tsx`                          | OAuth callback        |
+| `/admin`             | `_authenticated/admin.tsx` (8 tabs)          | Auth required         |
+| `/staff`             | `_authenticated/_staff/-staff-dashboard.tsx` | Auth (staff only)     |
 
 Admin tabs (imported sub-components): Dashboard (with payment-method breakdown + alerts), Calendar (with master overlay), Commissions, Alerts + CRM, Waitlist, Floor, AI Calls, Settings.
 
@@ -190,6 +191,7 @@ This is the minimal path to turn the template into a live, branded salon site.
 ### Step-by-Step
 
 1. **Copy the template**
+
    ```bash
    cp -r ~/mynails-generic ~/salons/ana-nails
    cd ~/salons/ana-nails && rm -rf .git && git init && git add -A && git commit -m "init"
@@ -203,6 +205,7 @@ This is the minimal path to turn the template into a live, branded salon site.
    - `VITE_APP_URL` (your domain)
 
 3. **Insert salon row in Supabase**
+
    ```sql
    INSERT INTO salons (id, name, phone, address, business_hours)
    VALUES ('<VITE_SALON_ID>', 'Ana Nails', '+15551234567', '123 Main St', '{"monday":{"open":"09:00","close":"18:00"},...}');
@@ -248,11 +251,13 @@ import { z } from "zod";
 
 export const submitReview = createServerFn({ method: "POST" })
   .inputValidator((d) =>
-    z.object({
-      bookingId: z.string().uuid(),
-      rating: z.number().min(1).max(5),
-      comment: z.string().max(500).optional(),
-    }).parse(d),
+    z
+      .object({
+        bookingId: z.string().uuid(),
+        rating: z.number().min(1).max(5),
+        comment: z.string().max(500).optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -273,7 +278,16 @@ Call it from any route component via `useServerFn`.
 // In admin.tsx
 import Reports from "./-admin-reports";
 
-type Tab = "dashboard" | "calendar" | "commissions" | "alerts" | "waitlist" | "floor" | "calls" | "settings" | "reports";
+type Tab =
+  | "dashboard"
+  | "calendar"
+  | "commissions"
+  | "alerts"
+  | "waitlist"
+  | "floor"
+  | "calls"
+  | "settings"
+  | "reports";
 const NAV = [...prev, { id: "reports", label: "Reports", icon: BarChart3 }];
 ```
 
@@ -292,7 +306,11 @@ export function hasDiscord(): boolean {
 
 // booking.functions.ts — call site
 if (hasDiscord()) {
-  try { await sendDiscordNotification(booking); } catch (e) { console.error(e); }
+  try {
+    await sendDiscordNotification(booking);
+  } catch (e) {
+    console.error(e);
+  }
 }
 ```
 
@@ -315,11 +333,11 @@ src/routes/promotions/$id.tsx → /promotions/:id
 
 ### Key Integration Points
 
-| Integration | What's Needed | Gated By |
-|---|---|---|
-| Twilio SMS + Rating Loop | `TWILIO_ACCOUNT_SID` + `TWILIO_AUTH_TOKEN` + `TWILIO_PHONE_NUMBER` | `hasTwilio()` |
-| Resend Email | `RESEND_API_KEY` | `hasEmail()` |
-| Umami Analytics | `VITE_UMAMI_WEBSITE_ID` | Empty string check |
+| Integration              | What's Needed                                                      | Gated By           |
+| ------------------------ | ------------------------------------------------------------------ | ------------------ |
+| Twilio SMS + Rating Loop | `TWILIO_ACCOUNT_SID` + `TWILIO_AUTH_TOKEN` + `TWILIO_PHONE_NUMBER` | `hasTwilio()`      |
+| Resend Email             | `RESEND_API_KEY`                                                   | `hasEmail()`       |
+| Umami Analytics          | `VITE_UMAMI_WEBSITE_ID`                                            | Empty string check |
 
 ---
 
@@ -374,38 +392,38 @@ These are NOT part of the template. Adding them would require application-level 
 
 ## Appendix: Key Files Reference
 
-| File | What It Does |
-|---|---|
-| `src/lib/env.ts` | Public env helpers — `getSalonName()`, `getSalonAddress()`, `getSalonPhone()`, `getSalonSocial()`, `getSalonId()`, `getOGImage()`, `isSeedAllowed()` |
-| `src/lib/config.server.ts` | Server-only config — `getServerConfig()`, `hasTwilio()`, `hasEmail()` |
-| `src/lib/booking.functions.ts` | Public booking: `createPublicBooking`, `completeStaffModal`, `getPendingCompletions`, `lookupAppointments`, `cancelPublicBooking` |
-| `src/lib/twilio.server.ts` | Twilio rating loop: `sendRatingSms`, `handleRatingReply` |
-| `src/lib/admin-crud.functions.ts` | Staff/services/hours CRUD — all authenticated via `requireSupabaseAuth` |
-| `src/lib/admin.functions.ts` | `getMyStaff`, `linkSelfToFirstSalon`, `getOwnerAlerts`, `seedDemoData` |
-| `src/lib/salon.ts` | `computeAvailableSlots`, `fetchSalon`, `fetchServices`, `fetchStaff` |
-| `src/lib/rate-limiter.ts` | Generic sliding-window rate limiter class |
-| `src/lib/email.server.ts` | `sendBookingConfirmation` via Resend |
-| `src/lib/error-capture.ts` | Global error capture with 5-second TTL |
-| `src/integrations/supabase/client.ts` | Public anon Supabase client |
-| `src/integrations/supabase/client.server.ts` | Service role admin client (dynamic import) |
-| `src/integrations/supabase/auth-middleware.ts` | `requireSupabaseAuth` middleware |
-| `src/integrations/supabase/auth-attacher.ts` | Global middleware — attaches bearer token to serverFn RPCs |
-| `src/routes/_authenticated/admin.tsx` | Admin panel — tabbed UI with 8 sub-views |
-| `src/routes/_authenticated/_staff/-staff-dashboard.tsx` | Staff dashboard — forced lockout modal for pending completions |
-| `src/routes/api/twilio-webhook.ts` | Incoming Twilio SMS handler (1-5 rating replies) |
-| `.env.template` | Single source of truth for all env vars |
-| `supabase/migrations/` | 7+ migrations in order |
+| File                                                    | What It Does                                                                                                                                         |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/env.ts`                                        | Public env helpers — `getSalonName()`, `getSalonAddress()`, `getSalonPhone()`, `getSalonSocial()`, `getSalonId()`, `getOGImage()`, `isSeedAllowed()` |
+| `src/lib/config.server.ts`                              | Server-only config — `getServerConfig()`, `hasTwilio()`, `hasEmail()`                                                                                |
+| `src/lib/booking.functions.ts`                          | Public booking: `createPublicBooking`, `completeStaffModal`, `getPendingCompletions`, `lookupAppointments`, `cancelPublicBooking`                    |
+| `src/lib/twilio.server.ts`                              | Twilio rating loop: `sendRatingSms`, `handleRatingReply`                                                                                             |
+| `src/lib/admin-crud.functions.ts`                       | Staff/services/hours CRUD — all authenticated via `requireSupabaseAuth`                                                                              |
+| `src/lib/admin.functions.ts`                            | `getMyStaff`, `linkSelfToFirstSalon`, `getOwnerAlerts`, `seedDemoData`                                                                               |
+| `src/lib/salon.ts`                                      | `computeAvailableSlots`, `fetchSalon`, `fetchServices`, `fetchStaff`                                                                                 |
+| `src/lib/rate-limiter.ts`                               | Generic sliding-window rate limiter class                                                                                                            |
+| `src/lib/email.server.ts`                               | `sendBookingConfirmation` via Resend                                                                                                                 |
+| `src/lib/error-capture.ts`                              | Global error capture with 5-second TTL                                                                                                               |
+| `src/integrations/supabase/client.ts`                   | Public anon Supabase client                                                                                                                          |
+| `src/integrations/supabase/client.server.ts`            | Service role admin client (dynamic import)                                                                                                           |
+| `src/integrations/supabase/auth-middleware.ts`          | `requireSupabaseAuth` middleware                                                                                                                     |
+| `src/integrations/supabase/auth-attacher.ts`            | Global middleware — attaches bearer token to serverFn RPCs                                                                                           |
+| `src/routes/_authenticated/admin.tsx`                   | Admin panel — tabbed UI with 8 sub-views                                                                                                             |
+| `src/routes/_authenticated/_staff/-staff-dashboard.tsx` | Staff dashboard — forced lockout modal for pending completions                                                                                       |
+| `src/routes/api/twilio-webhook.ts`                      | Incoming Twilio SMS handler (1-5 rating replies)                                                                                                     |
+| `.env.template`                                         | Single source of truth for all env vars                                                                                                              |
+| `supabase/migrations/`                                  | 7+ migrations in order                                                                                                                               |
 
 ---
 
 ## Appendix: Documentation Map
 
-| Doc | Audience | What It Covers |
-|---|---|---|
-| `ARCHITECTURE.md` | Developers | Full ADRs, data model, RLS strategy, file map, dependencies |
-| `TECHNICAL_SPEC.md` | Evaluators/Buyers | Stack details, security assessment, production readiness scorecard, technical debt |
-| `TEST-PATTERNS.md` | Developers | Test conventions, coverage goals, pattern reference |
-| `DEPLOYMENT_RUNBOOK.md` | DevOps | Env vars, Supabase setup, Twilio config, Cloudflare deploy, rollback plan |
-| `onboarding-new-salon.md` | Salon setup | Step-by-step from zero to live (non-technical owner + developer) |
-| `GENERICIZATION_ROADMAP.md` | Maintainers | What was extracted, what's left, verification checklist |
-| `AI-BLUEPRINT.md` | AI agents + devs | **This document** — everything an agent needs before coding |
+| Doc                         | Audience          | What It Covers                                                                     |
+| --------------------------- | ----------------- | ---------------------------------------------------------------------------------- |
+| `ARCHITECTURE.md`           | Developers        | Full ADRs, data model, RLS strategy, file map, dependencies                        |
+| `TECHNICAL_SPEC.md`         | Evaluators/Buyers | Stack details, security assessment, production readiness scorecard, technical debt |
+| `TEST-PATTERNS.md`          | Developers        | Test conventions, coverage goals, pattern reference                                |
+| `DEPLOYMENT_RUNBOOK.md`     | DevOps            | Env vars, Supabase setup, Twilio config, Cloudflare deploy, rollback plan          |
+| `onboarding-new-salon.md`   | Salon setup       | Step-by-step from zero to live (non-technical owner + developer)                   |
+| `GENERICIZATION_ROADMAP.md` | Maintainers       | What was extracted, what's left, verification checklist                            |
+| `AI-BLUEPRINT.md`           | AI agents + devs  | **This document** — everything an agent needs before coding                        |

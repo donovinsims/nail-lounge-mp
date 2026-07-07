@@ -86,7 +86,11 @@ export const seedDemoData = createServerFn({ method: "POST" })
     monday.setHours(9, 0, 0, 0);
 
     // Define the daily schedule — each day has a list of { hour, svcIndex, status }
-    const schedule: { hour: number; svcIndex: number; status: "completed" | "confirmed" | "cancelled" }[] = [
+    const schedule: {
+      hour: number;
+      svcIndex: number;
+      status: "completed" | "confirmed" | "cancelled";
+    }[] = [
       // Monday (past — completed for bar chart)
       { hour: 9, svcIndex: 0, status: "completed" },
       { hour: 10, svcIndex: 1, status: "completed" },

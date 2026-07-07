@@ -17,52 +17,52 @@
 
 ### Required — app won't start without these
 
-| Variable | Where to set | Description |
-|---|---|---|
-| `VITE_SUPABASE_URL` | Cloudflare Pages env | Supabase project URL |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Cloudflare Pages env | Supabase anon key |
-| `SUPABASE_URL` | Cloudflare Pages env (secret) | Same as `VITE_SUPABASE_URL` |
-| `SUPABASE_PUBLISHABLE_KEY` | Cloudflare Pages env (secret) | Same as `VITE_SUPABASE_PUBLISHABLE_KEY` |
-| `SUPABASE_SERVICE_ROLE_KEY` | Cloudflare Pages env (secret) | For admin / server-only operations |
-| `VITE_SALON_ID` | Cloudflare Pages env | UUID of the salon row in the database |
-| `VITE_APP_URL` | Cloudflare Pages env | Public URL of this deployment |
+| Variable                        | Where to set                  | Description                             |
+| ------------------------------- | ----------------------------- | --------------------------------------- |
+| `VITE_SUPABASE_URL`             | Cloudflare Pages env          | Supabase project URL                    |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Cloudflare Pages env          | Supabase anon key                       |
+| `SUPABASE_URL`                  | Cloudflare Pages env (secret) | Same as `VITE_SUPABASE_URL`             |
+| `SUPABASE_PUBLISHABLE_KEY`      | Cloudflare Pages env (secret) | Same as `VITE_SUPABASE_PUBLISHABLE_KEY` |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Cloudflare Pages env (secret) | For admin / server-only operations      |
+| `VITE_SALON_ID`                 | Cloudflare Pages env          | UUID of the salon row in the database   |
+| `VITE_APP_URL`                  | Cloudflare Pages env          | Public URL of this deployment           |
 
 ### Strongly Recommended
 
-| Variable | Description |
-|---|---|
-| `VITE_SALON_NAME` | Salon display name (fallback: "My Salon") |
-| `VITE_SALON_PHONE` | Salon phone number for display (fallback: none) |
-| `VITE_SALON_ADDRESS` | Salon address for display (fallback: none) |
-| `VITE_OG_IMAGE_URL` | OG image for social sharing (fallback: generic) |
+| Variable             | Description                                     |
+| -------------------- | ----------------------------------------------- |
+| `VITE_SALON_NAME`    | Salon display name (fallback: "My Salon")       |
+| `VITE_SALON_PHONE`   | Salon phone number for display (fallback: none) |
+| `VITE_SALON_ADDRESS` | Salon address for display (fallback: none)      |
+| `VITE_OG_IMAGE_URL`  | OG image for social sharing (fallback: generic) |
 
 ### Optional — features gate on these
 
 **Twilio (SMS notifications + 1-5 rating loop):**
 
-| Variable | Description |
-|---|---|
-| `TWILIO_ACCOUNT_SID` | Twilio account SID |
-| `TWILIO_AUTH_TOKEN` | Twilio auth token |
+| Variable              | Description                        |
+| --------------------- | ---------------------------------- |
+| `TWILIO_ACCOUNT_SID`  | Twilio account SID                 |
+| `TWILIO_AUTH_TOKEN`   | Twilio auth token                  |
 | `TWILIO_PHONE_NUMBER` | Twilio phone number (E.164 format) |
 
 **Resend (email notifications):**
 
-| Variable | Description |
-|---|---|
+| Variable         | Description    |
+| ---------------- | -------------- |
 | `RESEND_API_KEY` | Resend API key |
 
 **Umami (analytics):**
 
-| Variable | Description |
-|---|---|
-| `VITE_UMAMI_WEBSITE_ID` | Umami website UUID |
-| `VITE_UMAMI_HOST` | Umami host URL (default: `https://cloud.umami.is`) |
+| Variable                | Description                                        |
+| ----------------------- | -------------------------------------------------- |
+| `VITE_UMAMI_WEBSITE_ID` | Umami website UUID                                 |
+| `VITE_UMAMI_HOST`       | Umami host URL (default: `https://cloud.umami.is`) |
 
 ### Development Helpers
 
-| Variable | Description |
-|---|---|
+| Variable               | Description                                                 |
+| ---------------------- | ----------------------------------------------------------- |
 | `VITE_ALLOW_SEED_DATA` | Set to `"true"` to enable the seed data endpoint (dev only) |
 
 ---

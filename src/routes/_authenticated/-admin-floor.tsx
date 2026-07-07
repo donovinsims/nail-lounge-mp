@@ -77,10 +77,7 @@ export default function FloorView({ salonId }: { salonId: string }) {
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold truncate text-base">{f.staff?.name}</p>
                   <div className="mt-1">
-                    <StatusBadge
-                      status={f.status}
-                      pulse={f.status === "with_client"}
-                    />
+                    <StatusBadge status={f.status} pulse={f.status === "with_client"} />
                   </div>
                 </div>
               </div>

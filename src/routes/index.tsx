@@ -1,7 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSalon, fetchStaff } from "@/lib/salon";
-import { getSalonName, getSalonAddress, getSalonPhone, getSalonPhoneHref, getSalonSocial } from "@/lib/env";
+import {
+  getSalonName,
+  getSalonAddress,
+  getSalonPhone,
+  getSalonPhoneHref,
+  getSalonSocial,
+} from "@/lib/env";
 import { MapPin, Phone, Clock, ArrowRight, Instagram, Star, Mail } from "lucide-react";
 import heroImg from "@/assets/studio.jpg";
 import art1 from "@/assets/art1.jpg";
@@ -85,7 +91,11 @@ function Home() {
         <div className="mx-auto grid max-w-7xl gap-10 px-6 pt-16 pb-20 sm:px-10 sm:pt-24 md:grid-cols-12 md:gap-12 md:pt-32">
           <div className="md:col-span-6 md:pt-8">
             <p className="text-[11px] uppercase tracking-[0.35em] text-accent">
-              Est. {getSalonAddress()?.split(",").map((s) => s.trim()).filter(Boolean)[1] || ""}
+              Est.{" "}
+              {getSalonAddress()
+                ?.split(",")
+                .map((s) => s.trim())
+                .filter(Boolean)[1] || ""}
             </p>
             <h1 className="mt-6 font-display text-6xl leading-[0.92] tracking-[-0.02em] sm:text-7xl lg:text-8xl">
               The quiet
@@ -380,7 +390,9 @@ function Home() {
               <div className="mt-6 space-y-4 text-sm">
                 <div className="flex items-start gap-3">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  <span className="text-muted-foreground">{getSalonAddress() || getSalonSocial().mapsUrl}</span>
+                  <span className="text-muted-foreground">
+                    {getSalonAddress() || getSalonSocial().mapsUrl}
+                  </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <Phone className="mt-0.5 h-4 w-4 shrink-0 text-accent" />

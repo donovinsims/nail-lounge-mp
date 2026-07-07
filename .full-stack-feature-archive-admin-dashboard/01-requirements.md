@@ -32,6 +32,7 @@ The user wants to modernize all these views using TypeUI.sh design patterns for 
 ## Scope
 
 ### In Scope
+
 - Refactor all 8 admin tabs (Dashboard, Calendar, Floor, POS, Commissions, Waitlist, AI Calls, Settings)
 - Replace raw `<table>` with modern data table patterns
 - Replace `<Stat>` cards with richer KPI widgets
@@ -40,6 +41,7 @@ The user wants to modernize all these views using TypeUI.sh design patterns for 
 - Improve card/list patterns across all views
 
 ### Out of Scope
+
 - No changes to the client-facing website (homepage, services, booking, gallery, etc.)
 - No new database tables or backend routes (using existing Supabase queries)
 - No auth changes

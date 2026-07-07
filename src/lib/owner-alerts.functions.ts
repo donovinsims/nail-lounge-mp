@@ -24,10 +24,7 @@ export const getOwnerAlerts = createServerFn({ method: "GET" })
 
 export const acknowledgeAlert = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data: unknown) => {
-    const schema = z.object({ alertId: z.string().uuid() });
-    return schema.parse(data);
-  })
+  .inputValidator((d) => z.object({ alertId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await (context.supabase as any)
       .from("owner_alerts")

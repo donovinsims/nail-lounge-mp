@@ -16,15 +16,29 @@ export interface StepServiceProps {
   isLoading?: boolean;
 }
 
-export default function StepService({ services, selectedId, onSelect, isLoading }: StepServiceProps) {
+export default function StepService({
+  services,
+  selectedId,
+  onSelect,
+  isLoading,
+}: StepServiceProps) {
   if (services === null || isLoading) {
     return (
       <div className="grid place-items-center py-10">
         <div className="flex flex-col items-center gap-3">
           <div className="flex gap-1">
-            <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "0ms" }} />
-            <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "150ms" }} />
-            <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "300ms" }} />
+            <span
+              className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40"
+              style={{ animationDelay: "0ms" }}
+            />
+            <span
+              className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40"
+              style={{ animationDelay: "150ms" }}
+            />
+            <span
+              className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40"
+              style={{ animationDelay: "300ms" }}
+            />
           </div>
           <span className="text-sm text-muted-foreground">Loading services…</span>
         </div>
@@ -52,9 +66,7 @@ export default function StepService({ services, selectedId, onSelect, isLoading 
                 aria-checked={isSelected}
                 onClick={() => onSelect(service.id)}
                 className={`flex w-full tap-target items-center justify-between gap-3 rounded-2xl bg-surface p-4 text-left active:scale-[0.98] transition-all duration-200 ${
-                  isSelected
-                    ? "ring-2 ring-ring bg-primary/5 shadow-sm"
-                    : "hover:bg-surface-2"
+                  isSelected ? "ring-2 ring-ring bg-primary/5 shadow-sm" : "hover:bg-surface-2"
                 }`}
               >
                 <div className="min-w-0">

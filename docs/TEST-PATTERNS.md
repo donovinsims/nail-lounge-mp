@@ -8,9 +8,9 @@ Testing patterns and conventions for the mynails-generic project.
 
 The project uses **Vitest** with `globals: true` enabled.
 
-| Command | Description |
-|---|---|
-| `bun run test` | Run all tests once (`vitest run`) |
+| Command              | Description                        |
+| -------------------- | ---------------------------------- |
+| `bun run test`       | Run all tests once (`vitest run`)  |
 | `bun run test:watch` | Run tests in watch mode (`vitest`) |
 
 ### Vitest Configuration (`vitest.config.ts`)
@@ -36,15 +36,15 @@ The CI pipeline runs on push/PR to `main`:
 
 ## Current Test Coverage
 
-| File | Tests | What's Tested |
-|---|---|---|
-| `src/lib/booking.test.ts` | 18 | Booking Zod schemas (`createBookingSchema`, `lookupSchema`, `cancelSchema`) |
-| `src/lib/admin-crud.test.ts` | 20 | Admin CRUD Zod schemas (staff create/update, service create/update, salon hours) |
-| `src/lib/admin-functions.test.ts` | 9 | Staff modal Zod schemas (`completeStaffModal`) |
-| `src/lib/env.test.ts` | 16 | Env helper default values + `isSeedAllowed` behavior |
-| `src/lib/config.server.test.ts` | 9 | Server config (`getServerConfig`, `hasTwilio`, `hasEmail`) |
-| `src/lib/rate-limiter.test.ts` | 4 | Sliding-window rate limiter class |
-| **Total** | **76** | |
+| File                              | Tests  | What's Tested                                                                    |
+| --------------------------------- | ------ | -------------------------------------------------------------------------------- |
+| `src/lib/booking.test.ts`         | 18     | Booking Zod schemas (`createBookingSchema`, `lookupSchema`, `cancelSchema`)      |
+| `src/lib/admin-crud.test.ts`      | 20     | Admin CRUD Zod schemas (staff create/update, service create/update, salon hours) |
+| `src/lib/admin-functions.test.ts` | 9      | Staff modal Zod schemas (`completeStaffModal`)                                   |
+| `src/lib/env.test.ts`             | 16     | Env helper default values + `isSeedAllowed` behavior                             |
+| `src/lib/config.server.test.ts`   | 9      | Server config (`getServerConfig`, `hasTwilio`, `hasEmail`)                       |
+| `src/lib/rate-limiter.test.ts`    | 4      | Sliding-window rate limiter class                                                |
+| **Total**                         | **76** |                                                                                  |
 
 ---
 
@@ -166,7 +166,7 @@ const completeStaffModalSchema = z.object({
 it("accepts valid staff modal submission", () => {
   const result = completeStaffModalSchema.safeParse({
     bookingId: "550e8400-e29b-41d4-a716-446655440000",
-    tipAmount: 15.00,
+    tipAmount: 15.0,
     paymentMethod: "Cash",
     serviceNotes: "Client requested extra shaping",
   });
@@ -368,11 +368,11 @@ describe("rateLimiter", () => {
     const limiter = rateLimiter({ windowMs: 60_000, max: 2 });
     expect(limiter.check("user-a")).toBe(true);
     expect(limiter.check("user-a")).toBe(true);
-    expect(limiter.check("user-a")).toBe(false);  // user-a blocked
+    expect(limiter.check("user-a")).toBe(false); // user-a blocked
 
-    expect(limiter.check("user-b")).toBe(true);   // user-b still allowed
+    expect(limiter.check("user-b")).toBe(true); // user-b still allowed
     expect(limiter.check("user-b")).toBe(true);
-    expect(limiter.check("user-b")).toBe(false);  // now blocked too
+    expect(limiter.check("user-b")).toBe(false); // now blocked too
   });
 
   it("allows after window expires", () => {
@@ -380,9 +380,9 @@ describe("rateLimiter", () => {
     expect(limiter.check("user-1")).toBe(true);
     expect(limiter.check("user-1")).toBe(false);
 
-    vi.advanceTimersByTime(61_000);  // advance past window
+    vi.advanceTimersByTime(61_000); // advance past window
 
-    expect(limiter.check("user-1")).toBe(true);  // allowed again
+    expect(limiter.check("user-1")).toBe(true); // allowed again
   });
 });
 ```
@@ -410,16 +410,16 @@ describe("rateLimiter", () => {
 
 Areas to add test coverage:
 
-| Area | Suggested Approach | Priority |
-|---|---|---|
-| **Component rendering** | Vitest + `@testing-library/react` + `jsdom` environment | Medium |
-| **Server function logic** | Integration tests calling server functions with mocked Twilio/Resend | Low |
-| **Auth middleware** | Unit tests for `requireSupabaseAuth` with mocked request context | Medium |
-| **Slot availability** | Unit tests for `computeAvailableSlots` edge cases | Medium |
-| **Staff modal flow** | Integration test for `completeStaffModal` + `getPendingCompletions` chain | Medium |
-| **Twilio rating loop** | Integration test for `sendRatingSms` + `handleRatingReply` branching | Low |
-| **Twilio SMS / Resend email** | Mock external SDKs, test that correct payloads are sent | Low |
-| **E2E booking flow** | Playwright or similar browser testing | Low |
+| Area                          | Suggested Approach                                                        | Priority |
+| ----------------------------- | ------------------------------------------------------------------------- | -------- |
+| **Component rendering**       | Vitest + `@testing-library/react` + `jsdom` environment                   | Medium   |
+| **Server function logic**     | Integration tests calling server functions with mocked Twilio/Resend      | Low      |
+| **Auth middleware**           | Unit tests for `requireSupabaseAuth` with mocked request context          | Medium   |
+| **Slot availability**         | Unit tests for `computeAvailableSlots` edge cases                         | Medium   |
+| **Staff modal flow**          | Integration test for `completeStaffModal` + `getPendingCompletions` chain | Medium   |
+| **Twilio rating loop**        | Integration test for `sendRatingSms` + `handleRatingReply` branching      | Low      |
+| **Twilio SMS / Resend email** | Mock external SDKs, test that correct payloads are sent                   | Low      |
+| **E2E booking flow**          | Playwright or similar browser testing                                     | Low      |
 
 ### To Add Component Tests in the Future
 
@@ -462,14 +462,14 @@ import { getServerConfig, hasTwilio } from "./config.server";
 
 ## Coverage Goals and Current Status
 
-| Metric | Current | Target |
-|---|---|---|
-| Total tests | 76 | 100+ |
-| Zod schema coverage | All schemas with `z.object()` validated | 100% of input schemas |
-| Env/config coverage | Full | Maintain |
-| Rate limiter coverage | Full | Maintain |
-| Component coverage | 0% | ≥ 50% of UI components |
-| CI test execution | ❌ Not run in CI | ✅ Added to CI workflow |
+| Metric                | Current                                 | Target                  |
+| --------------------- | --------------------------------------- | ----------------------- |
+| Total tests           | 76                                      | 100+                    |
+| Zod schema coverage   | All schemas with `z.object()` validated | 100% of input schemas   |
+| Env/config coverage   | Full                                    | Maintain                |
+| Rate limiter coverage | Full                                    | Maintain                |
+| Component coverage    | 0%                                      | ≥ 50% of UI components  |
+| CI test execution     | ❌ Not run in CI                        | ✅ Added to CI workflow |
 
 ### Immediate Gaps
 

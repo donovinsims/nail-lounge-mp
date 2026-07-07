@@ -84,7 +84,9 @@ export function getTwilioPhone(): string {
  * Useful as a safety override for development environments.
  */
 export function isSeedAllowed(): boolean {
-  return import.meta.env.VITE_ALLOW_SEED_DATA === "true" || process.env.VITE_ALLOW_SEED_DATA === "true";
+  return (
+    import.meta.env.VITE_ALLOW_SEED_DATA === "true" || process.env.VITE_ALLOW_SEED_DATA === "true"
+  );
 }
 
 /** Umami website ID for analytics tracking. Empty = no analytics. */

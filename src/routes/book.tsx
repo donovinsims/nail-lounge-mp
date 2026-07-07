@@ -138,7 +138,9 @@ function Book() {
         if (parsed.email) setEmail(parsed.email);
         if (parsed.step) setStep(parsed.step as Step);
       }
-    } catch {}
+    } catch {
+      // Ignore — sessionStorage may be unavailable or corrupt.
+    }
   }, []);
 
   // Save booking state on change
@@ -265,9 +267,7 @@ function Book() {
               </p>
             </>
           ) : (
-            <p className="text-[11px] uppercase tracking-[0.35em] text-accent">
-              Step {step} of 4
-            </p>
+            <p className="text-[11px] uppercase tracking-[0.35em] text-accent">Step {step} of 4</p>
           )}
         </div>
       </section>
@@ -310,7 +310,8 @@ function Book() {
             )}
             {slot && (
               <span className="inline-flex items-center gap-1 rounded-full bg-surface px-3 py-1 text-xs font-medium">
-                <span className="text-muted-foreground">When:</span> {fmtDate(slot)}, {fmtTime(slot)}
+                <span className="text-muted-foreground">When:</span> {fmtDate(slot)},{" "}
+                {fmtTime(slot)}
               </span>
             )}
           </div>

@@ -72,7 +72,13 @@ function Admin() {
 
   const myStaff = useServerFn(getMyStaff);
   const link = useServerFn(linkSelfToFirstSalon);
-  const { data: staff, isLoading, isError, error, refetch } = useQuery({
+  const {
+    data: staff,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["my-staff"],
     queryFn: () => myStaff(),
     retry: 2,
@@ -133,10 +139,16 @@ function Admin() {
           This can happen if your account has duplicate staff records.
         </p>
         <div className="flex gap-3">
-          <button onClick={() => refetch()} className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
+          <button
+            onClick={() => refetch()}
+            className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+          >
             Try again
           </button>
-          <button onClick={signOut} className="rounded-xl bg-surface px-5 py-2.5 text-sm font-semibold hairline">
+          <button
+            onClick={signOut}
+            className="rounded-xl bg-surface px-5 py-2.5 text-sm font-semibold hairline"
+          >
             Sign out
           </button>
         </div>
@@ -152,7 +164,10 @@ function Admin() {
         {linkError && (
           <>
             <p className="text-xs text-destructive">{linkError}</p>
-            <button onClick={signOut} className="rounded-xl bg-surface px-5 py-2.5 text-sm font-semibold hairline">
+            <button
+              onClick={signOut}
+              className="rounded-xl bg-surface px-5 py-2.5 text-sm font-semibold hairline"
+            >
               Sign out
             </button>
           </>
@@ -226,23 +241,23 @@ function Admin() {
 
       {/* Mobile bottom nav */}
       <nav className="md:hidden fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-border bg-background/95 backdrop-blur safe-pb pt-2">
-          {NAV.slice(0, 4).map((n) => (
-            <button
-              key={n.id}
-              onClick={() => setTab(n.id)}
-              className={`relative flex flex-col items-center gap-1 py-2 text-[10px] transition-colors ${
-                tab === n.id ? "text-foreground" : "text-muted-foreground"
-              }`}
-            >
-              <div className="relative">
-                <n.icon className="h-5 w-5" />
-                {n.id === "alerts" && unacknowledgedCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-destructive" />
-                )}
-              </div>
-              {n.label}
-            </button>
-          ))}
+        {NAV.slice(0, 4).map((n) => (
+          <button
+            key={n.id}
+            onClick={() => setTab(n.id)}
+            className={`relative flex flex-col items-center gap-1 py-2 text-[10px] transition-colors ${
+              tab === n.id ? "text-foreground" : "text-muted-foreground"
+            }`}
+          >
+            <div className="relative">
+              <n.icon className="h-5 w-5" />
+              {n.id === "alerts" && unacknowledgedCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-destructive" />
+              )}
+            </div>
+            {n.label}
+          </button>
+        ))}
       </nav>
 
       {/* Main content */}

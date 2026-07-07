@@ -43,22 +43,22 @@ src/routes/_authenticated/
 
 ### Tables (9 layouts available → 3 primary patterns selected)
 
-| TypeUI Option | Applied To | Rationale |
-|---|---|---|
-| **Filterable Management Data Table** (#4) | Commissions | Sortable columns, status radio filters, footer totals. Closest match to commissions data (amounts, status, dates). |
-| **Expandable Detail Data Table** (#5) | Calendar | Expandable rows with inline detail panel — shows booking details on expand. |
-| **Item Workflow Data Table** (#7) | Waitlist / AI Calls | Progress, time tracking, status indicators pattern. Good for waitlist status and AI call intents. |
-| **Summary Metrics Data Table** (#2) | Dashboard bookings list | Summary stats + compact rows for today's schedule. |
-| **Request Queue Data Table** (#8) | AI Calls | Priority badges, agent assignment pattern — maps to call intent + handling status. |
-| **Selectable Amount Status Data Table** (#9) | POS | Transactions with sortable columns and row action menus — maps to open tickets. |
+| TypeUI Option                                | Applied To              | Rationale                                                                                                          |
+| -------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **Filterable Management Data Table** (#4)    | Commissions             | Sortable columns, status radio filters, footer totals. Closest match to commissions data (amounts, status, dates). |
+| **Expandable Detail Data Table** (#5)        | Calendar                | Expandable rows with inline detail panel — shows booking details on expand.                                        |
+| **Item Workflow Data Table** (#7)            | Waitlist / AI Calls     | Progress, time tracking, status indicators pattern. Good for waitlist status and AI call intents.                  |
+| **Summary Metrics Data Table** (#2)          | Dashboard bookings list | Summary stats + compact rows for today's schedule.                                                                 |
+| **Request Queue Data Table** (#8)            | AI Calls                | Priority badges, agent assignment pattern — maps to call intent + handling status.                                 |
+| **Selectable Amount Status Data Table** (#9) | POS                     | Transactions with sortable columns and row action menus — maps to open tickets.                                    |
 
 ### Widgets (50 layouts available → grouped into patterns)
 
-| TypeUI Widget Category | Applied To | Specific Patterns |
-|---|---|---|
-| **KPI Stat Card** | Dashboard stat rows | `Compact Metric Stat Card` (#25), `Icon Labeled Stat Card With Trend Comparison` (#33), `Widget With Trend Badge` (#32), `Widget With Left Icon And Text` (#36) |
-| **Chart Widgets** | Dashboard | `Dashboard Metrics Chart Widget` (#1 — KPI + icon + trend + bar chart), `Dual KPI Line Chart Widget` (#5 — dual metric line chart), `Filterable Donut Chart Widget` (#4 — donut with checkboxes), `Income Expense Bar Chart Widget` (#8 — horizontal bars) |
-| **List Widgets** | Waitlist, AI Calls, Floor | `List Widget With Avatars And Status Indicators` (#37), `List Widget With Avatars And Action Buttons` (#42), `List Widget With Status Indicators` (#37) |
+| TypeUI Widget Category | Applied To                | Specific Patterns                                                                                                                                                                                                                                          |
+| ---------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **KPI Stat Card**      | Dashboard stat rows       | `Compact Metric Stat Card` (#25), `Icon Labeled Stat Card With Trend Comparison` (#33), `Widget With Trend Badge` (#32), `Widget With Left Icon And Text` (#36)                                                                                            |
+| **Chart Widgets**      | Dashboard                 | `Dashboard Metrics Chart Widget` (#1 — KPI + icon + trend + bar chart), `Dual KPI Line Chart Widget` (#5 — dual metric line chart), `Filterable Donut Chart Widget` (#4 — donut with checkboxes), `Income Expense Bar Chart Widget` (#8 — horizontal bars) |
+| **List Widgets**       | Waitlist, AI Calls, Floor | `List Widget With Avatars And Status Indicators` (#37), `List Widget With Avatars And Action Buttons` (#42), `List Widget With Status Indicators` (#37)                                                                                                    |
 
 ---
 
@@ -69,6 +69,7 @@ src/routes/_authenticated/
 **Current:** 3 `<Stat>` cards (bookings count, revenue, confirmed) + plain schedule list. No charts.
 
 **Target:** Grid layout with:
+
 - **Row 1: KPI Widget Row** — 3-4 enriched stat cards:
   - Today's Bookings (with trend badge vs yesterday)
   - Revenue Today (with dollar sign icon, trend indicator)
@@ -86,6 +87,7 @@ src/routes/_authenticated/
 **Current:** 14-day date picker + plain hour rows with colored blocks.
 
 **Target:** Same 14-day date picker + improved day view:
+
 - Each hour slot with better booking cards (avatar, service name, client name, status badge)
 - Expandable booking detail on click (TypeUI #5 pattern)
 - Color-coded by staff member (already exists, improve styling)
@@ -97,6 +99,7 @@ src/routes/_authenticated/
 **Current:** Simple staff cards with status badge, tap to cycle. Real-time.
 
 **Target:** Same functionality, improved cards:
+
 - Better avatar display with status ring indicator
 - Animated status transitions
 - Service in progress info (if `with_client`)
@@ -109,6 +112,7 @@ src/routes/_authenticated/
 **Current:** 2-column layout (open tickets list + checkout panel). Basic range sliders.
 
 **Target:** Same 2-column layout, improved:
+
 - Ticket cards with better visual hierarchy (TypeUI #9 — selectable rows)
 - Checkout panel with better tip selection (button grid, not just slider)
 - Animated payment state
@@ -120,6 +124,7 @@ src/routes/_authenticated/
 **Current:** Raw `<table>` with CSV export. No search, filter, sort, pagination.
 
 **Target:** Full data table (TypeUI #4 — Filterable Management Data Table):
+
 - Search input (filter by tech name, service name)
 - Status/date filter dropdowns
 - Sortable columns (date, gross, tech share, tip)
@@ -134,6 +139,7 @@ src/routes/_authenticated/
 **Current:** Simple add form + plain list.
 
 **Target:** Improved list (TypeUI #7 — Item Workflow pattern):
+
 - Better add form with card container
 - List items with status badges, timestamps
 - Flagged entries visually distinct
@@ -146,6 +152,7 @@ src/routes/_authenticated/
 **Current:** Simple list with card-like items.
 
 **Target:** Improved cards (TypeUI #8 — Request Queue pattern):
+
 - Each call as a proper card with header (caller name + phone), intent badge, transcript excerpt
 - "Convert to booking" CTA more prominent
 - Sorted by date, filterable by intent
@@ -168,18 +175,19 @@ src/routes/_authenticated/
 
 ```tsx
 interface KpiCardProps {
-  label: string
-  value: string
-  icon?: React.ElementType
-  trend?: { direction: 'up' | 'down'; value: string }
-  sub?: string
-  chart?: React.ReactNode  // Optional sparkline
+  label: string;
+  value: string;
+  icon?: React.ElementType;
+  trend?: { direction: "up" | "down"; value: string };
+  sub?: string;
+  chart?: React.ReactNode; // Optional sparkline
 }
 ```
 
 ### DataTable (`-admin-components/data-table.tsx`)
 
 A reusable wrapper around shadcn/ui Table with:
+
 - Search input
 - Column sorting (click header to sort)
 - Filter dropdowns
@@ -213,12 +221,12 @@ No changes to TanStack Query patterns. Each tab component keeps its existing `us
 
 ## Risk Assessment
 
-| Risk | Impact | Mitigation |
-|---|---|---|
-| Large file (904 lines) hard to refactor | Medium | Extract one tab at a time. Each extraction is ~100 lines. |
-| Recharts SSR compatibility | Low | Charts are client-only. Use TanStack Router's SSR:false or client-only wrapper. |
-| Realtime floors subscription breaks | Medium | Keep subscription logic exactly as-is, only change the presentation JSX. |
-| Mobile responsiveness of charts | Low | Recharts has responsive containers. Use aspect ratio for mobile. |
+| Risk                                    | Impact | Mitigation                                                                      |
+| --------------------------------------- | ------ | ------------------------------------------------------------------------------- |
+| Large file (904 lines) hard to refactor | Medium | Extract one tab at a time. Each extraction is ~100 lines.                       |
+| Recharts SSR compatibility              | Low    | Charts are client-only. Use TanStack Router's SSR:false or client-only wrapper. |
+| Realtime floors subscription breaks     | Medium | Keep subscription logic exactly as-is, only change the presentation JSX.        |
+| Mobile responsiveness of charts         | Low    | Recharts has responsive containers. Use aspect ratio for mobile.                |
 
 ---
 

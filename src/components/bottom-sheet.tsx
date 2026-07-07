@@ -20,7 +20,7 @@ export function BottomSheet({
   className?: string;
 }) {
   return (
-      <VaulDrawer.Root open={open} onOpenChange={onOpenChange} fixed closeThreshold={0.5}>
+    <VaulDrawer.Root open={open} onOpenChange={onOpenChange} fixed closeThreshold={0.5}>
       <VaulDrawer.Portal>
         <VaulDrawer.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" />
         <VaulDrawer.Content
@@ -35,7 +35,9 @@ export function BottomSheet({
               {title}
             </VaulDrawer.Title>
           )}
-          <VaulDrawer.Description className="sr-only">{description ?? "Booking flow"}</VaulDrawer.Description>
+          <VaulDrawer.Description className="sr-only">
+            {description ?? "Booking flow"}
+          </VaulDrawer.Description>
           <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-4">{children}</div>
           {footer && (
             <div className="border-t border-border bg-card px-6 py-4 safe-pb">{footer}</div>

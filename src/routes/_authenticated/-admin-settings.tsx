@@ -2,9 +2,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import {
-  Save, Plus, Pencil, Trash2, X, Check,
-} from "lucide-react";
+import { Save, Plus, Pencil, Trash2, X, Check } from "lucide-react";
 import {
   getAllStaffForSalon,
   createStaff,
@@ -32,10 +30,7 @@ export default function SettingsView({ salon }: { salon: any }) {
 
   const saveBusiness = async () => {
     setSaving(true);
-    const { error } = await supabase
-      .from("salons")
-      .update({ name, phone })
-      .eq("id", salon.id);
+    const { error } = await supabase.from("salons").update({ name, phone }).eq("id", salon.id);
     if (error) toast.error(error.message);
     else toast.success("Settings saved");
     setSaving(false);
@@ -46,7 +41,9 @@ export default function SettingsView({ salon }: { salon: any }) {
     queryKey: ["staff-list"],
     queryFn: () => getAllStaffForSalon(),
   });
-  const [staffForm, setStaffForm] = useState<{ name: string; role: "owner" | "staff" } | null>(null);
+  const [staffForm, setStaffForm] = useState<{ name: string; role: "owner" | "staff" } | null>(
+    null,
+  );
   const [editingStaff, setEditingStaff] = useState<string | null>(null);
 
   const handleCreateStaff = async () => {
@@ -86,8 +83,11 @@ export default function SettingsView({ salon }: { salon: any }) {
     queryFn: () => getAllServicesForSalon(),
   });
   const [svcForm, setSvcForm] = useState<{
-    name: string; category: string; durationMinutes: number;
-    price: number; bufferAfterMinutes: number;
+    name: string;
+    category: string;
+    durationMinutes: number;
+    price: number;
+    bufferAfterMinutes: number;
   } | null>(null);
   const [editingSvc, setEditingSvc] = useState<string | null>(null);
 
@@ -123,17 +123,23 @@ export default function SettingsView({ salon }: { salon: any }) {
   };
 
   // ── Hours ────────────────────────────────────────────────────────────
-  const [hours, setHours] = useState<Record<string, { open: string; close: string }>>(
-    () => {
-      const raw = salon.business_hours || {};
-      const parsed: Record<string, { open: string; close: string }> = {};
-      for (const day of ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]) {
-        const slot = raw[day]?.[0];
-        parsed[day] = { open: slot?.open ?? "", close: slot?.close ?? "" };
-      }
-      return parsed;
-    },
-  );
+  const [hours, setHours] = useState<Record<string, { open: string; close: string }>>(() => {
+    const raw = salon.business_hours || {};
+    const parsed: Record<string, { open: string; close: string }> = {};
+    for (const day of [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday",
+    ]) {
+      const slot = raw[day]?.[0];
+      parsed[day] = { open: slot?.open ?? "", close: slot?.close ?? "" };
+    }
+    return parsed;
+  });
   const [savingHours, setSavingHours] = useState(false);
 
   const handleSaveHours = async () => {
@@ -177,8 +183,10 @@ export default function SettingsView({ salon }: { salon: any }) {
       <div className="rounded-2xl bg-surface p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">Staff</h3>
-          <button onClick={() => setStaffForm({ name: "", role: "staff" })}
-            className={`${BTN_SM_CLS} bg-primary/10 text-primary hover:bg-primary/20`}>
+          <button
+            onClick={() => setStaffForm({ name: "", role: "staff" })}
+            className={`${BTN_SM_CLS} bg-primary/10 text-primary hover:bg-primary/20`}
+          >
             <Plus className="h-3.5 w-3.5" /> Add
           </button>
         </div>
@@ -187,23 +195,37 @@ export default function SettingsView({ salon }: { salon: any }) {
           <div className="rounded-xl bg-surface-2 p-4 space-y-3 border border-border/30">
             <label className="block">
               <span className="text-xs text-muted-foreground font-medium">Name</span>
-              <input value={staffForm.name} onChange={(e) => setStaffForm({ ...staffForm, name: e.target.value })}
-                className={INPUT_CLS} placeholder="Staff name" />
+              <input
+                value={staffForm.name}
+                onChange={(e) => setStaffForm({ ...staffForm, name: e.target.value })}
+                className={INPUT_CLS}
+                placeholder="Staff name"
+              />
             </label>
             <label className="block">
               <span className="text-xs text-muted-foreground font-medium">Role</span>
-              <select value={staffForm.role}
-                onChange={(e) => setStaffForm({ ...staffForm, role: e.target.value as "owner" | "staff" })}
-                className={INPUT_CLS}>
+              <select
+                value={staffForm.role}
+                onChange={(e) =>
+                  setStaffForm({ ...staffForm, role: e.target.value as "owner" | "staff" })
+                }
+                className={INPUT_CLS}
+              >
                 <option value="staff">Staff</option>
                 <option value="owner">Owner</option>
               </select>
             </label>
             <div className="flex gap-2">
-              <button onClick={handleCreateStaff} className={`${BTN_SM_CLS} bg-emerald-600 text-white hover:bg-emerald-700`}>
+              <button
+                onClick={handleCreateStaff}
+                className={`${BTN_SM_CLS} bg-emerald-600 text-white hover:bg-emerald-700`}
+              >
                 <Check className="h-3.5 w-3.5" /> Save
               </button>
-              <button onClick={() => setStaffForm(null)} className={`${BTN_SM_CLS} bg-surface-3 text-muted-foreground hover:bg-border/40`}>
+              <button
+                onClick={() => setStaffForm(null)}
+                className={`${BTN_SM_CLS} bg-surface-3 text-muted-foreground hover:bg-border/40`}
+              >
                 <X className="h-3.5 w-3.5" /> Cancel
               </button>
             </div>
@@ -216,15 +238,22 @@ export default function SettingsView({ salon }: { salon: any }) {
 
         <div className="space-y-2">
           {staffList.map((s: any) => (
-            <div key={s.id} className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3">
+            <div
+              key={s.id}
+              className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3"
+            >
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                  style={{ backgroundColor: s.avatar_color || "#0a0a0a" }}>
+                <div
+                  className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                  style={{ backgroundColor: s.avatar_color || "#0a0a0a" }}
+                >
                   {(s.name || "?").charAt(0).toUpperCase()}
                 </div>
                 <div>
                   <p className="text-sm font-medium">{s.name}</p>
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{s.role}</p>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    {s.role}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -238,8 +267,10 @@ export default function SettingsView({ salon }: { salon: any }) {
                 >
                   {s.is_active ? "Active" : "Inactive"}
                 </button>
-                <button onClick={() => handleDeleteStaff(s.id)}
-                  className="tap-target p-1.5 text-muted-foreground hover:text-red-500 transition-colors">
+                <button
+                  onClick={() => handleDeleteStaff(s.id)}
+                  className="tap-target p-1.5 text-muted-foreground hover:text-red-500 transition-colors"
+                >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -252,11 +283,18 @@ export default function SettingsView({ salon }: { salon: any }) {
       <div className="rounded-2xl bg-surface p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">Services</h3>
-          <button onClick={() => setSvcForm({
-            name: "", category: "", durationMinutes: 30, price: 0,
-            bufferAfterMinutes: 0,
-          })}
-            className={`${BTN_SM_CLS} bg-primary/10 text-primary hover:bg-primary/20`}>
+          <button
+            onClick={() =>
+              setSvcForm({
+                name: "",
+                category: "",
+                durationMinutes: 30,
+                price: 0,
+                bufferAfterMinutes: 0,
+              })
+            }
+            className={`${BTN_SM_CLS} bg-primary/10 text-primary hover:bg-primary/20`}
+          >
             <Plus className="h-3.5 w-3.5" /> Add
           </button>
         </div>
@@ -266,38 +304,68 @@ export default function SettingsView({ salon }: { salon: any }) {
             <div className="grid grid-cols-2 gap-3">
               <label className="block col-span-2">
                 <span className="text-xs text-muted-foreground font-medium">Name</span>
-                <input value={svcForm.name} onChange={(e) => setSvcForm({ ...svcForm, name: e.target.value })}
-                  className={INPUT_CLS} placeholder="Service name" />
+                <input
+                  value={svcForm.name}
+                  onChange={(e) => setSvcForm({ ...svcForm, name: e.target.value })}
+                  className={INPUT_CLS}
+                  placeholder="Service name"
+                />
               </label>
               <label className="block">
                 <span className="text-xs text-muted-foreground font-medium">Category</span>
-                <input value={svcForm.category} onChange={(e) => setSvcForm({ ...svcForm, category: e.target.value })}
-                  className={INPUT_CLS} placeholder="e.g. Core Nail" />
+                <input
+                  value={svcForm.category}
+                  onChange={(e) => setSvcForm({ ...svcForm, category: e.target.value })}
+                  className={INPUT_CLS}
+                  placeholder="e.g. Core Nail"
+                />
               </label>
               <label className="block">
                 <span className="text-xs text-muted-foreground font-medium">Duration (min)</span>
-                <input type="number" value={svcForm.durationMinutes}
-                  onChange={(e) => setSvcForm({ ...svcForm, durationMinutes: Number(e.target.value) })}
-                  className={INPUT_CLS} />
+                <input
+                  type="number"
+                  value={svcForm.durationMinutes}
+                  onChange={(e) =>
+                    setSvcForm({ ...svcForm, durationMinutes: Number(e.target.value) })
+                  }
+                  className={INPUT_CLS}
+                />
               </label>
               <label className="block">
                 <span className="text-xs text-muted-foreground font-medium">Price ($)</span>
-                <input type="number" step="0.01" value={svcForm.price}
+                <input
+                  type="number"
+                  step="0.01"
+                  value={svcForm.price}
                   onChange={(e) => setSvcForm({ ...svcForm, price: Number(e.target.value) })}
-                  className={INPUT_CLS} />
+                  className={INPUT_CLS}
+                />
               </label>
               <label className="block col-span-2">
-                <span className="text-xs text-muted-foreground font-medium">Buffer after (min)</span>
-                <input type="number" value={svcForm.bufferAfterMinutes}
-                  onChange={(e) => setSvcForm({ ...svcForm, bufferAfterMinutes: Number(e.target.value) })}
-                  className={INPUT_CLS} />
+                <span className="text-xs text-muted-foreground font-medium">
+                  Buffer after (min)
+                </span>
+                <input
+                  type="number"
+                  value={svcForm.bufferAfterMinutes}
+                  onChange={(e) =>
+                    setSvcForm({ ...svcForm, bufferAfterMinutes: Number(e.target.value) })
+                  }
+                  className={INPUT_CLS}
+                />
               </label>
             </div>
             <div className="flex gap-2">
-              <button onClick={handleCreateService} className={`${BTN_SM_CLS} bg-emerald-600 text-white hover:bg-emerald-700`}>
+              <button
+                onClick={handleCreateService}
+                className={`${BTN_SM_CLS} bg-emerald-600 text-white hover:bg-emerald-700`}
+              >
                 <Check className="h-3.5 w-3.5" /> Save
               </button>
-              <button onClick={() => setSvcForm(null)} className={`${BTN_SM_CLS} bg-surface-3 text-muted-foreground hover:bg-border/40`}>
+              <button
+                onClick={() => setSvcForm(null)}
+                className={`${BTN_SM_CLS} bg-surface-3 text-muted-foreground hover:bg-border/40`}
+              >
                 <X className="h-3.5 w-3.5" /> Cancel
               </button>
             </div>
@@ -310,11 +378,16 @@ export default function SettingsView({ salon }: { salon: any }) {
 
         <div className="space-y-2">
           {servicesList.map((svc: any) => (
-            <div key={svc.id} className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3">
+            <div
+              key={svc.id}
+              className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3"
+            >
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium truncate">{svc.name}</p>
                 <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
-                  {svc.category && <span className="px-1.5 py-0.5 rounded bg-muted">{svc.category}</span>}
+                  {svc.category && (
+                    <span className="px-1.5 py-0.5 rounded bg-muted">{svc.category}</span>
+                  )}
                   <span>{svc.duration_minutes} min</span>
                   <span className="font-mono">${Number(svc.price).toFixed(2)}</span>
                 </div>
@@ -330,8 +403,10 @@ export default function SettingsView({ salon }: { salon: any }) {
                 >
                   {svc.is_active ? "Active" : "Inactive"}
                 </button>
-                <button onClick={() => handleDeleteService(svc.id)}
-                  className="tap-target p-1.5 text-muted-foreground hover:text-red-500 transition-colors">
+                <button
+                  onClick={() => handleDeleteService(svc.id)}
+                  className="tap-target p-1.5 text-muted-foreground hover:text-red-500 transition-colors"
+                >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -344,22 +419,32 @@ export default function SettingsView({ salon }: { salon: any }) {
       <div className="rounded-2xl bg-surface p-6 space-y-4">
         <h3 className="font-semibold">Business hours</h3>
         <div className="space-y-3">
-          {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map((day) => (
-            <div key={day} className="flex items-center gap-3">
-              <span className="w-24 text-xs font-medium capitalize text-muted-foreground">{day}</span>
-              <input
-                type="time" value={hours[day]?.open ?? ""}
-                onChange={(e) => setHours({ ...hours, [day]: { ...hours[day], open: e.target.value } })}
-                className="tap-target rounded-lg bg-surface-2 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/20"
-              />
-              <span className="text-xs text-muted-foreground">to</span>
-              <input
-                type="time" value={hours[day]?.close ?? ""}
-                onChange={(e) => setHours({ ...hours, [day]: { ...hours[day], close: e.target.value } })}
-                className="tap-target rounded-lg bg-surface-2 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/20"
-              />
-            </div>
-          ))}
+          {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map(
+            (day) => (
+              <div key={day} className="flex items-center gap-3">
+                <span className="w-24 text-xs font-medium capitalize text-muted-foreground">
+                  {day}
+                </span>
+                <input
+                  type="time"
+                  value={hours[day]?.open ?? ""}
+                  onChange={(e) =>
+                    setHours({ ...hours, [day]: { ...hours[day], open: e.target.value } })
+                  }
+                  className="tap-target rounded-lg bg-surface-2 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/20"
+                />
+                <span className="text-xs text-muted-foreground">to</span>
+                <input
+                  type="time"
+                  value={hours[day]?.close ?? ""}
+                  onChange={(e) =>
+                    setHours({ ...hours, [day]: { ...hours[day], close: e.target.value } })
+                  }
+                  className="tap-target rounded-lg bg-surface-2 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+            ),
+          )}
         </div>
         <button onClick={handleSaveHours} disabled={savingHours} className={BTN_CLS}>
           <Save className="h-4 w-4" />
@@ -371,8 +456,9 @@ export default function SettingsView({ salon }: { salon: any }) {
       <div className="rounded-2xl bg-surface p-6">
         <h3 className="font-semibold mb-2">Social & online</h3>
         <p className="text-xs text-muted-foreground">
-          Social links (Instagram, Facebook, TikTok, Booksy, Yelp) are managed via
-          environment variables. Update your <code className="text-primary bg-primary/10 px-1 rounded">.env</code> to change them.
+          Social links (Instagram, Facebook, TikTok, Booksy, Yelp) are managed via environment
+          variables. Update your{" "}
+          <code className="text-primary bg-primary/10 px-1 rounded">.env</code> to change them.
         </p>
       </div>
     </div>

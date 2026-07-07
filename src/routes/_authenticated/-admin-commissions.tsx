@@ -24,7 +24,9 @@ export default function Commissions({ salonId }: { salonId: string }) {
     queryFn: async () => {
       const { data } = await supabase
         .from("bookings")
-        .select("id, completed_at, tip_amount, payment_method, staff!inner(name), services!inner(name)")
+        .select(
+          "id, completed_at, tip_amount, payment_method, staff!inner(name), services!inner(name)",
+        )
         .eq("salon_id", salonId)
         .not("completed_at", "is", null)
         .order("completed_at", { ascending: false })
@@ -41,8 +43,7 @@ export default function Commissions({ salonId }: { salonId: string }) {
       const q = search.toLowerCase();
       arr = arr.filter(
         (r: any) =>
-          r.staff?.name?.toLowerCase().includes(q) ||
-          r.services?.name?.toLowerCase().includes(q),
+          r.staff?.name?.toLowerCase().includes(q) || r.services?.name?.toLowerCase().includes(q),
       );
     }
 
@@ -77,13 +78,7 @@ export default function Commissions({ salonId }: { salonId: string }) {
   );
 
   const exportCsv = () => {
-    const headers = [
-      "Date",
-      "Staff Name",
-      "Service Provided",
-      "Tip Amount",
-      "Payment Method",
-    ];
+    const headers = ["Date", "Staff Name", "Service Provided", "Tip Amount", "Payment Method"];
     const lines = [headers.join(",")].concat(
       filtered.map((r: any) =>
         [
@@ -115,8 +110,13 @@ export default function Commissions({ salonId }: { salonId: string }) {
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-50" />;
-    return sortDir === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />;
+    if (sortField !== field)
+      return <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-50" />;
+    return sortDir === "asc" ? (
+      <ChevronUp className="h-3 w-3" />
+    ) : (
+      <ChevronDown className="h-3 w-3" />
+    );
   };
 
   return (
@@ -177,10 +177,14 @@ export default function Commissions({ salonId }: { salonId: string }) {
             <tbody className="divide-y divide-border">
               {pageRows.map((r: any) => (
                 <tr key={r.id} className="hover:bg-surface-2/30 transition-colors">
-                  <td className="p-4 font-mono text-xs whitespace-nowrap">{fmtDate(r.completed_at)}</td>
+                  <td className="p-4 font-mono text-xs whitespace-nowrap">
+                    {fmtDate(r.completed_at)}
+                  </td>
                   <td className="font-medium whitespace-nowrap">{r.staff?.name}</td>
                   <td className="text-muted-foreground">{r.services?.name}</td>
-                  <td className="font-mono tabular-nums">{r.tip_amount != null ? fmtMoney(Number(r.tip_amount)) : "—"}</td>
+                  <td className="font-mono tabular-nums">
+                    {r.tip_amount != null ? fmtMoney(Number(r.tip_amount)) : "—"}
+                  </td>
                   <td className="text-muted-foreground">{r.payment_method || "—"}</td>
                 </tr>
               ))}
@@ -208,9 +212,7 @@ export default function Commissions({ salonId }: { salonId: string }) {
                   key={i}
                   onClick={() => setPage(i)}
                   className={`tap-target h-8 w-8 rounded-lg text-sm ${
-                    i === page
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-surface-2"
+                    i === page ? "bg-primary text-primary-foreground" : "hover:bg-surface-2"
                   }`}
                 >
                   {i + 1}

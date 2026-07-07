@@ -31,28 +31,40 @@ const { data: staff = [], isFetching: staffLoading } = useQuery({
 ```
 
 Then in the Book component render, pass `isFetching` to the step components:
+
 ```tsx
-{step === 1 && (
-  <StepService
-    services={services}
-    selectedId={serviceId}
-    onSelect={(id) => { setServiceId(id); next(); }}
-    isLoading={servicesLoading}  // NEW
-  />
-)}
-{step === 2 && (
-  <StepStaff
-    staff={staff}
-    selectedId={staffId}
-    onSelect={(id) => { setStaffId(id); next(); }}
-    isLoading={staffLoading}  // NEW
-  />
-)}
+{
+  step === 1 && (
+    <StepService
+      services={services}
+      selectedId={serviceId}
+      onSelect={(id) => {
+        setServiceId(id);
+        next();
+      }}
+      isLoading={servicesLoading} // NEW
+    />
+  );
+}
+{
+  step === 2 && (
+    <StepStaff
+      staff={staff}
+      selectedId={staffId}
+      onSelect={(id) => {
+        setStaffId(id);
+        next();
+      }}
+      isLoading={staffLoading} // NEW
+    />
+  );
+}
 ```
 
 **Fix in `src/routes/book/-step-service.tsx`:**
 
 Add the new prop:
+
 ```tsx
 export interface StepServiceProps {
   services: Service[] | null;
@@ -63,6 +75,7 @@ export interface StepServiceProps {
 ```
 
 Replace the existing loading check (the unreachable `services === null`):
+
 ```tsx
 // Lines 18-27 — replace:
 if (services === null || isLoading) {
@@ -70,9 +83,18 @@ if (services === null || isLoading) {
     <div className="grid place-items-center py-10">
       <div className="flex flex-col items-center gap-3">
         <div className="flex gap-1">
-          <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "0ms" }} />
-          <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "150ms" }} />
-          <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "300ms" }} />
+          <span
+            className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40"
+            style={{ animationDelay: "0ms" }}
+          />
+          <span
+            className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40"
+            style={{ animationDelay: "150ms" }}
+          />
+          <span
+            className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40"
+            style={{ animationDelay: "300ms" }}
+          />
         </div>
         <span className="text-sm text-muted-foreground">Loading services…</span>
       </div>
@@ -84,6 +106,7 @@ if (services === null || isLoading) {
 **Fix in `src/routes/book/-step-staff.tsx`:**
 
 Add the `isLoading` prop similarly:
+
 ```tsx
 export interface StepStaffProps {
   staff: StaffMember[];
@@ -94,6 +117,7 @@ export interface StepStaffProps {
 ```
 
 Add a loading state before the empty state:
+
 ```tsx
 // Lines 16-24 — modify:
 if (isLoading) {
@@ -101,9 +125,18 @@ if (isLoading) {
     <div className="grid place-items-center py-10">
       <div className="flex flex-col items-center gap-3">
         <div className="flex gap-1">
-          <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "0ms" }} />
-          <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "150ms" }} />
-          <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "300ms" }} />
+          <span
+            className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40"
+            style={{ animationDelay: "0ms" }}
+          />
+          <span
+            className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40"
+            style={{ animationDelay: "150ms" }}
+          />
+          <span
+            className="inline-block h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40"
+            style={{ animationDelay: "300ms" }}
+          />
         </div>
         <span className="text-sm text-muted-foreground">Loading artists…</span>
       </div>
@@ -188,15 +221,19 @@ className={`flex w-full tap-target items-center justify-between gap-3 rounded-2x
 ```
 
 Add a `Check` icon when selected (after the price span on line 60):
+
 ```tsx
-{isSelected && (
-  <span className="shrink-0 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
-    <Check className="h-3.5 w-3.5" />
-  </span>
-)}
+{
+  isSelected && (
+    <span className="shrink-0 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
+      <Check className="h-3.5 w-3.5" />
+    </span>
+  );
+}
 ```
 
 Import `Check` at the top:
+
 ```tsx
 import { Check } from "lucide-react";
 ```
@@ -204,6 +241,7 @@ import { Check } from "lucide-react";
 **Fix in `-step-staff.tsx` (line 35):**
 
 Similarly, add background tint and hover:
+
 ```tsx
 className={`flex w-full tap-target items-center gap-4 rounded-2xl bg-surface p-4 text-left ${
   isSelected
@@ -246,6 +284,7 @@ const handleDisabledClick = (step: number) => {
 ```
 
 Then on each disabled button, add `onClick`:
+
 ```tsx
 <button
   disabled={...}
@@ -255,12 +294,15 @@ Then on each disabled button, add `onClick`:
 ```
 
 And render the hint:
+
 ```tsx
-{disabledHint && (
-  <p className="text-xs text-amber-600 text-center mt-2 animate-in fade-in slide-in-from-bottom-1 duration-200">
-    {disabledHint}
-  </p>
-)}
+{
+  disabledHint && (
+    <p className="text-xs text-amber-600 text-center mt-2 animate-in fade-in slide-in-from-bottom-1 duration-200">
+      {disabledHint}
+    </p>
+  );
+}
 ```
 
 ---
@@ -285,6 +327,7 @@ onSelect={(id) => {
 ```
 
 The Continue button checks if a selection is made:
+
 ```tsx
 // Continue button disabled state already works:
 disabled={(step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)}
@@ -412,16 +455,26 @@ useEffect(() => {
 ```
 
 For `sessionStorage` backup, add save/restore:
+
 ```tsx
 const BOOKING_STATE_KEY = "booking-state";
 
 // Save on change:
 useEffect(() => {
   if (serviceId || staffId || slot || name || phone) {
-    sessionStorage.setItem(BOOKING_STATE_KEY, JSON.stringify({
-      serviceId, staffId, date: date.toISOString(),
-      slot: slot?.toISOString(), name, phone, email, step,
-    }));
+    sessionStorage.setItem(
+      BOOKING_STATE_KEY,
+      JSON.stringify({
+        serviceId,
+        staffId,
+        date: date.toISOString(),
+        slot: slot?.toISOString(),
+        name,
+        phone,
+        email,
+        step,
+      }),
+    );
   }
 }, [serviceId, staffId, date, slot, name, phone, email, step]);
 ```
@@ -453,6 +506,7 @@ const handleDateChange = (d: Date) => {
 Replace the existing `onDateChange` prop usage with `handleDateChange`.
 
 Also set a `staleTime` on the slot query (line 113):
+
 ```tsx
 const { data: slots = [], isFetching: loadingSlots } = useQuery({
   queryKey: ["slots", staffId, serviceId, date.toDateString()],
@@ -488,8 +542,14 @@ The `animate-in` and `fade-in` classes come from `tw-animate-css` (already impor
 
 ```css
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .animate-fade-in {
   animation: fadeIn 200ms ease-out;
@@ -527,6 +587,7 @@ The `animate-in` and `fade-in` classes come from `tw-animate-css` (already impor
 ```
 
 Apply the same pattern to the phone field (lines 114-128):
+
 - Add `id="phone-error"` and `role="alert"` to the error paragraph
 - Add `aria-describedby="phone-error"` to the input
 - Add `aria-invalid={showPhoneError || undefined}` to the input
@@ -561,9 +622,10 @@ className={`flex w-full tap-target items-center gap-4 rounded-2xl bg-surface p-4
 ```
 
 Also add a hover state for desktop:
+
 ```tsx
 // Add to both:
-hover:bg-surface-2
+hover: bg - surface - 2;
 ```
 
 ---
@@ -583,9 +645,11 @@ hover:bg-surface-2
 ```tsx
 // Around line 148-158:
 <section className={`border-b border-border/60 ${step > 1 ? "sm:block" : ""}`}>
-  <div className={`mx-auto max-w-3xl px-6 text-center ${
-    step > 1 ? "py-4 sm:py-16" : "py-16 sm:py-20"
-  }`}>
+  <div
+    className={`mx-auto max-w-3xl px-6 text-center ${
+      step > 1 ? "py-4 sm:py-16" : "py-16 sm:py-20"
+    }`}
+  >
     {step === 1 ? (
       <>
         <p className="text-[11px] uppercase tracking-[0.35em] text-accent">Booking</p>
@@ -597,9 +661,7 @@ hover:bg-surface-2
         </p>
       </>
     ) : (
-      <p className="text-[11px] uppercase tracking-[0.35em] text-accent">
-        Step {step} of 4
-      </p>
+      <p className="text-[11px] uppercase tracking-[0.35em] text-accent">Step {step} of 4</p>
     )}
   </div>
 </section>
@@ -641,9 +703,7 @@ hover:bg-surface-2
 
 ```tsx
 // After the phone input group (after line 128):
-<p className="mt-1 text-[11px] text-muted-foreground">
-  US number: (555) 123-4567
-</p>
+<p className="mt-1 text-[11px] text-muted-foreground">US number: (555) 123-4567</p>
 ```
 
 ---
@@ -660,14 +720,16 @@ hover:bg-surface-2
 /* Line 74 in styles.css — change: */
 --muted-foreground: oklch(0.48 0.03 350);
 /* TO: */
---muted-foreground: oklch(0.40 0.03 350);
+--muted-foreground: oklch(0.4 0.03 350);
 ```
 
 Also verify the dark mode equivalent (line 113):
+
 ```css
 /* Line 113 — ensure it's adequate: */
 --muted-foreground: oklch(0.65 0 0);
 ```
+
 This may need to be lightened on dark mode for visibility.
 
 ---
@@ -681,15 +743,18 @@ This may need to be lightened on dark mode for visibility.
 **Fix — Either refactor to use it or delete the file:**
 
 **Option A (Delete — simpler):**
+
 ```bash
 rm src/routes/book/-booking-layout-desktop.tsx
 ```
 
 **Option B (Refactor — if you want the pattern):**
 Import and use it in `book.tsx`:
+
 ```tsx
 import BookingLayoutDesktop from "./book/-booking-layout-desktop";
 ```
+
 Then wrap the `book.tsx` layout in it instead of the inline layout.
 
 ---
@@ -704,23 +769,23 @@ Then wrap the `book.tsx` layout in it instead of the inline layout.
 
 ```tsx
 // Lines 49-52 — replace:
-{loadingSlots ? (
-  <div className="grid place-items-center py-10">
-    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-  </div>
-) : null}
+{
+  loadingSlots ? (
+    <div className="grid place-items-center py-10">
+      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+    </div>
+  ) : null;
+}
 // WITH:
-{loadingSlots ? (
-  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-    {Array.from({ length: 6 }).map((_, i) => (
-      <div
-        key={i}
-        className="h-10 rounded-xl bg-surface animate-pulse"
-        aria-hidden="true"
-      />
-    ))}
-  </div>
-) : null}
+{
+  loadingSlots ? (
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="h-10 rounded-xl bg-surface animate-pulse" aria-hidden="true" />
+      ))}
+    </div>
+  ) : null;
+}
 ```
 
 ---
@@ -735,7 +800,9 @@ Then wrap the `book.tsx` layout in it instead of the inline layout.
 
 ```tsx
 // Lines 149-157 — replace:
-{/* Payment Section */}
+{
+  /* Payment Section */
+}
 <div className="rounded-2xl bg-surface p-4">
   <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
     <Check className="h-3 w-3 text-success" />
@@ -744,7 +811,7 @@ Then wrap the `book.tsx` layout in it instead of the inline layout.
   <p className="mt-2 text-sm">
     Pay at the salon after your service. We'll send a reminder before your appointment.
   </p>
-</div>
+</div>;
 ```
 
 ---
