@@ -69,8 +69,22 @@ describe("env defaults", () => {
     expect(getUmamiHost()).toBe("https://cloud.umami.is");
   });
 
-  it("getSalonId returns undefined when no env set", () => {
-    expect(getSalonId()).toBeUndefined();
+});
+
+describe("getSalonId", () => {
+  afterEach(() => {
+    delete process.env.VITE_SALON_ID;
+  });
+
+  it("returns the salon ID from env", async () => {
+    process.env.VITE_SALON_ID = "11111111-1111-1111-1111-111111111111";
+    const { getSalonId: get } = await import("./env");
+    expect(get()).toBe("11111111-1111-1111-1111-111111111111");
+  });
+
+  it("returns undefined when no env set", async () => {
+    const { getSalonId: get } = await import("./env");
+    expect(get()).toBeUndefined();
   });
 });
 

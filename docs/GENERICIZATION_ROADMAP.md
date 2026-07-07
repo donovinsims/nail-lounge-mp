@@ -14,7 +14,7 @@
 
 ### P0.2 — Clean Up Duplicate Tree
 
-- Redundant `mynails/` subdirectory does not exist in this repo — clean single tree.
+- Redundant `nail-lounge/` subdirectory does not exist in this repo — clean single tree.
 
 ### P0.3 — Gate Seed Demo Data
 
@@ -273,7 +273,7 @@ To deploy this generic template for a new salon:
 
 ```bash
 # 1. Clone template
-cp -r ~/mynails-generic ~/salons/new-salon
+cp -r ~/nail-lounge ~/salons/new-salon
 cd ~/salons/new-salon
 rm -rf .git && git init && git add -A && git commit -m "Initial commit"
 

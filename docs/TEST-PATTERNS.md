@@ -1,6 +1,6 @@
 # Test Patterns
 
-Testing patterns and conventions for the mynails-generic project.
+Testing patterns and conventions for the nail-lounge project.
 
 ---
 

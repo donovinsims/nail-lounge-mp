@@ -38,7 +38,7 @@ function Appointments() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-lookupMutation.mutate({ data: { phone, salonId: getSalonId()! } });
+          lookupMutation.mutate({ data: { phone, salonId: getSalonId()! } });
         }}
         className="mt-6 flex gap-2"
       >

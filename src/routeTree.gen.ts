@@ -9,8 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ServiceRouteImport } from './routes/service'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as GiftCardsRouteImport } from './routes/gift-cards'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as BookingConfirmedRouteImport } from './routes/booking-confirmed'
@@ -25,6 +27,11 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedStaffIndexRouteImport } from './routes/_authenticated/staff/index'
 import { Route as AuthenticatedStaffAppointmentsRouteImport } from './routes/_authenticated/staff/appointments'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
@@ -33,6 +40,11 @@ const ServicesRoute = ServicesRouteImport.update({
 const ServiceRoute = ServiceRouteImport.update({
   id: '/service',
   path: '/service',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GiftCardsRoute = GiftCardsRouteImport.update({
@@ -109,8 +121,10 @@ export interface FileRoutesByFullPath {
   '/booking-confirmed': typeof BookingConfirmedRoute
   '/gallery': typeof GalleryRoute
   '/gift-cards': typeof GiftCardsRoute
+  '/privacy': typeof PrivacyRoute
   '/service': typeof ServiceRoute
   '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/staff': typeof AuthenticatedStaffRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
@@ -125,8 +139,10 @@ export interface FileRoutesByTo {
   '/booking-confirmed': typeof BookingConfirmedRoute
   '/gallery': typeof GalleryRoute
   '/gift-cards': typeof GiftCardsRoute
+  '/privacy': typeof PrivacyRoute
   '/service': typeof ServiceRoute
   '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/staff/appointments': typeof AuthenticatedStaffAppointmentsRoute
@@ -142,8 +158,10 @@ export interface FileRoutesById {
   '/booking-confirmed': typeof BookingConfirmedRoute
   '/gallery': typeof GalleryRoute
   '/gift-cards': typeof GiftCardsRoute
+  '/privacy': typeof PrivacyRoute
   '/service': typeof ServiceRoute
   '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/staff': typeof AuthenticatedStaffRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
@@ -160,8 +178,10 @@ export interface FileRouteTypes {
     | '/booking-confirmed'
     | '/gallery'
     | '/gift-cards'
+    | '/privacy'
     | '/service'
     | '/services'
+    | '/terms'
     | '/admin'
     | '/staff'
     | '/auth/callback'
@@ -176,8 +196,10 @@ export interface FileRouteTypes {
     | '/booking-confirmed'
     | '/gallery'
     | '/gift-cards'
+    | '/privacy'
     | '/service'
     | '/services'
+    | '/terms'
     | '/admin'
     | '/auth/callback'
     | '/staff/appointments'
@@ -192,8 +214,10 @@ export interface FileRouteTypes {
     | '/booking-confirmed'
     | '/gallery'
     | '/gift-cards'
+    | '/privacy'
     | '/service'
     | '/services'
+    | '/terms'
     | '/_authenticated/admin'
     | '/_authenticated/staff'
     | '/auth/callback'
@@ -210,12 +234,21 @@ export interface RootRouteChildren {
   BookingConfirmedRoute: typeof BookingConfirmedRoute
   GalleryRoute: typeof GalleryRoute
   GiftCardsRoute: typeof GiftCardsRoute
+  PrivacyRoute: typeof PrivacyRoute
   ServiceRoute: typeof ServiceRoute
   ServicesRoute: typeof ServicesRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services': {
       id: '/services'
       path: '/services'
@@ -228,6 +261,13 @@ declare module '@tanstack/react-router' {
       path: '/service'
       fullPath: '/service'
       preLoaderRoute: typeof ServiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gift-cards': {
@@ -369,8 +409,10 @@ const rootRouteChildren: RootRouteChildren = {
   BookingConfirmedRoute: BookingConfirmedRoute,
   GalleryRoute: GalleryRoute,
   GiftCardsRoute: GiftCardsRoute,
+  PrivacyRoute: PrivacyRoute,
   ServiceRoute: ServiceRoute,
   ServicesRoute: ServicesRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

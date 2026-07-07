@@ -18,7 +18,7 @@ export interface SalonSocialConfig {
 }
 
 export function getSalonId(): string | undefined {
-  return import.meta.env.VITE_SALON_ID;
+  return import.meta.env.VITE_SALON_ID ?? process.env.VITE_SALON_ID;
 }
 
 export function getSalonName(): string {

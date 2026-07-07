@@ -67,12 +67,10 @@ function AuthPage() {
               <Mail className="h-6 w-6 text-primary" />
             </div>
             <p className="text-sm text-muted-foreground">
-              Magic link sent to{" "}
-              <span className="font-medium text-foreground">{email}</span>
+              Magic link sent to <span className="font-medium text-foreground">{email}</span>
             </p>
             <p className="text-xs text-muted-foreground">
-              Check your inbox and click the link to sign in. You can close this
-              tab.
+              Check your inbox and click the link to sign in. You can close this tab.
             </p>
             <button
               onClick={() => {
@@ -104,8 +102,7 @@ function AuthPage() {
               </button>
             </form>
             <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-              <div className="h-px flex-1 bg-border" /> OR{" "}
-              <div className="h-px flex-1 bg-border" />
+              <div className="h-px flex-1 bg-border" /> OR <div className="h-px flex-1 bg-border" />
             </div>
             <button
               onClick={google}

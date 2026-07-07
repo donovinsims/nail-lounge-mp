@@ -56,10 +56,7 @@ export async function handleRatingReply(params: {
 
   // Update the booking with the rating
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  await supabaseAdmin
-    .from("bookings")
-    .update({ client_rating: rating })
-    .eq("id", params.bookingId);
+  await supabaseAdmin.from("bookings").update({ client_rating: rating }).eq("id", params.bookingId);
 
   if (rating >= 4) {
     // High rating — send Google Review SMS

@@ -8,7 +8,7 @@
 ## 1. Quick Start
 
 ```
-Location:      /Users/forex/mynails-generic
+Location:      /Users/forex/nail-lounge
 Framework:     TanStack Start (React 19) + Vite 7 + Tailwind CSS v4
 Database:      Supabase PostgreSQL (10+ tables, 5 enums, RLS, RPCs)
 Auth:          Supabase Auth (magic links + service role)
@@ -193,7 +193,7 @@ This is the minimal path to turn the template into a live, branded salon site.
 1. **Copy the template**
 
    ```bash
-   cp -r ~/mynails-generic ~/salons/ana-nails
+   cp -r ~/nail-lounge ~/salons/ana-nails
    cd ~/salons/ana-nails && rm -rf .git && git init && git add -A && git commit -m "init"
    ```
 

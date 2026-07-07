@@ -161,8 +161,20 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-border">
-        <div className="mx-auto max-w-7xl px-6 py-6 text-center text-[11px] uppercase tracking-[0.3em] text-muted-foreground sm:px-10">
-          © {new Date().getFullYear()} {getSalonName()}
+        <div className="mx-auto max-w-7xl px-6 py-6 sm:px-10">
+          <div className="flex flex-col items-center gap-2 text-center text-[11px] uppercase tracking-[0.3em] text-muted-foreground sm:flex-row sm:justify-between">
+            <span>
+              © {new Date().getFullYear()} {getSalonName()}
+            </span>
+            <div className="flex gap-6">
+              <Link to="/privacy" className="hover:text-foreground transition">
+                Privacy
+              </Link>
+              <Link to="/terms" className="hover:text-foreground transition">
+                Terms
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

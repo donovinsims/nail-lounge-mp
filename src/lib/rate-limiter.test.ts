@@ -14,9 +14,7 @@ describe("RateLimiter", () => {
 
   it("allows requests under the limit", async () => {
     mockRpc.mockResolvedValue({
-      data: [
-        { allowed: true, remaining: 2, reset_at: null },
-      ],
+      data: [{ allowed: true, remaining: 2, reset_at: null }],
       error: null,
     });
 
@@ -55,7 +53,9 @@ describe("RateLimiter", () => {
     });
     // Second call - blocked
     mockRpc.mockResolvedValueOnce({
-      data: [{ allowed: false, remaining: 0, reset_at: new Date(Date.now() + 60000).toISOString() }],
+      data: [
+        { allowed: false, remaining: 0, reset_at: new Date(Date.now() + 60000).toISOString() },
+      ],
       error: null,
     });
 

@@ -1,8 +1,8 @@
-# mynails-generic — TanStack Start + Supabase Salon Template
+# nail-lounge — TanStack Start + Supabase Salon Template
 
 ## Project Identity
 
-- **Name:** mynails-generic
+- **Name:** nail-lounge
 - **Framework:** TanStack Start (`@tanstack/react-start`) + Vite 7 + React 19
 - **Stack:** Tailwind CSS v4, shadcn/ui (new-york, no RSC), Supabase Auth + PostgreSQL, Twilio
 - **Multi-tenant capable:** One deployment per salon (SALON_ID in env). Full isolation — every DB query filters by SALON_ID.

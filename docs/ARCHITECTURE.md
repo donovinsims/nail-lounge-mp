@@ -1,4 +1,4 @@
-# Architecture Reference — mynails-generic
+# Architecture Reference — nail-lounge
 
 > A production-ready, generic salon management platform built with TanStack Start + Supabase.
 > Zero hardcoded branding — all salon-specific values come from centralized env helpers.

@@ -6,7 +6,7 @@
 
 ## Overview
 
-This template (`~/mynails-generic`) is a **single-tenant** web app: one deployment = one salon. Every salon gets its own Supabase database, its own environment variables, and its own frontend — zero risk of data leaking between tenants.
+This template (`~/nail-lounge`) is a **single-tenant** web app: one deployment = one salon. Every salon gets its own Supabase database, its own environment variables, and its own frontend — zero risk of data leaking between tenants.
 
 **What you get out of the box:**
 
@@ -37,14 +37,14 @@ Time estimate: **2–4 hours** first time, faster on repeat.
 
 ```bash
 # Copy the template (not clone — you want a clean git history)
-cp -r ~/mynails-generic ~/salons/ana-nails
+cp -r ~/nail-lounge ~/salons/ana-nails
 cd ~/salons/ana-nails
 
 # Start fresh
 rm -rf .git
 git init
 git add -A
-git commit -m "Initial commit — from mynails-generic template"
+git commit -m "Initial commit — from nail-lounge template"
 ```
 
 > ✏️ Replace `ana-nails` with the actual salon name. Keep it lowercase-hyphenated.

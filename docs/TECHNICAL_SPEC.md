@@ -93,7 +93,7 @@ Integrations (gated via env):
 ## 2. Project Structure
 
 ```
-mynails/
+nail-lounge/
 ├── .env.template              # All env vars with comments (no secrets)
 ├── .github/workflows/
 │   └── ci.yml                 # Lint + typecheck + build on push/PR
