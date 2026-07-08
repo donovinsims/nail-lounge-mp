@@ -36,12 +36,6 @@ export async function fetchSalon() {
   return data;
 }
 
-export async function fetchSalonOrThrow() {
-  const salon = await fetchSalon();
-  if (!salon) throw new Error("Salon not found — check VITE_SALON_ID");
-  return salon;
-}
-
 export async function fetchServices(salonId: string) {
   const { data, error } = await supabase
     .from("services")
@@ -65,9 +59,6 @@ export async function fetchStaff(salonId: string) {
   if (error) throw error;
   return data ?? [];
 }
-
-// BUSINESS info is now provided by env.ts helpers: getSalonName, getSalonAddress,
-// getSalonPhone, getSalonPhoneHref, getSalonSocial (email, mapsUrl, etc.)
 
 /**
  * Compute available 15-min start slots for a given staff/service on a date.

@@ -100,4 +100,3 @@ describe("staffQuerySchema", () => {
 //
 // getMyStaff           — GET endpoint, no input schema
 // linkSelfToFirstSalon — POST endpoint, no input schema
-// seedDemoData         — POST endpoint, no input schema
