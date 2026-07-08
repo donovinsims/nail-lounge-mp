@@ -5,6 +5,7 @@ export interface Service {
   id: string;
   name: string;
   category: string | null;
+  description: string | null;
   duration_minutes: number;
   price: number;
 }
@@ -71,6 +72,11 @@ export default function StepService({
               >
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{service.name}</p>
+                  {service.description && (
+                    <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                      {service.description}
+                    </p>
+                  )}
                   <p className="mt-0.5 font-mono text-xs sm:text-sm text-muted-foreground">
                     {service.category ?? "Service"} · {service.duration_minutes} min
                   </p>

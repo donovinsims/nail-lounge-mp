@@ -257,7 +257,7 @@ function Book() {
             <>
               <p className="text-xs uppercase tracking-[0.35em] text-accent">Booking</p>
               <h1 className="mt-4 font-display text-4xl leading-[0.95] sm:text-5xl">
-                Reserve your <span className="italic">seat.</span>
+                Reserve <span className="italic">your seat.</span>
               </h1>
               <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
                 Four short steps — service, artist, time, details.
@@ -426,7 +426,7 @@ function Book() {
                       next();
                     }
                   }}
-                  className="tap-target inline-flex items-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-40"
+                  className="tap-target inline-flex items-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50"
                 >
                   Continue
                 </button>
@@ -461,7 +461,7 @@ function Book() {
                 (step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)
               }
               onClick={next}
-              className="flex-1 tap-target rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-40"
+              className="flex-1 tap-target rounded-lg bg-primary h-11 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50"
             >
               Continue
             </button>

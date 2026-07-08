@@ -83,7 +83,7 @@ export default function Waitlist({ salonId }: { salonId: string }) {
           <button
             onClick={add}
             disabled={adding || !form.client_name || !form.client_phone}
-            className="tap-target inline-flex items-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-all"
+            className="tap-target inline-flex items-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
           >
             <Plus className="h-4 w-4" /> Add
           </button>

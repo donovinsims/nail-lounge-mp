@@ -126,7 +126,7 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
 
                   <button
                     onClick={() => handleAcknowledge(a.id)}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all shrink-0"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150 shrink-0"
                   >
                     <Check className="h-4 w-4" /> Acknowledge
                   </button>
@@ -168,7 +168,7 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
                   footer={
                     <button
                       onClick={() => handleAcknowledge(a.id)}
-                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all"
+                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-3 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
                     >
                       <Check className="h-4 w-4" /> Acknowledge
                     </button>
@@ -356,7 +356,7 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
                       footer={
                         <a
                           href={`tel:${c.phone}`}
-                          className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all"
+                          className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-3 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
                         >
                           <Phone className="h-4 w-4" /> Call {c.phone}
                         </a>

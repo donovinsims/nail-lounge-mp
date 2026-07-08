@@ -33,6 +33,7 @@ export const deleteStaffSchema = z.object({ id: z.string().uuid() });
 export const createServiceSchema = z.object({
   name: z.string().trim().min(1).max(200),
   category: z.string().trim().max(100).optional().or(z.literal("")),
+  description: z.string().max(500).optional().or(z.literal("")),
   durationMinutes: z.number().int().min(5).max(480),
   price: z.number().min(0),
   bufferAfterMinutes: z.number().int().min(0).default(0),
@@ -42,6 +43,7 @@ export const updateServiceSchema = z.object({
   id: z.string().uuid(),
   name: z.string().trim().min(1).max(200).optional(),
   category: z.string().trim().max(100).optional(),
+  description: z.string().max(500).optional(),
   durationMinutes: z.number().int().min(5).max(480).optional(),
   price: z.number().min(0).optional(),
   bufferAfterMinutes: z.number().int().min(0).optional(),
@@ -134,7 +136,9 @@ export const getAllServicesForSalon = createServerFn({ method: "GET" })
     const salonId = SALON_ID_FILTER();
     const { data } = await context.supabase
       .from("services")
-      .select("id, name, category, duration_minutes, price, buffer_after_minutes, is_active")
+      .select(
+        "id, name, category, description, duration_minutes, price, buffer_after_minutes, is_active",
+      )
       .eq("salon_id", salonId)
       .order("name");
     return data ?? [];
@@ -151,11 +155,14 @@ export const createService = createServerFn({ method: "POST" })
         salon_id: salonId,
         name: data.name,
         category: data.category || null,
+        description: data.description || null,
         duration_minutes: data.durationMinutes,
         price: data.price,
         buffer_after_minutes: data.bufferAfterMinutes,
       })
-      .select("id, name, category, duration_minutes, price, buffer_after_minutes, is_active")
+      .select(
+        "id, name, category, description, duration_minutes, price, buffer_after_minutes, is_active",
+      )
       .single();
     if (error) throw new Error(error.message);
     return service;
@@ -169,6 +176,7 @@ export const updateService = createServerFn({ method: "POST" })
     const update: ServiceUpdate = {};
     if (data.name !== undefined) update.name = data.name;
     if (data.category !== undefined) update.category = data.category || null;
+    if (data.description !== undefined) update.description = data.description || null;
     if (data.durationMinutes !== undefined) update.duration_minutes = data.durationMinutes;
     if (data.price !== undefined) update.price = data.price;
     if (data.bufferAfterMinutes !== undefined)
@@ -180,7 +188,9 @@ export const updateService = createServerFn({ method: "POST" })
       .update(update)
       .eq("id", data.id)
       .eq("salon_id", salonId)
-      .select("id, name, category, duration_minutes, price, buffer_after_minutes, is_active")
+      .select(
+        "id, name, category, description, duration_minutes, price, buffer_after_minutes, is_active",
+      )
       .single();
     if (error) throw new Error(error.message);
     return service;

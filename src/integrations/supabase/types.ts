@@ -428,6 +428,7 @@ export type Database = {
           category: string | null;
           created_at: string;
           deposit_amount: number;
+          description: string | null;
           duration_minutes: number;
           id: string;
           is_active: boolean;
@@ -440,6 +441,7 @@ export type Database = {
           category?: string | null;
           created_at?: string;
           deposit_amount?: number;
+          description?: string | null;
           duration_minutes?: number;
           id?: string;
           is_active?: boolean;
@@ -452,6 +454,7 @@ export type Database = {
           category?: string | null;
           created_at?: string;
           deposit_amount?: number;
+          description?: string | null;
           duration_minutes?: number;
           id?: string;
           is_active?: boolean;

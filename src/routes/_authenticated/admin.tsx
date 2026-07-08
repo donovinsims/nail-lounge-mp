@@ -160,7 +160,7 @@ function Admin() {
         <div className="flex gap-3">
           <button
             onClick={() => refetch()}
-            className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+            className="tap-target inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
           >
             Try again
           </button>

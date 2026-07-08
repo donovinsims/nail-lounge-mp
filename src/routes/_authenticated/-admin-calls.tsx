@@ -102,7 +102,7 @@ export default function Calls({ salonId }: { salonId: string }) {
                 <div className="mt-4 pt-3 border-t border-border">
                   <button
                     onClick={() => navigate({ to: "/book" })}
-                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all"
+                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
                   >
                     <Check className="h-4 w-4" /> Convert to booking
                   </button>
@@ -156,14 +156,14 @@ export default function Calls({ salonId }: { salonId: string }) {
                     onClick={() => {
                       navigate({ to: "/book" });
                     }}
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
                   >
                     <Check className="h-4 w-4" /> Convert to booking
                   </button>
                 ) : (
                   <a
                     href={`tel:${c.caller_phone}`}
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
                   >
                     <PhoneCall className="h-4 w-4" /> Call back
                   </a>

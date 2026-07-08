@@ -68,7 +68,7 @@ function ServicesPage() {
             to="/book"
             className="mt-10 inline-flex tap-target items-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
           >
-            Reserve your seat <ArrowRight className="h-4 w-4" />
+            Reserve <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
@@ -109,6 +109,11 @@ function ServicesPage() {
                         {/* Expanded detail */}
                         {isOpen && (
                           <div className="px-4 py-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-[240ms]">
+                            {s.description && (
+                              <p className="text-sm text-muted-foreground leading-relaxed">
+                                {s.description}
+                              </p>
+                            )}
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <Clock className="h-4 w-4" />
                               <span>{s.duration_minutes} minutes</span>
@@ -118,7 +123,7 @@ function ServicesPage() {
                               search={{ service: s.id } as { service: string }}
                               className="flex w-full tap-target items-center justify-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
                             >
-                              Book Now <ArrowRight className="h-4 w-4" />
+                              Reserve <ArrowRight className="h-4 w-4" />
                             </Link>
                           </div>
                         )}
@@ -152,7 +157,7 @@ function ServicesPage() {
           to="/book"
           className="flex w-full tap-target items-center justify-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
         >
-          Reserve your seat <Sparkles className="h-4 w-4" />
+          Reserve <Sparkles className="h-4 w-4" />
         </Link>
       </div>
 

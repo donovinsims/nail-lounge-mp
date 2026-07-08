@@ -95,7 +95,7 @@ function AuthPage() {
               />
               <button
                 disabled={loading}
-                className="flex w-full tap-target items-center justify-center gap-2 rounded-xl bg-primary py-3 font-semibold text-primary-foreground disabled:opacity-50"
+                className="tap-target inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150 w-full justify-center"
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Send magic link

@@ -68,10 +68,10 @@ function Appointments() {
           onChange={(e) => setPhone(e.target.value)}
           type="tel"
           placeholder="(815) 555-0123"
-          className="flex-1 tap-target rounded-xl bg-surface px-4 py-3 outline-none focus:ring-2 focus:ring-ring"
+          className="flex-1 tap-target rounded-xl bg-surface px-4 py-3 outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
         />
         <button
-          className="tap-target rounded-xl bg-primary px-5 font-medium text-primary-foreground"
+          className="tap-target rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50"
           disabled={lookupMutation.isPending}
         >
           {lookupMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Find"}

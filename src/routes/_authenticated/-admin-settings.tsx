@@ -87,6 +87,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
   const [svcForm, setSvcForm] = useState<{
     name: string;
     category: string;
+    description: string;
     durationMinutes: number;
     price: number;
     bufferAfterMinutes: number;
@@ -283,6 +284,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
               setSvcForm({
                 name: "",
                 category: "",
+                description: "",
                 durationMinutes: 30,
                 price: 0,
                 bufferAfterMinutes: 0,
@@ -304,6 +306,16 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
                   onChange={(e) => setSvcForm({ ...svcForm, name: e.target.value })}
                   className={INPUT_CLS}
                   placeholder="Service name"
+                />
+              </label>
+              <label className="block col-span-2">
+                <span className="text-xs text-muted-foreground font-medium">Description</span>
+                <textarea
+                  value={svcForm.description}
+                  onChange={(e) => setSvcForm({ ...svcForm, description: e.target.value })}
+                  className={INPUT_CLS}
+                  placeholder="Brief description shown in booking selector"
+                  rows={2}
                 />
               </label>
               <label className="block">
@@ -379,6 +391,11 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
             >
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium truncate">{svc.name}</p>
+                {svc.description && (
+                  <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
+                    {svc.description}
+                  </p>
+                )}
                 <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
                   {svc.category && (
                     <span className="px-1.5 py-0.5 rounded bg-muted">{svc.category}</span>

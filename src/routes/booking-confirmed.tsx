@@ -86,7 +86,7 @@ function BookingConfirmed() {
             </p>
             <Link
               to="/"
-              className="inline-block rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-all"
+              className="inline-block rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
             >
               Back to home
             </Link>
@@ -103,7 +103,7 @@ function BookingConfirmed() {
             </p>
             <Link
               to="/"
-              className="inline-block rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-all"
+              className="inline-block rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
             >
               Back to home
             </Link>
@@ -120,7 +120,9 @@ function BookingConfirmed() {
                 <CheckCircle className="h-8 w-8 text-success-ink" />
               </div>
               <div className="space-y-1">
-                <h1 className="font-display text-2xl tracking-tight">You're all set!</h1>
+                <h1 className="font-display text-5xl leading-[0.95] tracking-[-0.01em] sm:text-7xl">
+                  You're all set!
+                </h1>
                 <p className="text-sm text-muted-foreground">
                   Your appointment at {getSalonName()} is confirmed.
                 </p>
@@ -129,7 +131,7 @@ function BookingConfirmed() {
 
             {/* Booking Summary Card */}
             <div className="rounded-2xl bg-surface p-6 shadow-lg space-y-4">
-              <h2 className="font-display text-lg">Appointment Details</h2>
+              <h2 className="font-display text-3xl">Appointment Details</h2>
 
               <div className="space-y-3">
                 <DetailRow label="Service" value={data.serviceName} />
@@ -157,14 +159,14 @@ function BookingConfirmed() {
             <div className="flex flex-col gap-3">
               <Link
                 to="/"
-                className="w-full rounded-full bg-primary py-3 text-center text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-all"
+                className="w-full rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] inline-flex items-center justify-center"
               >
                 Back to home
               </Link>
               <Link
                 to="/appointments"
                 search={{ phone: data.clientPhone } as { phone: string }}
-                className="w-full rounded-full border border-border py-3 text-center text-sm font-medium text-foreground hover:bg-muted transition-all"
+                className="w-full rounded-lg border border-border bg-card h-11 px-5 text-sm font-medium tracking-[0.01em] shadow-1 transition duration-150 hover:shadow-2 inline-flex items-center justify-center"
               >
                 View all my appointments
               </Link>

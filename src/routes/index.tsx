@@ -133,7 +133,7 @@ function Home() {
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 pt-16 pb-20 sm:px-10 sm:pt-24 md:grid-cols-12 md:gap-12 md:pt-32">
           <div className="md:col-span-6 md:pt-8">
-            <p className="text-[11px] uppercase tracking-[0.35em] text-accent">
+            <p className="text-xs uppercase tracking-[0.35em] text-accent">
               Est. {salon?.created_at ? new Date(salon.created_at).getFullYear() : ""}
             </p>
             <h1 className="mt-6 font-display text-6xl leading-[0.92] tracking-[-0.02em] sm:text-7xl lg:text-8xl">
@@ -152,7 +152,7 @@ function Home() {
                 to="/book"
                 className="inline-flex tap-target items-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
               >
-                Reserve your seat <ArrowRight className="h-4 w-4" />
+                Reserve <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 to="/services"
