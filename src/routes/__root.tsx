@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { Analytics } from "@vercel/analytics/react";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 
@@ -160,6 +161,7 @@ function RootComponent() {
       <ThemeProvider>
         <Outlet />
         <Toaster position="top-center" />
+        <Analytics />
       </ThemeProvider>
     </QueryClientProvider>
   );
