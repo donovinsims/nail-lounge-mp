@@ -5,10 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Cormorant Garamond", "Times New Roman", serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  /* Coastal Neutral type roles — Fraunces display / Figtree body / Space Mono data */
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-mono: "Space Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
+  /* Radius scale — soft beach-stone corners, lg (14px) is the default (--radius) */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -35,8 +37,13 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-ink: var(--destructive-ink);
   --color-success: var(--success);
+  --color-success-ink: var(--success-ink);
   --color-warning: var(--warning);
+  --color-warning-ink: var(--warning-ink);
+  --color-gold: var(--gold);
+  --color-taupe: var(--taupe);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -53,81 +60,120 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
+  /* Elevation — "soft midday light": warm espresso-tinted, gentle and diffuse.
+     Doc names Shadow 1/2/3; Tailwind's default keys are redefined to the same
+     family so legacy shadow / shadow-sm / shadow-md classes inherit the softness. */
+  --shadow-1: 0 1px 2px 0 rgb(47 42 36 / 0.06), 0 1px 3px 0 rgb(47 42 36 / 0.05);
+  --shadow-2: 0 2px 4px 0 rgb(47 42 36 / 0.06), 0 8px 16px -2px rgb(47 42 36 / 0.09);
+  --shadow-3: 0 8px 20px -4px rgb(47 42 36 / 0.12), 0 24px 48px -8px rgb(47 42 36 / 0.18);
+  --shadow-2xs: 0 1px 2px 0 rgb(47 42 36 / 0.05);
+  --shadow-xs: 0 1px 2px 0 rgb(47 42 36 / 0.05);
+  --shadow-sm: 0 1px 2px 0 rgb(47 42 36 / 0.06), 0 1px 3px 0 rgb(47 42 36 / 0.05);
+  --shadow: 0 1px 2px 0 rgb(47 42 36 / 0.06), 0 1px 3px 0 rgb(47 42 36 / 0.05);
+  --shadow-md: 0 2px 4px 0 rgb(47 42 36 / 0.06), 0 8px 16px -2px rgb(47 42 36 / 0.09);
+  --shadow-lg: 0 8px 20px -4px rgb(47 42 36 / 0.12), 0 24px 48px -8px rgb(47 42 36 / 0.18);
+  --shadow-xl: 0 12px 28px -6px rgb(47 42 36 / 0.14), 0 32px 64px -12px rgb(47 42 36 / 0.2);
+  --shadow-2xl: 0 12px 28px -6px rgb(47 42 36 / 0.14), 0 32px 64px -12px rgb(47 42 36 / 0.2);
+
+  /* Motion — "Tide Ease": a slow wave settling. Applied as the global default
+     so every existing transition inherits it; 150ms/400ms set per-surface. */
+  --ease-tide: cubic-bezier(0.33, 1, 0.68, 1);
+  --default-transition-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+  --default-transition-duration: 240ms;
 }
 
 :root {
   --radius: 14px;
-  /* Warm ivory + blush + deep plum — elegant nail salon */
-  --background: oklch(0.985 0.008 60);
-  --foreground: oklch(0.18 0.04 350);
-  --surface: oklch(0.965 0.015 25);
-  --surface-2: oklch(0.93 0.025 20);
-  --card: oklch(0.995 0.006 60);
-  --card-foreground: oklch(0.18 0.04 350);
-  --popover: oklch(0.995 0.006 60);
-  --popover-foreground: oklch(0.18 0.04 350);
-  --primary: oklch(0.28 0.08 350);
-  --primary-foreground: oklch(0.985 0.008 60);
-  --secondary: oklch(0.93 0.03 20);
-  --secondary-foreground: oklch(0.22 0.05 350);
-  --muted: oklch(0.95 0.012 30);
-  --muted-foreground: oklch(0.4 0.03 350);
-  --accent: oklch(0.7 0.12 25);
-  --accent-foreground: oklch(0.99 0 0);
-  --destructive: oklch(0.55 0.21 25);
-  --destructive-foreground: oklch(0.99 0 0);
-  --success: oklch(0.62 0.13 150);
-  --warning: oklch(0.78 0.14 75);
-  --border: oklch(0.88 0.02 25);
-  --input: oklch(0.9 0.018 25);
-  --ring: oklch(0.28 0.08 350);
-  --sidebar: oklch(0.97 0.012 30);
-  --sidebar-foreground: oklch(0.18 0.04 350);
-  --sidebar-primary: oklch(0.28 0.08 350);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.93 0.025 20);
-  --sidebar-accent-foreground: oklch(0.22 0.05 350);
-  --sidebar-border: oklch(0.88 0.02 25);
-  --sidebar-ring: oklch(0.28 0.08 350);
-  --chart-1: oklch(0.28 0.08 350);
-  --chart-2: oklch(0.55 0.12 20);
-  --chart-3: oklch(0.7 0.1 25);
-  --chart-4: oklch(0.6 0.08 340);
-  --chart-5: oklch(0.62 0.13 150);
+  /* Coastal Neutral — warm sand, seafoam, champagne gold (light mode).
+     Every pair below is WCAG-verified; see CHANGES doc for the full checklist. */
+  --background: #ede7de;
+  --foreground: #2f2f2f;
+  --surface: #f7f3ec;
+  --surface-2: #e3dacc;
+  --card: #f7f3ec;
+  --card-foreground: #2f2f2f;
+  --popover: #f7f3ec;
+  --popover-foreground: #2f2f2f;
+  --primary: #4e6f62; /* deepened seafoam (doc: pale #A9BFB6 fails AA on buttons) */
+  --primary-foreground: #f7f3ec;
+  --secondary: #a9bfb6; /* pale seafoam lives on as secondary tints (doc) */
+  --secondary-foreground: #243a31;
+  --muted: #e7dfd2;
+  --muted-foreground: #6e5f51; /* deepened from doc taupe #8C7B6B (3.31:1) to pass AA */
+  --accent: #eddfc4; /* quiet champagne wash for hover surfaces */
+  --accent-foreground: #2f2f2f;
+  --gold: #c9a24b; /* champagne gold — decorative/chips only, never text on light */
+  --taupe: #8c7b6b; /* doc muted tone — large text + decorative use */
+  --destructive: #a2543e; /* deepened from doc #B5654F (4.25:1 w/ light text) for AA */
+  --destructive-foreground: #fbf7f1;
+  --destructive-ink: #8c4130; /* text on destructive 15% tints */
+  --success: #7a9e85;
+  --success-ink: #355f46; /* text on success 15% tints */
+  --warning: #d9a44c;
+  --warning-ink: #7a5718; /* text on warning 15% tints */
+  --border: #d8cfc0;
+  --input: #8f7f68; /* taupe input boundary, ≥3:1 on both grounds */
+  --ring: #4e6f62;
+  --sidebar: #f7f3ec;
+  --sidebar-foreground: #2f2f2f;
+  --sidebar-primary: #4e6f62;
+  --sidebar-primary-foreground: #f7f3ec;
+  --sidebar-accent: #e7dfd2;
+  --sidebar-accent-foreground: #2f2f2f;
+  --sidebar-border: #d8cfc0;
+  --sidebar-ring: #4e6f62;
+  --chart-1: #4e6f62;
+  --chart-2: #c9a24b;
+  --chart-3: #8c7b6b;
+  --chart-4: #a9bfb6;
+  --chart-5: #a2543e;
 }
 
 .dark {
-  --background: oklch(0.08 0 0);
-  --foreground: oklch(0.98 0 0);
-  --surface: oklch(0.12 0 0);
-  --surface-2: oklch(0.16 0 0);
-  --card: oklch(0.11 0 0);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.11 0 0);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.08 0 0);
-  --secondary: oklch(0.17 0 0);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.16 0 0);
-  --muted-foreground: oklch(0.72 0 0);
-  --accent: oklch(0.2 0 0);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.62 0.22 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --success: oklch(0.7 0.17 150);
-  --warning: oklch(0.82 0.16 75);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.98 0 0);
-  --sidebar: oklch(0.1 0 0);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.98 0 0);
-  --sidebar-primary-foreground: oklch(0.08 0 0);
-  --sidebar-accent: oklch(0.17 0 0);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.98 0 0);
+  /* Coastal Neutral dark — derived (doc specifies only Primary #A9BFB6).
+     Warm espresso grounds, sand-toned text. Ready to activate; light is default. */
+  --background: #201c17;
+  --foreground: #f1ece2;
+  --surface: #2a251e;
+  --surface-2: #322c24;
+  --card: #2a251e;
+  --card-foreground: #f1ece2;
+  --popover: #2a251e;
+  --popover-foreground: #f1ece2;
+  --primary: #a9bfb6; /* doc dark-mode primary */
+  --primary-foreground: #1f2a25;
+  --secondary: #3a443f;
+  --secondary-foreground: #d8e2dc;
+  --muted: #322c24;
+  --muted-foreground: #b7a996;
+  --accent: #3d3730;
+  --accent-foreground: #f1ece2;
+  --gold: #d9b562;
+  --taupe: #b7a996;
+  --destructive: #d08a76;
+  --destructive-foreground: #33150b;
+  --destructive-ink: #dfa492;
+  --success: #93b89f;
+  --success-ink: #93b89f;
+  --warning: #e2b563;
+  --warning-ink: #e2b563;
+  --border: rgb(241 236 226 / 12%);
+  --input: #7d7466;
+  --ring: #a9bfb6;
+  --sidebar: #262119;
+  --sidebar-foreground: #f1ece2;
+  --sidebar-primary: #a9bfb6;
+  --sidebar-primary-foreground: #1f2a25;
+  --sidebar-accent: #322c24;
+  --sidebar-accent-foreground: #f1ece2;
+  --sidebar-border: rgb(241 236 226 / 12%);
+  --sidebar-ring: #a9bfb6;
+  --chart-1: #a9bfb6;
+  --chart-2: #d9b562;
+  --chart-3: #b7a996;
+  --chart-4: #93b89f;
+  --chart-5: #d08a76;
 }
 
 @layer base {
@@ -142,7 +188,6 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -164,6 +209,18 @@
   }
   .safe-pt {
     padding-top: max(env(safe-area-inset-top), 1rem);
+  }
+
+  /* Calm-by-default: honor reduced-motion everywhere (doc: Motion section) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
