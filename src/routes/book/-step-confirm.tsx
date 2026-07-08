@@ -36,6 +36,7 @@ interface StepConfirmProps {
   onEmailChange: (v: string) => void;
   isPending: boolean;
   onSubmit: () => void;
+  isNoPreference?: boolean;
 }
 
 export default function StepConfirm({
@@ -50,6 +51,7 @@ export default function StepConfirm({
   onEmailChange,
   isPending,
   onSubmit,
+  isNoPreference,
 }: StepConfirmProps) {
   useEffect(() => {
     const handleResize = () => {
@@ -104,7 +106,9 @@ export default function StepConfirm({
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">With</span>
-            <span className="font-medium">{staff?.name ?? "—"}</span>
+            <span className="font-medium">
+              {isNoPreference ? "Auto-assigned" : (staff?.name ?? "—")}
+            </span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">When</span>
@@ -192,7 +196,7 @@ export default function StepConfirm({
       {/* Submit Button */}
       <button
         type="button"
-        disabled={isPending || !slot || !service || !staff}
+        disabled={isPending || !slot || !service || (!isNoPreference && !staff)}
         onClick={onFormSubmit}
         className="flex tap-target w-full items-center justify-center gap-2 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50"
       >

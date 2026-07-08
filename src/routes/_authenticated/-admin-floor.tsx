@@ -3,7 +3,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import type { FloorStatusRow } from "@/integrations/supabase/rows";
+import { EmptyState } from "@/components/empty-state";
 import { StatusBadge } from "./-admin-components/status-badge";
+import { Users } from "lucide-react";
 
 type FloorWithStaff = FloorStatusRow & {
   staff: { name: string; avatar_color: string | null } | null;
@@ -48,12 +50,11 @@ export default function FloorView({ salonId }: { salonId: string }) {
 
   if (floor.length === 0) {
     return (
-      <div className="rounded-2xl bg-surface p-8 text-center">
-        <p className="text-sm text-muted-foreground">No staff on floor yet.</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Staff will appear here once they're checked in.
-        </p>
-      </div>
+      <EmptyState
+        icon={<Users className="h-12 w-12" />}
+        title="No staff on floor"
+        body="Staff members will appear here once they check in. Tap a staff card to cycle through their status."
+      />
     );
   }
 

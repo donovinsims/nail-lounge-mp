@@ -4,16 +4,22 @@ export interface BookingSummaryProps {
   service: { name: string; price: number } | null;
   staff: { name: string } | null;
   slot: Date | null;
+  isNoPreference?: boolean;
 }
 
-export default function BookingSummary({ service, staff, slot }: BookingSummaryProps) {
+export default function BookingSummary({
+  service,
+  staff,
+  slot,
+  isNoPreference,
+}: BookingSummaryProps) {
   return (
     <aside className="rounded-2xl bg-surface p-5 text-sm space-y-3">
       <h2 className="font-semibold text-base">Your Booking</h2>
 
       <div className="space-y-1.5">
         <Row label="Service" value={service?.name ?? null} />
-        <Row label="Artist" value={staff?.name ?? null} />
+        <Row label="Artist" value={isNoPreference ? "Auto-assigned" : (staff?.name ?? null)} />
         <Row label="When" value={slot ? `${fmtDate(slot)}, ${fmtTime(slot)}` : null} mono />
       </div>
 

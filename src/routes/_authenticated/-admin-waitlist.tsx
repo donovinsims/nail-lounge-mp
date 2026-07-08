@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { WaitlistEntryRow } from "@/integrations/supabase/rows";
 import { StatusBadge } from "./-admin-components/status-badge";
+import { EmptyState } from "@/components/empty-state";
 import { BottomSheet } from "@/components/bottom-sheet";
 import { Phone, User, Plus, Clock, Zap } from "lucide-react";
 import { fmtDate } from "@/lib/utils";
@@ -93,9 +94,12 @@ export default function Waitlist({ salonId }: { salonId: string }) {
       {/* List */}
       <ul className="space-y-2">
         {rows.length === 0 && (
-          <li className="flex flex-col items-center justify-center py-12 text-sm text-muted-foreground gap-2">
-            <Clock className="h-8 w-8 text-muted-foreground/40" />
-            <span>No waitlist entries.</span>
+          <li>
+            <EmptyState
+              icon={<Clock className="h-12 w-12" />}
+              title="No waitlist entries"
+              body="Add walk-in clients to the waitlist so you can notify them when a slot opens up."
+            />
           </li>
         )}
         {rows.map((r: WaitlistEntryRow) => (

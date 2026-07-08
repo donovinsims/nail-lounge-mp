@@ -4,7 +4,8 @@ import type { SalonRow } from "@/integrations/supabase/rows";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/error-handler";
-import { Save, Plus, Trash2, X, Check } from "lucide-react";
+import { EmptyState } from "@/components/empty-state";
+import { Save, Plus, Trash2, X, Check, Users, Scissors } from "lucide-react";
 import {
   getAllStaffForSalon,
   createStaff,
@@ -229,7 +230,11 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
         )}
 
         {staffList.length === 0 && !staffForm && (
-          <p className="text-sm text-muted-foreground">No staff yet. Add your first team member.</p>
+          <EmptyState
+            icon={<Users className="h-12 w-12" />}
+            title="No staff yet"
+            body="Add your first team member so they can start accepting appointments."
+          />
         )}
 
         <div className="space-y-2">
@@ -380,7 +385,11 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
         )}
 
         {servicesList.length === 0 && !svcForm && (
-          <p className="text-sm text-muted-foreground">No services yet. Add your first service.</p>
+          <EmptyState
+            icon={<Scissors className="h-12 w-12" />}
+            title="No services yet"
+            body="Add your first service so clients can start booking appointments."
+          />
         )}
 
         <div className="space-y-2">

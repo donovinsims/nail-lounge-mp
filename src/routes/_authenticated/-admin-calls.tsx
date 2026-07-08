@@ -6,6 +6,7 @@ import type { AiCallRow } from "@/integrations/supabase/rows";
 import { fmtDate } from "@/lib/utils";
 import { BottomSheet } from "@/components/bottom-sheet";
 import { StatusBadge } from "./-admin-components/status-badge";
+import { EmptyState } from "@/components/empty-state";
 import { Phone, Check, PhoneCall, MessageSquare } from "lucide-react";
 
 const INTENT_LABELS: Record<string, string> = {
@@ -44,13 +45,11 @@ export default function Calls({ salonId }: { salonId: string }) {
   return (
     <div>
       {rows.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-sm text-muted-foreground gap-3">
-          <Phone className="h-12 w-12 text-muted-foreground/30" />
-          <span>No AI calls yet.</span>
-          <span className="text-xs">
-            Use the Seed demo button on the dashboard to generate sample data.
-          </span>
-        </div>
+        <EmptyState
+          icon={<Phone className="h-12 w-12" />}
+          title="No AI calls yet"
+          body="AI-powered call handling will appear here once calls start coming in. Use the Seed demo button on the dashboard to generate sample data."
+        />
       )}
 
       <div className="grid gap-3">

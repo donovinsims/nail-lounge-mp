@@ -10,6 +10,7 @@ import {
 } from "@/lib/owner-alerts.functions";
 import { fmtDate, fmtMoney } from "@/lib/utils";
 import { BottomSheet } from "@/components/bottom-sheet";
+import { EmptyState } from "@/components/empty-state";
 import { AlertTriangle, Check, Phone, Search, Users } from "lucide-react";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/error-handler";
@@ -87,10 +88,11 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
         </h2>
 
         {unacknowledged.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-sm text-muted-foreground gap-2 rounded-2xl bg-surface">
-            <AlertTriangle className="h-8 w-8 text-muted-foreground/30" />
-            <span>No alerts — all ratings have been 4+</span>
-          </div>
+          <EmptyState
+            icon={<AlertTriangle className="h-12 w-12" />}
+            title="No alerts"
+            body="All customer ratings have been 4 or higher. You'll be notified here if a low rating comes in."
+          />
         ) : (
           <div className="grid gap-3">
             {unacknowledged.map((a: OwnerAlertRow) => (
@@ -230,10 +232,11 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
           </div>
 
           {customers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-sm text-muted-foreground gap-2">
-              <Users className="h-8 w-8 text-muted-foreground/30" />
-              <span>No customers yet</span>
-            </div>
+            <EmptyState
+              icon={<Users className="h-12 w-12" />}
+              title="No customers yet"
+              body="Customer visit history will appear here once clients start booking appointments."
+            />
           ) : (
             <>
               {/* Desktop table */}

@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, useRef } from "react";
 import { z } from "zod";
-import { fetchSalon, fetchServices, fetchStaff, computeAvailableSlots } from "@/lib/salon";
+import { fetchSalon, fetchServices, fetchStaff, computeSlotsForAllStaff } from "@/lib/salon";
 import { fmtTime, fmtDate } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { createPublicBooking } from "@/lib/booking.functions";
@@ -182,14 +182,46 @@ function Book() {
   }, [step]);
 
   const service = services.find((s: { id: string }) => s.id === serviceId);
-  const tech = staff.find((s: { id: string }) => s.id === staffId);
+  const isNoPreference = staffId === "no-preference";
+  const tech = isNoPreference ? null : staff.find((s: { id: string }) => s.id === staffId);
+
+  // Cache of staffId → available slots for resolving "no-preference" at submit time
+  const staffSlotMapRef = useRef<Map<string, Date[]>>(new Map());
 
   const { data: slots = [], isFetching: loadingSlots } = useQuery({
-    queryKey: ["slots", staffId, serviceId, date.toDateString()],
-    enabled: !!salon && !!service && !!tech,
+    queryKey: [
+      "slots",
+      isNoPreference ? { all: true } : { staffId },
+      serviceId,
+      date.toDateString(),
+    ],
+    enabled:
+      !!salon && !!service && staffId !== null && (isNoPreference ? staff.length > 0 : !!tech),
     staleTime: 60_000,
-    queryFn: () =>
-      computeAvailableSlots(supabase, tech!.id, date, service!.duration_minutes, salon!.id),
+    queryFn: async () => {
+      if (!service) return [];
+      if (isNoPreference) {
+        const { staffMap, mergedSlots } = await computeSlotsForAllStaff(
+          supabase,
+          staff.map((s: { id: string }) => s.id),
+          date,
+          service.duration_minutes,
+          salon!.id,
+        );
+        staffSlotMapRef.current = staffMap;
+        return mergedSlots;
+      }
+      const { computeAvailableSlots } = await import("@/lib/salon");
+      const singleSlots = await computeAvailableSlots(
+        supabase,
+        tech!.id,
+        date,
+        service.duration_minutes,
+        salon!.id,
+      );
+      staffSlotMapRef.current = new Map([[tech!.id, singleSlots]]);
+      return singleSlots;
+    },
   });
 
   const create = useServerFn(createPublicBooking);
@@ -216,18 +248,40 @@ function Book() {
     PHONE_RE.test(phone.trim()) &&
     slot != null &&
     service != null &&
-    tech != null;
+    (isNoPreference || tech != null);
 
   const handleSubmit = () => {
     if (submittingRef.current || mutation.isPending) return;
-    if (!salon || !service || !tech || !slot) return;
+    if (!salon || !service || !slot) return;
+
+    // Resolve "no-preference" to an actual staff ID using cached slot data
+    let finalStaffId = staffId;
+    if (isNoPreference) {
+      const slotTime = slot.getTime();
+      for (const [sId, sSlots] of staffSlotMapRef.current.entries()) {
+        if (sSlots.some((t) => t.getTime() === slotTime)) {
+          finalStaffId = sId;
+          break;
+        }
+      }
+      // Fallback to first staff member if resolution fails
+      if (!finalStaffId || finalStaffId === "no-preference") {
+        const firstStaff = staff[0] as { id: string } | undefined;
+        finalStaffId = firstStaff ? firstStaff.id : null;
+      }
+    }
+
+    if (!finalStaffId) return;
+    const resolvedTech = staff.find((s: { id: string }) => s.id === finalStaffId);
+    if (!resolvedTech) return;
+
     submittingRef.current = true;
     mutation.mutate(
       {
         data: {
           salonId: salon.id,
           serviceId: service.id,
-          staffId: tech.id,
+          staffId: resolvedTech.id,
           startTime: slot.toISOString(),
           clientName: name,
           clientPhone: phone,
@@ -375,19 +429,8 @@ function Book() {
                   onPhoneChange={setPhone}
                   onEmailChange={setEmail}
                   isPending={mutation.isPending}
-                  onSubmit={() =>
-                    mutation.mutate({
-                      data: {
-                        salonId: salon!.id,
-                        serviceId: service!.id,
-                        staffId: tech!.id,
-                        startTime: slot!.toISOString(),
-                        clientName: name,
-                        clientPhone: phone,
-                        clientEmail: email,
-                      },
-                    })
-                  }
+                  isNoPreference={isNoPreference}
+                  onSubmit={handleSubmit}
                 />
               )}
             </div>
@@ -437,7 +480,12 @@ function Book() {
           {/* Sidebar summary — visible from md up */}
           <div className="hidden md:block md:col-span-4">
             <div className="sticky top-24">
-              <BookingSummary service={service ?? null} staff={tech ?? null} slot={slot} />
+              <BookingSummary
+                service={service ?? null}
+                staff={tech ?? null}
+                slot={slot}
+                isNoPreference={isNoPreference}
+              />
             </div>
           </div>
         </div>

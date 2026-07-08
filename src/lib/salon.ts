@@ -97,3 +97,33 @@ export async function computeAvailableSlots(
 
   return (data ?? []).map((row) => new Date(row.start_time));
 }
+
+/**
+ * Compute available slots for multiple staff members at once.
+ * Returns a Map of staffId → Date[] and a merged, deduplicated array of all slots.
+ */
+export async function computeSlotsForAllStaff(
+  supabase: SupabaseClient<Database>,
+  staffIds: string[],
+  date: Date,
+  durationMinutes: number,
+  salonId?: string,
+): Promise<{ staffMap: Map<string, Date[]>; mergedSlots: Date[] }> {
+  const staffMap = new Map<string, Date[]>();
+  const allSlots: Date[] = [];
+
+  await Promise.all(
+    staffIds.map(async (id) => {
+      const slots = await computeAvailableSlots(supabase, id, date, durationMinutes, salonId);
+      staffMap.set(id, slots);
+      allSlots.push(...slots);
+    }),
+  );
+
+  // Deduplicate by timestamp and sort
+  const mergedSlots = [...new Set(allSlots.map((t) => t.getTime()))]
+    .map((t) => new Date(t))
+    .sort((a, b) => a.getTime() - b.getTime());
+
+  return { staffMap, mergedSlots };
+}
