@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
@@ -24,25 +25,25 @@ import {
 
 const OG_IMAGE = getOGImage();
 
-function NotFoundComponent() {
+const NotFoundComponent = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-[60vh] items-center justify-center p-8">
       <div className="max-w-md text-center">
-        <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">404</p>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight">Not found</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist.
+        <div className="mb-6 text-8xl font-display font-bold text-primary/20">404</div>
+        <h1 className="font-display text-3xl">Page Not Found</h1>
+        <p className="mt-3 text-muted-foreground">
+          Looks like this page got a little lost. Let's get you back on track.
         </p>
         <Link
           to="/"
-          className="mt-6 inline-flex tap-target h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02]"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90"
         >
-          Go home
+          <ArrowLeft className="h-4 w-4" /> Back to Home
         </Link>
       </div>
     </div>
   );
-}
+};
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);

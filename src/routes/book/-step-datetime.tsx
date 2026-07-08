@@ -60,11 +60,11 @@ export default function StepDateTime({
         <p className="mb-3 text-xs font-medium text-muted-foreground">Available times</p>
 
         {loadingSlots ? (
-          <div className="flex flex-col gap-2 w-full">
-            {Array.from({ length: 5 }).map((_, i) => (
+          <div className="grid grid-cols-2 gap-2">
+            {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="h-14 rounded-xl bg-surface animate-pulse w-full"
+                className="h-12 rounded-xl bg-surface animate-pulse"
                 aria-hidden="true"
               />
             ))}
@@ -77,7 +77,7 @@ export default function StepDateTime({
           <div
             role="radiogroup"
             aria-label="Available time slots"
-            className="flex flex-col gap-2 w-full"
+            className="grid grid-cols-2 gap-2"
           >
             {slots.map((t) => {
               const selected = slot !== null && slot.getTime() === t.getTime();
@@ -87,10 +87,10 @@ export default function StepDateTime({
                   role="radio"
                   aria-checked={selected}
                   onClick={() => onSlotChange(t)}
-                  className={`w-full py-4 rounded-lg text-sm text-center font-mono font-medium transition-all duration-150 active:scale-[0.98] ${
+                  className={`py-3 rounded-xl text-sm text-center font-mono font-medium transition duration-150 active:scale-[0.98] ${
                     selected
-                      ? "bg-primary/5 text-primary ring-2 ring-ring shadow-sm"
-                      : "bg-surface text-foreground hover:bg-surface-2"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-surface text-foreground hover:bg-surface-2 border border-border hover:border-primary/50"
                   }`}
                 >
                   {t.toLocaleTimeString("en-US", {

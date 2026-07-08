@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { InstagramEmbed, TikTokEmbed } from "@/components/social-embeds";
 import { getSalonName, getSalonSocial } from "@/lib/env";
-import { Instagram, ArrowRight } from "lucide-react";
+import { Instagram, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import art1 from "@/assets/art1.jpg";
 import art2 from "@/assets/art2.jpg";
 import art3 from "@/assets/art3.jpg";
@@ -12,13 +14,29 @@ import g3 from "@/assets/gallery3.jpg";
 import g4 from "@/assets/gallery4.jpg";
 
 const PIECES = [
-  { src: g1, alt: "Chrome ombre nails with soft gold flake" },
-  { src: art1, alt: "Soft pink french with gold floral detail" },
-  { src: g3, alt: "Floral nail art with rhinestone accents on coffin shape" },
-  { src: art2, alt: "Sheer rose gel on natural nails" },
-  { src: g2, alt: "Delicate almond french tip" },
-  { src: art3, alt: "Glossy burgundy almond" },
-  { src: g4, alt: "Red gel pedicure in a spa setting" },
+  {
+    src: g1,
+    alt: "Chrome ombre nails with soft gold flake",
+    caption: "Chrome ombre nails with soft gold flake",
+  },
+  {
+    src: art1,
+    alt: "Soft pink french with gold floral detail",
+    caption: "Soft pink french with gold floral detail",
+  },
+  {
+    src: g3,
+    alt: "Floral nail art with rhinestone accents on coffin shape",
+    caption: "Floral nail art with rhinestone accents on coffin shape",
+  },
+  { src: art2, alt: "Sheer rose gel on natural nails", caption: "Sheer rose gel on natural nails" },
+  { src: g2, alt: "Delicate almond french tip", caption: "Delicate almond french tip" },
+  { src: art3, alt: "Glossy burgundy almond", caption: "Glossy burgundy almond" },
+  {
+    src: g4,
+    alt: "Red gel pedicure in a spa setting",
+    caption: "Red gel pedicure in a spa setting",
+  },
 ];
 
 export const Route = createFileRoute("/gallery")({
@@ -43,6 +61,12 @@ export const Route = createFileRoute("/gallery")({
 });
 
 function GalleryPage() {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const show = (i: number) => setActiveIndex(i);
+  const close = () => setActiveIndex(null);
+  const step = (dir: number) =>
+    setActiveIndex((cur) => (cur === null ? cur : (cur + dir + PIECES.length) % PIECES.length));
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
@@ -87,21 +111,57 @@ function GalleryPage() {
       </section>
 
       <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-24">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-6">
+        <div className="columns-1 gap-4 sm:columns-2 lg:columns-3 [&>*]:mb-4">
           {PIECES.map((p, i) => (
-            <figure
+            <button
               key={i}
-              className={`group relative overflow-hidden rounded-2xl bg-surface sm:rounded-3xl ${i % 5 === 0 ? "row-span-2 aspect-[3/5]" : "aspect-square"}`}
+              onClick={() => show(i)}
+              className="group relative block w-full overflow-hidden rounded-2xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 cursor-pointer"
             >
               <img
                 src={p.src}
                 alt={p.alt}
                 loading="lazy"
-                className="h-full w-full object-cover transition duration-[400ms] group-hover:scale-105"
+                className="w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
               />
-            </figure>
+              <div className="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-black/60 via-transparent to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                <p className="text-sm text-white">{p.caption}</p>
+              </div>
+            </button>
           ))}
         </div>
+
+        <Dialog open={activeIndex !== null} onOpenChange={(o) => !o && close()}>
+          <DialogContent className="max-w-3xl overflow-hidden border-0 bg-transparent p-0 shadow-none">
+            {activeIndex !== null && PIECES[activeIndex] && (
+              <figure className="relative">
+                <DialogTitle className="sr-only">{PIECES[activeIndex].caption}</DialogTitle>
+                <img
+                  src={PIECES[activeIndex].src}
+                  alt={PIECES[activeIndex].alt}
+                  className="max-h-[80vh] w-full rounded-xl object-contain"
+                />
+                <figcaption className="absolute inset-x-0 bottom-0 rounded-b-xl bg-gradient-to-t from-black/70 to-transparent p-4 text-center text-sm text-white">
+                  {PIECES[activeIndex].caption}
+                </figcaption>
+                <button
+                  onClick={() => step(-1)}
+                  aria-label="Previous image"
+                  className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white/50 cursor-pointer active:scale-[0.96]"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => step(1)}
+                  aria-label="Next image"
+                  className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white/50 cursor-pointer active:scale-[0.96]"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </figure>
+            )}
+          </DialogContent>
+        </Dialog>
 
         <section className="mt-24">
           <div className="flex items-end justify-between gap-4">

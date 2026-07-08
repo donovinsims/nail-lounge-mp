@@ -47,6 +47,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-input-background: oklch(0.93 0.01 80); /* light mode — warm sand */
+  --color-switch-background: oklch(0.8 0.03 70); /* light mode — tan */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -161,6 +163,8 @@
   --border: rgb(241 236 226 / 12%);
   --input: #7d7466;
   --ring: #a9bfb6;
+  --color-input-background: oklch(0.22 0.01 150); /* dark mode — dark green-sand */
+  --color-switch-background: oklch(0.32 0.02 140); /* dark mode — muted olive */
   --sidebar: #262119;
   --sidebar-foreground: #f1ece2;
   --sidebar-primary: #a9bfb6;

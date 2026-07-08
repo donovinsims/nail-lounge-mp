@@ -1,6 +1,19 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { fmtTime, fmtDate, fmtMoney } from "@/lib/utils";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+
+const confirmFormSchema = z.object({
+  clientName: z.string().trim().min(1, "Name is required").max(100),
+  clientPhone: z.string().regex(/^[\d\s\-()]{7,20}$/, "Enter a valid US phone number"),
+  clientEmail: z.string().email("Invalid email").optional().or(z.literal("")),
+});
 
 interface ServiceInfo {
   name: string;
@@ -49,131 +62,120 @@ export default function StepConfirm({
     return () => window.visualViewport?.removeEventListener("resize", handleResize);
   }, []);
 
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const form = useForm<z.infer<typeof confirmFormSchema>>({
+    resolver: zodResolver(confirmFormSchema),
+    defaultValues: {
+      clientName: name,
+      clientPhone: phone,
+      clientEmail: email,
+    },
+    mode: "onTouched",
+  });
 
-  const markTouched = (field: string) => {
-    setTouched((prev) => ({ ...prev, [field]: true }));
-  };
+  const watchedValues = form.watch();
 
-  const PHONE_RE = /^[\d\s\-()]{7,20}$/;
-  const showPhoneFormatError =
-    touched.phone && phone.trim().length > 0 && !PHONE_RE.test(phone.trim());
+  useEffect(() => {
+    onNameChange(watchedValues.clientName ?? "");
+  }, [watchedValues.clientName, onNameChange]);
 
-  const showNameError = touched.name && !name.trim();
-  const showPhoneError = touched.phone && !phone.trim();
-  const canSubmit =
-    !isPending &&
-    name.trim().length > 0 &&
-    phone.trim().length > 0 &&
-    PHONE_RE.test(phone.trim()) &&
-    slot != null &&
-    service != null &&
-    staff != null;
+  useEffect(() => {
+    onPhoneChange(watchedValues.clientPhone ?? "");
+  }, [watchedValues.clientPhone, onPhoneChange]);
+
+  useEffect(() => {
+    onEmailChange(watchedValues.clientEmail ?? "");
+  }, [watchedValues.clientEmail, onEmailChange]);
+
+  const onFormSubmit = form.handleSubmit(() => {
+    onSubmit();
+  });
 
   return (
     <div className="space-y-4">
       {/* Order Summary Card */}
-      <div className="rounded-2xl bg-surface p-4 text-sm space-y-1">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Service</span>
-          <span className="font-medium">{service?.name}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">With</span>
-          <span className="font-medium">{staff?.name}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">When</span>
-          <span className="font-medium">{slot ? `${fmtDate(slot)}, ${fmtTime(slot)}` : ""}</span>
-        </div>
-        <div className="mt-2 flex justify-between border-t pt-2">
-          <span className="text-muted-foreground">Total</span>
-          <span className="font-mono font-semibold">{fmtMoney(Number(service?.price ?? 0))}</span>
-        </div>
-      </div>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium">Your Booking</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Service</span>
+            <span className="font-medium">{service?.name ?? "—"}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">With</span>
+            <span className="font-medium">{staff?.name ?? "—"}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">When</span>
+            <span className="font-medium">{slot ? `${fmtDate(slot)}, ${fmtTime(slot)}` : "—"}</span>
+          </div>
+          <Separator />
+          <div className="flex justify-between font-medium">
+            <span>Total</span>
+            <span className="font-mono">{fmtMoney(Number(service?.price ?? 0))}</span>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Client Info Fields */}
-      <div className="space-y-2">
-        <label className="block">
-          <span className="text-xs font-medium text-muted-foreground">
+      <div className="space-y-3">
+        <div className="space-y-1">
+          <Label htmlFor="name">
             Full name <span className="text-destructive-ink">*</span>
-          </span>
-          <input
-            value={name}
-            onChange={(e) => onNameChange(e.target.value)}
-            onBlur={() => markTouched("name")}
-            type="text"
-            name="name"
-            autoComplete="name"
+          </Label>
+          <Input
+            id="name"
+            className="rounded-xl"
+            {...form.register("clientName")}
             placeholder="Jane Doe"
-            enterKeyHint="next"
+            autoComplete="name"
             disabled={isPending}
-            aria-invalid={showNameError || undefined}
-            aria-describedby={showNameError ? "name-error" : undefined}
-            className={`mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none transition-all focus:ring-2 focus:ring-ring disabled:opacity-50 ${
-              showNameError ? "ring-2 ring-destructive" : ""
-            }`}
+            aria-invalid={!!form.formState.errors.clientName}
           />
-          {showNameError && (
-            <p id="name-error" role="alert" className="mt-1 text-xs text-destructive-ink">
-              Please enter your name
+          {form.formState.errors.clientName && (
+            <p className="text-xs text-destructive-ink" role="alert">
+              {form.formState.errors.clientName.message}
             </p>
           )}
-        </label>
+        </div>
 
-        <label className="block">
-          <span className="text-xs font-medium text-muted-foreground">
+        <div className="space-y-1">
+          <Label htmlFor="phone">
             Phone <span className="text-destructive-ink">*</span>
-          </span>
-          <input
-            value={phone}
-            onChange={(e) => onPhoneChange(e.target.value)}
-            onBlur={() => markTouched("phone")}
+          </Label>
+          <Input
+            id="phone"
             type="tel"
-            name="phone"
-            autoComplete="tel"
+            className="rounded-xl"
+            {...form.register("clientPhone")}
             placeholder="(815) 555-0123"
-            enterKeyHint="next"
+            autoComplete="tel"
             disabled={isPending}
-            aria-invalid={showPhoneError || undefined}
-            aria-describedby={showPhoneError ? "phone-error" : undefined}
-            className={`mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none transition-all focus:ring-2 focus:ring-ring disabled:opacity-50 ${
-              showPhoneError || showPhoneFormatError ? "ring-2 ring-destructive" : ""
-            }`}
+            aria-invalid={!!form.formState.errors.clientPhone}
           />
-          {showPhoneError && (
-            <p id="phone-error" role="alert" className="mt-1 text-xs text-destructive-ink">
-              Required
+          {form.formState.errors.clientPhone && (
+            <p className="text-xs text-destructive-ink" role="alert">
+              {form.formState.errors.clientPhone.message}
             </p>
           )}
-          {showPhoneFormatError && (
-            <p className="mt-1 text-xs text-warning-ink">
-              Enter a valid phone number (e.g., (815) 555-0123)
-            </p>
-          )}
-          <p className="mt-1 text-xs text-muted-foreground">US number: (555) 123-4567</p>
-        </label>
+          <p className="text-xs text-muted-foreground">US number: (555) 123-4567</p>
+        </div>
 
-        <label className="block">
-          <span className="text-xs font-medium text-muted-foreground">
-            Email{" "}
-            <span className="text-muted-foreground/60" id="email-hint">
-              (optional)
-            </span>
-          </span>
-          <input
-            value={email}
-            onChange={(e) => onEmailChange(e.target.value)}
+        <div className="space-y-1">
+          <Label htmlFor="email">
+            Email <span className="text-muted-foreground/60">(optional)</span>
+          </Label>
+          <Input
+            id="email"
             type="email"
-            name="email"
-            autoComplete="email"
+            className="rounded-xl"
+            {...form.register("clientEmail")}
             placeholder="you@example.com"
-            enterKeyHint="done"
+            autoComplete="email"
             disabled={isPending}
-            aria-describedby="email-hint"
-            className="mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
           />
-        </label>
+        </div>
       </div>
 
       {/* Payment Section */}
@@ -190,8 +192,8 @@ export default function StepConfirm({
       {/* Submit Button */}
       <button
         type="button"
-        disabled={!canSubmit}
-        onClick={onSubmit}
+        disabled={isPending || !slot || !service || !staff}
+        onClick={onFormSubmit}
         className="flex tap-target w-full items-center justify-center gap-2 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50"
       >
         {isPending ? (

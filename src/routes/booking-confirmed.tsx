@@ -2,6 +2,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useEffect } from "react";
+import confetti from "canvas-confetti";
 import { CheckCircle } from "lucide-react";
 import { z } from "zod";
 import { getBookingDetails } from "@/lib/booking.functions";
@@ -63,6 +65,37 @@ function BookingConfirmed() {
       error?.message?.toLowerCase().includes("network"));
 
   const start = data ? new Date(data.startTime) : null;
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+
+    const duration = 3000;
+    const end = Date.now() + duration;
+
+    const frame = () => {
+      confetti({
+        particleCount: 2,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.6 },
+        colors: ["#4e6f62", "#c9a24b", "#a9bfb6", "#ede7de"],
+      });
+      confetti({
+        particleCount: 2,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.6 },
+        colors: ["#4e6f62", "#c9a24b", "#a9bfb6", "#ede7de"],
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+
+    frame();
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">

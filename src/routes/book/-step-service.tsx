@@ -1,5 +1,6 @@
-import { Check } from "lucide-react";
-import { fmtMoney } from "@/lib/utils";
+import { Clock, Check } from "lucide-react";
+import { useMemo } from "react";
+import { cn, fmtMoney } from "@/lib/utils";
 
 export interface Service {
   id: string;
@@ -23,6 +24,18 @@ export default function StepService({
   onSelect,
   isLoading,
 }: StepServiceProps) {
+  const grouped = useMemo(() => {
+    if (!services) return [];
+    const map = new Map<string, Service[]>();
+    for (const s of services) {
+      const cat = s.category || "Other";
+      const arr = map.get(cat) ?? [];
+      arr.push(s);
+      map.set(cat, arr);
+    }
+    return Array.from(map, ([category, items]) => ({ category, items }));
+  }, [services]);
+
   if (services === null || isLoading) {
     return (
       <div className="grid place-items-center py-10">
@@ -54,46 +67,59 @@ export default function StepService({
       </div>
     );
   }
-
   return (
-    <div role="radiogroup" aria-label="Select a service">
-      <ul className="space-y-2">
-        {services.map((service) => {
-          const isSelected = service.id === selectedId;
-          return (
-            <li key={service.id}>
-              <button
-                role="radio"
-                aria-checked={isSelected}
-                onClick={() => onSelect(service.id)}
-                className={`flex w-full tap-target items-center justify-between gap-3 rounded-2xl bg-surface p-4 text-left active:scale-[0.98] transition-all duration-150 ${
-                  isSelected ? "ring-2 ring-ring bg-primary/5 shadow-sm" : "hover:bg-surface-2"
-                }`}
-              >
-                <div className="min-w-0">
-                  <p className="truncate font-semibold">{service.name}</p>
+    <div role="radiogroup" aria-label="Select a service" className="space-y-10">
+      {grouped.map(({ category, items }) => (
+        <section key={category}>
+          <h3 className="font-display mb-3 text-xl">{category}</h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {items.map((service) => {
+              const isSelected = service.id === selectedId;
+              return (
+                <button
+                  key={service.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  onClick={() => onSelect(service.id)}
+                  className={cn(
+                    "group relative rounded-xl border p-4 text-left transition hover:-translate-y-0.5 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-sm",
+                    isSelected
+                      ? "border-primary bg-primary/5 ring-2 ring-primary"
+                      : "border-border bg-surface hover:border-primary/50 hover:shadow-md",
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="font-medium">{service.name}</span>
+                    <span
+                      className={cn(
+                        "grid size-5 shrink-0 place-items-center rounded-full border transition-colors",
+                        isSelected
+                          ? "border-transparent bg-primary text-primary-foreground"
+                          : "border-border",
+                      )}
+                    >
+                      {isSelected && <Check className="size-3.5" />}
+                    </span>
+                  </div>
                   {service.description && (
-                    <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                    <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
                       {service.description}
                     </p>
                   )}
-                  <p className="mt-0.5 font-mono text-xs sm:text-sm text-muted-foreground">
-                    {service.category ?? "Service"} · {service.duration_minutes} min
-                  </p>
-                </div>
-                <p className="shrink-0 font-mono text-sm font-semibold">
-                  {fmtMoney(Number(service.price))}
-                </p>
-                {isSelected && (
-                  <span className="shrink-0 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                    <Check className="h-3.5 w-3.5" />
-                  </span>
-                )}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                  <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
+                    <span className="font-semibold text-foreground">{fmtMoney(service.price)}</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Clock className="size-3.5" />
+                      {service.duration_minutes} min
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      ))}
     </div>
   );
 }

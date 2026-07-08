@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSalon, fetchStaff, fetchServices, asBusinessHours, type DayKey } from "@/lib/salon";
-import { fmtMoney } from "@/lib/utils";
+
 import type { StaffRow } from "@/integrations/supabase/rows";
 import {
   getSalonName,
@@ -18,6 +18,8 @@ import art3 from "@/assets/art3.jpg";
 import g1 from "@/assets/gallery1.jpg";
 import { SiteHeader, SiteFooter, MapEmbed } from "@/components/site-chrome";
 import { Skeleton } from "@/components/ui/skeleton";
+import { WaveDivider } from "@/components/wave-divider";
+import { BookingCTA } from "@/components/booking-cta";
 
 type Staff = Pick<
   StaffRow,
@@ -133,9 +135,10 @@ function Home() {
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 pt-16 pb-20 sm:px-10 sm:pt-24 md:grid-cols-12 md:gap-12 md:pt-32">
           <div className="md:col-span-6 md:pt-8">
-            <p className="text-xs uppercase tracking-[0.35em] text-accent">
-              Est. {salon?.created_at ? new Date(salon.created_at).getFullYear() : ""}
-            </p>
+            <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-accent font-mono text-[0.7rem] tracking-[0.12em] uppercase">
+              <Star className="size-3 fill-current" /> Neighborhood studio · est.{" "}
+              {salon?.created_at ? new Date(salon.created_at).getFullYear() : "2019"}
+            </span>
             <h1 className="mt-6 font-display text-6xl leading-[0.92] tracking-[-0.02em] sm:text-7xl lg:text-8xl">
               The quiet
               <br />
@@ -180,6 +183,7 @@ function Home() {
                 height={1024}
                 fetchPriority="high"
               />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent" />
               <div className="absolute inset-x-6 bottom-6 rounded-2xl bg-card/90 px-5 py-4 backdrop-blur-md">
                 <p className="font-display text-lg italic">Curated by hand.</p>
                 <p className="mt-1 text-xs uppercase tracking-[0.25em] text-muted-foreground">
@@ -248,7 +252,8 @@ function Home() {
       </section>
 
       {/* SERVICES PREVIEW */}
-      <section id="services" className="border-t border-border bg-surface/40">
+      <section id="services" className="bg-card">
+        <WaveDivider className="text-card" />
         <div className="mx-auto max-w-7xl px-6 py-24 sm:px-10 sm:py-32">
           <div className="flex items-end justify-between">
             <div>
@@ -262,29 +267,50 @@ function Home() {
               Full menu →
             </Link>
           </div>
-          <ul className="mt-12 divide-y divide-border">
-            {services.slice(0, 6).map((s) => (
-              <li
-                key={s.id}
-                className="grid grid-cols-[1fr_auto] items-baseline gap-x-6 gap-y-1 py-6 sm:grid-cols-[2fr_1fr_auto]"
-              >
-                <p className="font-display text-2xl sm:text-3xl">{s.name}</p>
-                {s.category && (
-                  <p className="hidden text-sm text-muted-foreground sm:block">{s.category}</p>
-                )}
-                <p className="text-right font-mono text-sm tracking-wider">
-                  {fmtMoney(Number(s.price))}
-                </p>
-                {s.category && (
-                  <p className="text-sm text-muted-foreground sm:hidden">{s.category}</p>
-                )}
-                <p className="hidden font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground sm:col-start-3 sm:block">
-                  {s.duration_minutes} min
-                </p>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-8 sm:hidden">
+
+          {/* Group services by category */}
+          {(() => {
+            const grouped = new Map<string, typeof services>();
+            for (const s of services) {
+              const cat = s.category || "Other";
+              if (!grouped.has(cat)) grouped.set(cat, []);
+              grouped.get(cat)!.push(s);
+            }
+            return Array.from(grouped.entries());
+          })().map(([category, items]) => (
+            <div key={category} className="mt-10 first:mt-0">
+              <h3 className="font-display mb-4 text-2xl">{category}</h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {items.map((service) => (
+                  <div
+                    key={service.id}
+                    className="group rounded-xl bg-surface p-5 transition-all hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <h4 className="font-medium">{service.name}</h4>
+                        {service.description && (
+                          <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                            {service.description}
+                          </p>
+                        )}
+                        {service.duration_minutes && (
+                          <p className="mt-2 text-xs text-muted-foreground">
+                            ~{service.duration_minutes} min
+                          </p>
+                        )}
+                      </div>
+                      <span className="shrink-0 font-semibold">
+                        ${Number(service.price).toFixed(0)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          <div className="mt-8 flex justify-center sm:hidden">
             <Link
               to="/services"
               className="text-xs uppercase tracking-[0.25em] underline-offset-4 underline"
@@ -293,6 +319,7 @@ function Home() {
             </Link>
           </div>
         </div>
+        <WaveDivider className="text-card" flip />
       </section>
 
       {/* MEET THE ARTISTS */}
@@ -327,7 +354,7 @@ function Home() {
               return (
                 <article
                   key={s.id}
-                  className="group rounded-3xl bg-surface overflow-hidden flex flex-col"
+                  className="group rounded-3xl bg-surface overflow-hidden flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <div className="relative aspect-[4/5] bg-muted overflow-hidden">
                     <div
@@ -401,7 +428,7 @@ function Home() {
             ].map(([src, alt], i) => (
               <figure
                 key={i}
-                className="group relative aspect-square overflow-hidden rounded-3xl bg-surface"
+                className="group relative aspect-square overflow-hidden rounded-3xl bg-surface transition-all hover:-translate-y-0.5 hover:shadow-md"
               >
                 <img
                   src={src as string}
@@ -438,110 +465,112 @@ function Home() {
       </section>
 
       {/* VISIT + HOURS */}
-      <section id="visit" className="mx-auto max-w-7xl px-6 py-24 sm:px-10 sm:py-32">
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="rounded-3xl bg-surface overflow-hidden flex flex-col">
-            <div className="aspect-[5/4] w-full bg-muted">
-              <MapEmbed />
-            </div>
-            <div className="p-8 sm:p-10">
-              <p className="text-[11px] uppercase tracking-[0.3em] text-accent">Visit</p>
-              <h3 className="mt-3 font-display text-3xl">Find the studio.</h3>
-              <div className="mt-6 space-y-4 text-sm">
-                <div className="flex items-start gap-3">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  <span className="text-muted-foreground">
-                    {getSalonAddress() || getSalonSocial().mapsUrl}
-                  </span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Phone className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  <a
-                    href={`tel:${getSalonPhoneHref()}`}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    {getSalonPhone()}
-                  </a>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  <a
-                    href={`mailto:${getSalonSocial().email}`}
-                    className="text-muted-foreground hover:text-foreground break-all"
-                  >
-                    {getSalonSocial().email}
-                  </a>
-                </div>
+      <section id="visit" className="bg-card">
+        <WaveDivider className="text-card" />
+        <div className="mx-auto max-w-7xl px-6 py-24 sm:px-10 sm:py-32">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="rounded-3xl bg-surface overflow-hidden flex flex-col">
+              <div className="aspect-[5/4] w-full bg-muted">
+                <MapEmbed />
               </div>
-              <a
-                href={getSalonSocial().mapsUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-6 inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] underline-offset-4 hover:underline"
-              >
-                Open in Maps <ArrowRight className="h-3 w-3" />
-              </a>
-            </div>
-          </div>
-
-          <div className="rounded-3xl bg-surface p-8 sm:p-10">
-            <p className="text-[11px] uppercase tracking-[0.3em] text-accent">Hours</p>
-            <h3 className="mt-4 flex items-center gap-3 font-display text-4xl">
-              When we're open <Clock className="h-6 w-6 text-accent" />
-            </h3>
-            <ul className="mt-8 space-y-2.5 text-sm">
-              {DAYS.map(([label, key]) => {
-                const h = asBusinessHours(salon?.business_hours)[key];
-                return (
-                  <li
-                    key={key}
-                    className="flex items-baseline justify-between border-b border-dashed border-border/70 pb-2.5"
-                  >
-                    <span className="font-display text-lg">{label}</span>
-                    <span className="font-mono text-xs tracking-wider text-muted-foreground">
-                      {h ? `${h.open} — ${h.close}` : "Closed"}
+              <div className="p-8 sm:p-10">
+                <p className="text-[11px] uppercase tracking-[0.3em] text-accent">Visit</p>
+                <h3 className="mt-3 font-display text-3xl">Find the studio.</h3>
+                <div className="mt-6 space-y-4 text-sm">
+                  <div className="flex items-start gap-3">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    <span className="text-muted-foreground">
+                      {getSalonAddress() || getSalonSocial().mapsUrl}
                     </span>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="mt-8 flex flex-wrap gap-2">
-              <a
-                href={getSalonSocial().yelp}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full border border-border bg-card px-4 py-2 text-[10px] uppercase tracking-[0.2em] hover:bg-surface"
-              >
-                Yelp
-              </a>
-              <a
-                href={getSalonSocial().instagram}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full border border-border bg-card px-4 py-2 text-[10px] uppercase tracking-[0.2em] hover:bg-surface"
-              >
-                Instagram
-              </a>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Phone className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    <a
+                      href={`tel:${getSalonPhoneHref()}`}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      {getSalonPhone()}
+                    </a>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    <a
+                      href={`mailto:${getSalonSocial().email}`}
+                      className="text-muted-foreground hover:text-foreground break-all"
+                    >
+                      {getSalonSocial().email}
+                    </a>
+                  </div>
+                </div>
+                <a
+                  href={getSalonSocial().mapsUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-6 inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] underline-offset-4 hover:underline"
+                >
+                  Open in Maps <ArrowRight className="h-3 w-3" />
+                </a>
+              </div>
+            </div>
+
+            <div className="rounded-3xl bg-surface p-8 sm:p-10">
+              <p className="text-[11px] uppercase tracking-[0.3em] text-accent">Hours</p>
+              <h3 className="mt-4 flex items-center gap-3 font-display text-4xl">
+                When we're open <Clock className="h-6 w-6 text-accent" />
+              </h3>
+              <ul className="mt-8 space-y-2.5 text-sm">
+                {(() => {
+                  const todayName = new Date().toLocaleDateString("en-US", { weekday: "long" });
+                  return DAYS.map(([label, key]) => {
+                    const h = asBusinessHours(salon?.business_hours)[key];
+                    const isToday = label === todayName;
+                    return (
+                      <li
+                        key={key}
+                        className={`flex items-baseline justify-between border-b border-dashed border-border/70 pb-2.5 ${isToday ? "bg-secondary/50 -mx-3 rounded-md px-3" : ""}`}
+                      >
+                        <span className="font-display text-lg">
+                          {label}
+                          {isToday && (
+                            <span className="text-accent ml-1.5 text-sm font-mono">· today</span>
+                          )}
+                        </span>
+                        <span className="font-mono text-xs tracking-wider text-muted-foreground">
+                          {h ? `${h.open} — ${h.close}` : "Closed"}
+                        </span>
+                      </li>
+                    );
+                  });
+                })()}
+              </ul>
+              <div className="mt-8 flex flex-wrap gap-2">
+                <a
+                  href={getSalonSocial().yelp}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full border border-border bg-card px-4 py-2 text-[10px] uppercase tracking-[0.2em] hover:bg-surface"
+                >
+                  Yelp
+                </a>
+                <a
+                  href={getSalonSocial().instagram}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full border border-border bg-card px-4 py-2 text-[10px] uppercase tracking-[0.2em] hover:bg-surface"
+                >
+                  Instagram
+                </a>
+              </div>
             </div>
           </div>
         </div>
+        <WaveDivider className="text-card" flip />
       </section>
 
       {/* CTA BAND */}
-      <section className="border-t border-border bg-primary text-primary-foreground">
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-6 py-20 text-center sm:px-10 sm:py-28">
-          <p className="text-[11px] uppercase tracking-[0.35em] text-primary-foreground/60">
-            Ready when you are
-          </p>
-          <h2 className="font-display text-5xl leading-tight sm:text-7xl">
-            Book your <span className="italic">moment.</span>
-          </h2>
-          <Link
-            to="/book"
-            className="inline-flex tap-target items-center gap-3 rounded-lg bg-background h-12 px-7 text-sm font-medium tracking-[0.01em] text-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-          >
-            Reserve <ArrowRight className="h-4 w-4" />
-          </Link>
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
+          <BookingCTA variant="primary" />
         </div>
       </section>
 
