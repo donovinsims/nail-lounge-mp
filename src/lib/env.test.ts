@@ -51,7 +51,6 @@ describe("env defaults", () => {
       instagram: "",
       facebook: "",
       tiktok: "",
-      booksy: "",
       yelp: "",
     });
   });

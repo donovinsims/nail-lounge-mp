@@ -62,7 +62,6 @@ VITE_SALON_MAP_EMBED="<maps-embed-url>"
 VITE_SALON_INSTAGRAM="<instagram-url>"
 VITE_SALON_FACEBOOK="<facebook-url>"
 VITE_SALON_TIKTOK="<tiktok-url>"
-VITE_SALON_BOOKSY="<booksy-url>"
 VITE_SALON_YELP="<yelp-url>"
 VITE_TWILIO_PHONE_NUMBER="<twilio-phone>"
 

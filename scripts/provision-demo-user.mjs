@@ -19,7 +19,7 @@ import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const DEMO_EMAIL = "emaildonovin@gmail.com";
-const DEMO_PASSWORD = "Hononegah1!";
+const DEMO_PASSWORD = process.env.DEMO_PASSWORD || "changeme123!";
 const DEMO_NAME = "Donovin (Demo)";
 const SALON_ID = "11111111-1111-1111-1111-111111111111";
 const EXPECTED_PROJECT = "wjyjgtsaepoxtmalttzj";

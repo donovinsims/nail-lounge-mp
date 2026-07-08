@@ -56,20 +56,48 @@ const DAY_SHORT: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: `${getSalonName()} — Manicures, Pedicures & Nail Art` },
-      {
-        name: "description",
-        content: `Precision manicures, pedicures, gel, acrylic, and modern nail art. Book online in 60 seconds at ${getSalonName()}.`,
-      },
-      { property: "og:title", content: `${getSalonName()} — Salon Services` },
-      { property: "og:description", content: "Manicures, pedicures, gel, acrylic, and nail art." },
-      { property: "og:image", content: heroImg },
-      { property: "og:url", content: "/" },
-    ],
-    links: [{ rel: "canonical", href: "/" }],
-  }),
+  head: () => {
+    const social = getSalonSocial();
+    const socialUrls = [
+      social.instagram && `https://instagram.com/${social.instagram}`,
+      social.facebook && `https://facebook.com/${social.facebook}`,
+      social.tiktok && `https://tiktok.com/@${social.tiktok}`,
+      social.yelp && social.yelp,
+    ].filter(Boolean) as string[];
+    return {
+      meta: [
+        { title: `${getSalonName()} — Manicures, Pedicures & Nail Art` },
+        {
+          name: "description",
+          content: `Precision manicures, pedicures, gel, acrylic, and modern nail art. Book online in 60 seconds at ${getSalonName()}.`,
+        },
+        { property: "og:title", content: `${getSalonName()} — Salon Services` },
+        {
+          property: "og:description",
+          content: "Manicures, pedicures, gel, acrylic, and nail art.",
+        },
+        { property: "og:image", content: heroImg },
+        { property: "og:url", content: "/" },
+      ],
+      links: [{ rel: "canonical", href: "/" }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "HairSalon",
+            name: getSalonName(),
+            image: heroImg,
+            address: { "@type": "PostalAddress", streetAddress: getSalonAddress() },
+            telephone: getSalonPhone(),
+            url: "/",
+            sameAs: socialUrls.length > 0 ? socialUrls : undefined,
+            priceRange: "$$",
+          }),
+        },
+      ],
+    };
+  },
   component: Home,
 });
 
@@ -478,14 +506,6 @@ function Home() {
               })}
             </ul>
             <div className="mt-8 flex flex-wrap gap-2">
-              <a
-                href={getSalonSocial().booksy}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full border border-border bg-card px-4 py-2 text-[10px] uppercase tracking-[0.2em] hover:bg-surface"
-              >
-                Booksy
-              </a>
               <a
                 href={getSalonSocial().yelp}
                 target="_blank"

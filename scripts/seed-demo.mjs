@@ -346,7 +346,6 @@ async function main() {
       start_time: b.start.toISOString(),
       end_time: b.end.toISOString(),
       status: "confirmed",
-      deposit_paid: 10,
     };
 
     if (!isDryRun) {

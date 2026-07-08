@@ -147,16 +147,6 @@ export function SiteFooter() {
                 Yelp
               </a>
             </li>
-            <li>
-              <a
-                href={getSalonSocial().booksy}
-                target="_blank"
-                rel="noreferrer"
-                className="hover:underline"
-              >
-                Booksy
-              </a>
-            </li>
           </ul>
         </div>
       </div>

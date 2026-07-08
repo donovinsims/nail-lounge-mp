@@ -46,6 +46,17 @@ export default function FloorView({ salonId }: { salonId: string }) {
       .eq("id", id);
   };
 
+  if (floor.length === 0) {
+    return (
+      <div className="rounded-2xl bg-surface p-8 text-center">
+        <p className="text-sm text-muted-foreground">No staff on floor yet.</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Staff will appear here once they're checked in.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

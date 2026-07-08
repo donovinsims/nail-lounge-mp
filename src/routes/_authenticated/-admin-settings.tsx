@@ -126,18 +126,11 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
 
   // ── Hours ────────────────────────────────────────────────────────────
   const [hours, setHours] = useState<Record<string, { open: string; close: string }>>(() => {
-    const raw = (salon.business_hours ?? {}) as Record<string, { open: string; close: string }[]>;
+    const raw = (salon.business_hours ?? {}) as Record<string, { open: string; close: string }>;
     const parsed: Record<string, { open: string; close: string }> = {};
-    for (const day of [
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-      "sunday",
-    ]) {
-      const slot = raw[day]?.[0];
+    const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+    for (const day of DAYS) {
+      const slot = raw[day];
       parsed[day] = { open: slot?.open ?? "", close: slot?.close ?? "" };
     }
     return parsed;
@@ -146,10 +139,10 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
 
   const handleSaveHours = async () => {
     setSavingHours(true);
-    const businessHours: Record<string, { open: string; close: string }[]> = {};
+    const businessHours: Record<string, { open: string; close: string }> = {};
     for (const [day, times] of Object.entries(hours)) {
       if (times.open && times.close) {
-        businessHours[day] = [{ open: times.open, close: times.close }];
+        businessHours[day] = { open: times.open, close: times.close };
       }
     }
     try {
@@ -421,12 +414,20 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
       <div className="rounded-2xl bg-surface p-6 space-y-4">
         <h3 className="font-semibold">Business hours</h3>
         <div className="space-y-3">
-          {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map(
-            (day) => (
+          {(["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const).map((day) => {
+            const label =
+              {
+                mon: "Monday",
+                tue: "Tuesday",
+                wed: "Wednesday",
+                thu: "Thursday",
+                fri: "Friday",
+                sat: "Saturday",
+                sun: "Sunday",
+              }[day] ?? day;
+            return (
               <div key={day} className="flex items-center gap-3">
-                <span className="w-24 text-xs font-medium capitalize text-muted-foreground">
-                  {day}
-                </span>
+                <span className="w-24 text-xs font-medium text-muted-foreground">{label}</span>
                 <input
                   type="time"
                   value={hours[day]?.open ?? ""}
@@ -445,8 +446,8 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
                   className="tap-target rounded-lg bg-surface-2 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>
-            ),
-          )}
+            );
+          })}
         </div>
         <button onClick={handleSaveHours} disabled={savingHours} className={BTN_CLS}>
           <Save className="h-4 w-4" />
@@ -458,9 +459,9 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
       <div className="rounded-2xl bg-surface p-6">
         <h3 className="font-semibold mb-2">Social & online</h3>
         <p className="text-xs text-muted-foreground">
-          Social links (Instagram, Facebook, TikTok, Booksy, Yelp) are managed via environment
-          variables. Update your{" "}
-          <code className="text-primary bg-primary/10 px-1 rounded">.env</code> to change them.
+          Social links (Instagram, Facebook, TikTok, Yelp) are managed via environment variables.
+          Update your <code className="text-primary bg-primary/10 px-1 rounded">.env</code> to
+          change them.
         </p>
       </div>
     </div>
