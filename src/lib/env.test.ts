@@ -52,6 +52,7 @@ describe("env defaults", () => {
       facebook: "",
       tiktok: "",
       yelp: "",
+      googleReviews: "",
     });
   });
 
