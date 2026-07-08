@@ -326,7 +326,7 @@ User → Sign-in (/auth.tsx) → Email magic link → Callback (/auth/callback.t
 
 - **`getSalonId()`** — Reads `VITE_SALON_ID` / `SALON_ID` env var
 - **`getSalonName()`**, **`getSalonAddress()`**, **`getSalonPhone()`** — Branding from env
-- **`getSocialLinks()`** — Returns object with Instagram, Facebook, TikTok, YouTube, Booksy, Yelp URLs
+- **`getSocialLinks()`** — Returns object with Instagram, Facebook, TikTok, Yelp URLs
 - **`getOGImage()`** — OG image URL for social previews
 - **`isSeedAllowed()`** — Checks `VITE_ALLOW_SEED_DATA` env gate
 - All values fall back from `import.meta.env` to `process.env` for SSR compatibility
@@ -501,7 +501,7 @@ See `.env.template` for the complete list. Key categories:
 
 - **Required:** Supabase URL/keys, App URL, Salon ID/Name/Address/Phone
 - **Branding:** Primary/secondary color, OG image
-- **Social:** Instagram, Facebook, TikTok, YouTube, Booksy, Yelp, Maps
+- **Social:** Instagram, Facebook, TikTok, Yelp, Maps
 - **Admin:** Admin email, onboarding flag
 - **Twilio:** Account SID, auth token, phone number
 - **Feature Flags:** `VITE_ALLOW_SEED_DATA`

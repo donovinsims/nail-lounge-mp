@@ -100,7 +100,7 @@ Generated file (do not edit by hand): `src/routeTree.gen.ts`
 
 Server-only values (without `VITE_` prefix) must be read inside a function/handler, not at module scope.
 
-### Supabase Schema (8 migrations)
+### Supabase Schema (13 migrations)
 
 **Tables:** `salons`, `staff`, `services`, `clients`, `bookings`, `commission_records`, `waitlist_entries`, `floor_status`, `ai_calls`, `profiles`, `owner_alerts`
 
@@ -116,10 +116,15 @@ Server-only values (without `VITE_` prefix) must be read inside a function/handl
 6. Add `stripe_session_id` column to bookings
 7. Unique partial index on `staff.auth_user_id`
 8. Pivot: drop Stripe/deposit columns, add `payment_method` enum, staff modal fields (`tip_amount`, `payment_method`, `service_notes`, `completed_at`), Twilio rating fields (`client_rating`, `rating_sent_at`), `owner_alerts` table
+9. Add `client_phone` column to bookings
+10. Create `rate_limits` table
+11. Replace `get_busy_slots` with `get_available_slots` RPC (short-key JSONB access)
+12. Add `paid` boolean column to bookings
+13. REVOKE anon SELECT on `bookings` (closes PII exposure)
 
 ### RLS Key Points
 
-- `get_busy_slots()` RPC is the public read path for bookings
+- `get_available_slots()` RPC is the public read path for bookings
 - Anon can read limited fields of salons, staff, services
 - All writes require authenticated salon membership (checked via `is_salon_member()` SECURITY DEFINER)
 - Service role bypasses RLS (used in public booking server functions only)
@@ -150,7 +155,7 @@ Server-only values (without `VITE_` prefix) must be read inside a function/handl
 
 ### Public Booking
 
-`/book` → `createPublicBooking` (`src/lib/booking.functions.ts`): validates input (Zod), checks slot availability via `get_busy_slots` RPC, upserts client by phone, creates booking with `confirmed` status. Sends Twilio SMS + Resend email confirmation. Uses supabaseAdmin (service role) for writes. All payments collected in-studio — no digital payment processing.
+`/book` → `createPublicBooking` (`src/lib/booking.functions.ts`): validates input (Zod), checks slot availability via `get_available_slots` RPC, upserts client by phone, creates booking with `confirmed` status. Sends Twilio SMS + Resend email confirmation. Uses supabaseAdmin (service role) for writes. All payments collected in-studio — no digital payment processing.
 
 ### Admin Functions
 
@@ -158,7 +163,7 @@ Server-only values (without `VITE_` prefix) must be read inside a function/handl
 
 ### Slot Availability
 
-`src/lib/salon.ts` → `computeAvailableSlots()`: computes 15-min slots using staff working hours ∩ salon business hours, subtracts existing bookings via `get_busy_slots` RPC with 30-min minimum lead time.
+`src/lib/salon.ts` → `computeAvailableSlots()`: computes 15-min slots using staff working hours ∩ salon business hours, subtracts existing bookings via `get_available_slots` RPC with 30-min minimum lead time.
 
 ## Error Handling
 

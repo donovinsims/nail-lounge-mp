@@ -7,7 +7,7 @@ import { getBookingDetails } from "@/lib/booking.functions";
 import { getSalonName } from "@/lib/env";
 import { fmtDate, fmtTime, fmtMoney } from "@/lib/utils";
 
-const searchSchema = z.object({
+export const searchSchema = z.object({
   bookingId: z.string().uuid(),
 });
 
@@ -140,7 +140,7 @@ function BookingConfirmed() {
   );
 }
 
-function DetailRow({ label, value }: { label: string; value: string }) {
+export function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between gap-2">
       <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">

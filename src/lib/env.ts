@@ -13,7 +13,6 @@ export interface SalonSocialConfig {
   instagram: string;
   facebook: string;
   tiktok: string;
-  booksy: string;
   yelp: string;
 }
 
@@ -65,7 +64,6 @@ export function getSalonSocial(): SalonSocialConfig {
     instagram: import.meta.env.VITE_SALON_INSTAGRAM || "",
     facebook: import.meta.env.VITE_SALON_FACEBOOK || "",
     tiktok: import.meta.env.VITE_SALON_TIKTOK || "",
-    booksy: import.meta.env.VITE_SALON_BOOKSY || "",
     yelp: import.meta.env.VITE_SALON_YELP || "",
   };
 }

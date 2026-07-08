@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import { getMyStaff } from "@/lib/admin.functions";
 import { getPendingCompletions, completeStaffModal } from "@/lib/booking.functions";
@@ -183,6 +183,15 @@ function StaffDashboard() {
                   ? "Saving..."
                   : `Complete & ${currentIndex < pending.length - 1 ? "Next" : "Finish"}`}
               </button>
+
+              <div className="text-center">
+                <Link
+                  to="/staff/appointments"
+                  className="text-xs text-muted-foreground underline hover:text-foreground"
+                >
+                  View my appointments
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -196,8 +205,16 @@ function StaffDashboard() {
         </p>
 
         {!showModal && pending.length === 0 && (
-          <div className="mt-8 rounded-xl border bg-card p-8 text-center text-muted-foreground">
-            <p>No pending appointments to complete.</p>
+          <div className="mt-8 rounded-xl border bg-card p-8 text-center">
+            <p className="text-muted-foreground">
+              All caught up! No pending appointments to complete.
+            </p>
+            <Link
+              to="/staff/appointments"
+              className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
+            >
+              View your upcoming appointments &rarr;
+            </Link>
           </div>
         )}
 
