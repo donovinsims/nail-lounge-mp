@@ -196,6 +196,7 @@ function Book() {
   const mutation = useMutation({
     mutationFn: create,
     onSuccess: (result) => {
+      sessionStorage.removeItem(BOOKING_STATE_KEY);
       toast.success("Booking confirmed!");
       navigate({ to: "/booking-confirmed", search: { bookingId: result.bookingId } });
     },
