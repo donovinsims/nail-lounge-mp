@@ -38,24 +38,20 @@ function CallbackPage() {
       await navigate({ to, replace: true });
     }
 
-    // Strategy 1: Listen for auth state change (works for PKCE code exchange)
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (cancelled) return;
-      // SIGNED_IN fires after a successful OAuth/magic link exchange
-      if (event === "SIGNED_IN" && session) {
-        go("/admin");
-      }
-      // INITIAL_SESSION fires once on mount — if session exists, user was already
-      // logged in. If null, the SDK is still processing the OAuth code/hash, so
-      // we wait for SIGNED_IN or the fallback strategies below.
-      if (event === "INITIAL_SESSION" && session) {
-        go("/admin");
-      }
-    });
-    subscription = sub.subscription;
-
-    // Strategy 2: Try getSession immediately (covers already-stored session)
     (async () => {
+      // Strategy 0: Explicitly initialize the Supabase Auth client.
+      // The SDK does NOT auto-initialize — you must call `initialize()`
+      // for the OAuth token processing (implicit flow hash, PKCE code
+      // exchange) to run. Without this, the URL is never parsed, the
+      // session is never stored, and getSession() always returns null.
+      const initResult = await supabase.auth.initialize();
+      if (cancelled) return;
+      if (initResult?.error) {
+        console.error("supabase.auth.initialize() error:", initResult.error);
+        // Don't immediately give up — fall through to manual strategies
+      }
+
+      // Strategy 1: Check if initialization gave us a session
       const { data } = await supabase.auth.getSession();
       if (cancelled) return;
       if (data.session) {
@@ -63,15 +59,27 @@ function CallbackPage() {
         return;
       }
 
+      // Strategy 2: Listen for auth state change (covers PKCE exchange
+      // that completes after our initialize call)
+      const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+        if (cancelled) return;
+        if (event === "SIGNED_IN" && session) {
+          go("/admin");
+        }
+        if (event === "INITIAL_SESSION" && session) {
+          go("/admin");
+        }
+      });
+      subscription = sub.subscription;
+
       // Strategy 3: Manual fallback — parse URL hash directly and set session
       const tokens = parseHashFragment();
       if (tokens?.access_token) {
         try {
-          const { data: sessionData, error: sessionError } =
-            await supabase.auth.setSession({
-              access_token: tokens.access_token,
-              refresh_token: tokens.refresh_token || "",
-            });
+          const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+            access_token: tokens.access_token,
+            refresh_token: tokens.refresh_token || "",
+          });
           if (cancelled) return;
           if (sessionData.session) {
             go("/admin");
@@ -86,7 +94,7 @@ function CallbackPage() {
         }
       }
 
-      // Strategy 4: Wait a moment in case Supabase client is still initializing
+      // Strategy 4: Wait a moment and retry
       timeoutId = setTimeout(async () => {
         if (cancelled) return;
         const { data: retry } = await supabase.auth.getSession();
@@ -94,7 +102,6 @@ function CallbackPage() {
         if (retry.session) {
           go("/admin");
         } else {
-          // Try the hash one more time
           const tokens = parseHashFragment();
           if (tokens?.access_token) {
             try {
@@ -112,9 +119,7 @@ function CallbackPage() {
             }
           }
           if (!cancelled) {
-            setError(
-              "Could not complete sign in. The link may have expired. Please try again.",
-            );
+            setError("Could not complete sign in. The link may have expired. Please try again.");
           }
         }
       }, 2000);
