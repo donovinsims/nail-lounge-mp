@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   getSalonAddress,
   getSalonName,
@@ -7,9 +8,13 @@ import {
   getSalonSocial,
   getSalonTagline,
 } from "@/lib/env";
-import { Instagram, Facebook } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Menu, Instagram, Facebook } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 
 export function SiteHeader() {
+  const [open, setOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 sm:px-10">
@@ -41,16 +46,87 @@ export function SiteHeader() {
           <Link to="/" hash="visit" className="hover:text-foreground transition">
             Visit Us
           </Link>
-          <Link to="/appointments" className="hover:text-foreground transition">
+          <Link
+            to="/appointments"
+            search={{ phone: undefined }}
+            className="hover:text-foreground transition"
+          >
             My Visits
           </Link>
         </nav>
-        <Link
-          to="/book"
-          className="hidden sm:inline-flex h-11 items-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition-[transform,box-shadow] duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-        >
-          Reserve
-        </Link>
+        <div className="flex items-center gap-3">
+          <Button asChild>
+            <Link to="/book">Reserve</Link>
+          </Button>
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <button
+                className="flex size-10 items-center justify-center rounded-lg md:hidden hover:bg-accent/50 transition-colors"
+                aria-label="Open navigation menu"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[280px] sm:w-[320px]">
+              <div className="flex h-full flex-col">
+                <div className="mt-6">
+                  <p className="font-display text-xl italic">{getSalonName()}</p>
+                </div>
+                <nav className="mt-10 flex flex-col gap-6">
+                  <SheetClose asChild>
+                    <Link
+                      to="/services"
+                      className="text-sm uppercase tracking-[0.22em] text-muted-foreground transition hover:text-foreground"
+                    >
+                      Services
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link
+                      to="/gallery"
+                      className="text-sm uppercase tracking-[0.22em] text-muted-foreground transition hover:text-foreground"
+                    >
+                      Gallery
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link
+                      to="/gift-cards"
+                      className="text-sm uppercase tracking-[0.22em] text-muted-foreground transition hover:text-foreground"
+                    >
+                      Gift Cards
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link
+                      to="/"
+                      hash="visit"
+                      className="text-sm uppercase tracking-[0.22em] text-muted-foreground transition hover:text-foreground"
+                    >
+                      Visit Us
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link
+                      to="/appointments"
+                      search={{ phone: undefined }}
+                      className="text-sm uppercase tracking-[0.22em] text-muted-foreground transition hover:text-foreground"
+                    >
+                      My Visits
+                    </Link>
+                  </SheetClose>
+                </nav>
+                <div className="mt-auto pb-8">
+                  <SheetClose asChild>
+                    <Button asChild className="w-full">
+                      <Link to="/book">Reserve</Link>
+                    </Button>
+                  </SheetClose>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   );
@@ -93,7 +169,7 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link to="/appointments" className="hover:underline">
+              <Link to="/appointments" search={{ phone: undefined }} className="hover:underline">
                 My visits
               </Link>
             </li>

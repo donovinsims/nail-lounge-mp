@@ -6,6 +6,8 @@ import { fmtMoney, fmtDate } from "@/lib/utils";
 import { Download, Search, ArrowUpDown, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { KpiCard } from "./-admin-components/kpi-card";
 import { toggleBookingPaid } from "@/lib/admin-crud.functions";
+import { getErrorMessage } from "@/lib/error-handler";
+import { toast } from "sonner";
 
 type SortField = "date" | "staffName" | "tip";
 type SortDir = "asc" | "desc";
@@ -40,6 +42,7 @@ export default function Commissions({ salonId }: { salonId: string }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payroll-ledger", salonId] });
     },
+    onError: (err) => toast.error(getErrorMessage(err, "Failed to update payment status")),
   });
 
   const { data: rows = [] } = useQuery({

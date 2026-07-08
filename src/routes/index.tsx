@@ -17,9 +17,9 @@ import art2 from "@/assets/art2.jpg";
 import art3 from "@/assets/art3.jpg";
 import g1 from "@/assets/gallery1.jpg";
 import { SiteHeader, SiteFooter, MapEmbed } from "@/components/site-chrome";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { WaveDivider } from "@/components/wave-divider";
-import { BookingCTA } from "@/components/booking-cta";
 
 type Staff = Pick<
   StaffRow,
@@ -135,28 +135,26 @@ function Home() {
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 pt-16 pb-20 sm:px-10 sm:pt-24 md:grid-cols-12 md:gap-12 md:pt-32">
           <div className="md:col-span-6 md:pt-8">
-            <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-accent font-mono text-[0.7rem] tracking-[0.12em] uppercase">
+            <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-muted-foreground font-mono text-[0.7rem] tracking-[0.12em] uppercase">
               <Star className="size-3 fill-current" /> Neighborhood studio · est.{" "}
               {salon?.created_at ? new Date(salon.created_at).getFullYear() : "2019"}
             </span>
             <h1 className="mt-6 font-display text-6xl leading-[0.92] tracking-[-0.02em] sm:text-7xl lg:text-8xl">
-              The quiet
+              Manicures,
               <br />
-              <span className="italic font-normal text-accent">artistry</span>
-              <br />
-              of the hand.
+              <span className="italic font-normal text-primary">Pedicures</span>
+              <br />& Modern Nail Art.
             </h1>
             <p className="mt-8 max-w-md text-base leading-relaxed text-muted-foreground">
-              A considered studio for precision manicures, pedicures, acrylic sculpture, and modern
-              nail art — precision nail care.
+              A considered studio for manicures, pedicures, acrylic sculpture, and modern nail art —
+              where every detail matters.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-4">
-              <Link
-                to="/book"
-                className="inline-flex tap-target items-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-              >
-                Reserve <ArrowRight className="h-4 w-4" />
-              </Link>
+              <Button asChild>
+                <Link to="/book">
+                  Reserve <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
               <Link
                 to="/services"
                 className="text-sm uppercase tracking-[0.22em] underline-offset-4 hover:underline"
@@ -165,7 +163,7 @@ function Home() {
               </Link>
             </div>
             <div className="mt-12 flex items-center gap-3 text-xs text-muted-foreground">
-              <div className="flex gap-0.5 text-accent">
+              <div className="flex gap-0.5 text-gold">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-3.5 w-3.5 fill-current" />
                 ))}
@@ -214,7 +212,9 @@ function Home() {
       <section className="mx-auto max-w-7xl px-6 py-24 sm:px-10 sm:py-32">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-5">
-            <p className="text-[11px] uppercase tracking-[0.3em] text-accent">Our studio</p>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
+              Our studio
+            </p>
             <h2 className="mt-4 font-display text-5xl leading-[0.95] sm:text-6xl">
               A slower
               <br />
@@ -257,7 +257,9 @@ function Home() {
         <div className="mx-auto max-w-7xl px-6 py-24 sm:px-10 sm:py-32">
           <div className="flex items-end justify-between">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.3em] text-accent">The menu</p>
+              <p className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
+                The menu
+              </p>
               <h2 className="mt-4 font-display text-5xl sm:text-6xl">Selected services.</h2>
             </div>
             <Link
@@ -326,7 +328,9 @@ function Home() {
       <section id="artists" className="mx-auto max-w-7xl px-6 py-24 sm:px-10 sm:py-32">
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.3em] text-accent">Meet the studio</p>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
+              Meet the studio
+            </p>
             <h2 className="mt-4 font-display text-5xl sm:text-6xl">The artists.</h2>
           </div>
         </div>
@@ -366,7 +370,7 @@ function Home() {
                   </div>
                   <div className="p-6 flex-1 flex flex-col">
                     <p className="font-display text-2xl">{s.name}</p>
-                    <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-accent">
+                    <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
                       {s.title}
                     </p>
                     {s.bio && (
@@ -387,13 +391,11 @@ function Home() {
                     <div className="mt-4 text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
                       {openDays.map((k) => DAY_SHORT[k]).join(" · ") || "By appointment"}
                     </div>
-                    <Link
-                      to="/book"
-                      search={{ staff: s.id }}
-                      className="mt-6 inline-flex tap-target items-center justify-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-                    >
-                      Book with {s.name.split(" ")[0]}
-                    </Link>
+                    <Button asChild variant="outline">
+                      <Link to="/book" search={{ staff: s.id }}>
+                        Book with {s.name.split(" ")[0]}
+                      </Link>
+                    </Button>
                   </div>
                 </article>
               );
@@ -407,7 +409,9 @@ function Home() {
         <div className="mx-auto max-w-7xl px-6 py-24 sm:px-10 sm:py-32">
           <div className="flex items-end justify-between">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.3em] text-accent">From the studio</p>
+              <p className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
+                From the studio
+              </p>
               <h2 className="mt-4 font-display text-5xl sm:text-6xl">Recent work.</h2>
             </div>
             <a
@@ -453,7 +457,7 @@ function Home() {
       {/* TESTIMONIAL */}
       <section className="border-y border-border bg-background">
         <div className="mx-auto max-w-3xl px-6 py-24 text-center sm:py-32">
-          <Ornament className="mx-auto h-3 w-32 text-accent" />
+          <Ornament className="mx-auto h-3 w-32 text-muted-foreground" />
           <blockquote className="mt-8 font-display text-4xl italic leading-tight sm:text-5xl">
             "Easily the most calming hour of my week. They treat your hands like a small piece of
             art."
@@ -474,17 +478,19 @@ function Home() {
                 <MapEmbed />
               </div>
               <div className="p-8 sm:p-10">
-                <p className="text-[11px] uppercase tracking-[0.3em] text-accent">Visit</p>
+                <p className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
+                  Visit
+                </p>
                 <h3 className="mt-3 font-display text-3xl">Find the studio.</h3>
                 <div className="mt-6 space-y-4 text-sm">
                   <div className="flex items-start gap-3">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                     <span className="text-muted-foreground">
                       {getSalonAddress() || getSalonSocial().mapsUrl}
                     </span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Phone className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    <Phone className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                     <a
                       href={`tel:${getSalonPhoneHref()}`}
                       className="text-muted-foreground hover:text-foreground"
@@ -493,7 +499,7 @@ function Home() {
                     </a>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    <Mail className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                     <a
                       href={`mailto:${getSalonSocial().email}`}
                       className="text-muted-foreground hover:text-foreground break-all"
@@ -514,9 +520,9 @@ function Home() {
             </div>
 
             <div className="rounded-3xl bg-surface p-8 sm:p-10">
-              <p className="text-[11px] uppercase tracking-[0.3em] text-accent">Hours</p>
+              <p className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground">Hours</p>
               <h3 className="mt-4 flex items-center gap-3 font-display text-4xl">
-                When we're open <Clock className="h-6 w-6 text-accent" />
+                When we're open <Clock className="h-6 w-6 text-muted-foreground" />
               </h3>
               <ul className="mt-8 space-y-2.5 text-sm">
                 {(() => {
@@ -532,7 +538,9 @@ function Home() {
                         <span className="font-display text-lg">
                           {label}
                           {isToday && (
-                            <span className="text-accent ml-1.5 text-sm font-mono">· today</span>
+                            <span className="text-muted-foreground ml-1.5 text-sm font-mono">
+                              · today
+                            </span>
                           )}
                         </span>
                         <span className="font-mono text-xs tracking-wider text-muted-foreground">
@@ -565,13 +573,6 @@ function Home() {
           </div>
         </div>
         <WaveDivider className="text-card" flip />
-      </section>
-
-      {/* CTA BAND */}
-      <section className="border-t border-border">
-        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
-          <BookingCTA variant="primary" />
-        </div>
       </section>
 
       <SiteFooter />

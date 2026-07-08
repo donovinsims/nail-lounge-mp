@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
 import confetti from "canvas-confetti";
+import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import { z } from "zod";
 import { getBookingDetails } from "@/lib/booking.functions";
@@ -117,12 +118,9 @@ function BookingConfirmed() {
             <p className="text-sm text-muted-foreground">
               Couldn't reach our servers. Please check your internet connection and try again.
             </p>
-            <Link
-              to="/"
-              className="inline-block rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-            >
-              Back to home
-            </Link>
+            <Button asChild>
+              <Link to="/">Back to home</Link>
+            </Button>
           </div>
         </div>
       )}
@@ -134,12 +132,9 @@ function BookingConfirmed() {
             <p className="text-sm text-muted-foreground">
               We couldn't find your booking details. Please check your confirmation SMS.
             </p>
-            <Link
-              to="/"
-              className="inline-block rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-            >
-              Back to home
-            </Link>
+            <Button asChild>
+              <Link to="/">Back to home</Link>
+            </Button>
           </div>
         </div>
       ) : null}
@@ -190,19 +185,14 @@ function BookingConfirmed() {
 
             {/* Actions */}
             <div className="flex flex-col gap-3">
-              <Link
-                to="/"
-                className="w-full rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] inline-flex items-center justify-center"
-              >
-                Back to home
-              </Link>
-              <Link
-                to="/appointments"
-                search={{ phone: data.clientPhone } as { phone: string }}
-                className="w-full rounded-lg border border-border bg-card h-11 px-5 text-sm font-medium tracking-[0.01em] shadow-1 transition duration-150 hover:shadow-2 inline-flex items-center justify-center"
-              >
-                View all my appointments
-              </Link>
+              <Button asChild>
+                <Link to="/">Back to home</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/appointments" search={{ phone: data.clientPhone } as { phone: string }}>
+                  View all my appointments
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

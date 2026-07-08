@@ -63,7 +63,7 @@ export default function StepService({
   if (services.length === 0) {
     return (
       <div className="py-10 text-center text-sm text-muted-foreground">
-        No services available right now.
+        No services are available right now. Please check back later or call us to book.
       </div>
     );
   }
@@ -83,7 +83,7 @@ export default function StepService({
                   aria-checked={isSelected}
                   onClick={() => onSelect(service.id)}
                   className={cn(
-                    "group relative rounded-xl border p-4 text-left transition hover:-translate-y-0.5 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-sm",
+                    "group relative rounded-xl border p-4 text-left transition hover:-translate-y-0.5 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-sm",
                     isSelected
                       ? "border-primary bg-primary/5 ring-2 ring-primary"
                       : "border-border bg-surface hover:border-primary/50 hover:shadow-md",

@@ -43,7 +43,8 @@ export default function StepStaff({ staff, selectedId, onSelect, isLoading }: St
   if (staff.length === 0) {
     return (
       <div className="py-10 text-center text-sm text-muted-foreground">
-        No artists available right now.
+        No artists are available right now. Select No Preference if you'd like us to assign someone,
+        or try a different date.
       </div>
     );
   }
@@ -59,12 +60,12 @@ export default function StepStaff({ staff, selectedId, onSelect, isLoading }: St
             role="radio"
             aria-checked={isNoPrefSelected}
             onClick={() => onSelect("no-preference")}
-            className={`flex w-full tap-target items-center gap-4 rounded-2xl bg-surface p-4 text-left active:scale-[0.98] transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            className={`flex w-full tap-target items-center gap-4 rounded-2xl bg-surface p-4 text-left active:scale-[0.97] transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
               isNoPrefSelected ? "ring-2 ring-ring bg-primary/5 shadow-sm" : "hover:bg-surface-2"
             }`}
           >
             <div
-              className="h-11 w-11 shrink-0 rounded-full grid place-items-center bg-muted text-accent"
+              className="h-11 w-11 shrink-0 rounded-full grid place-items-center bg-muted text-muted-foreground"
               aria-hidden="true"
             >
               <Users className="h-5 w-5" />
@@ -100,7 +101,7 @@ export default function StepStaff({ staff, selectedId, onSelect, isLoading }: St
                 role="radio"
                 aria-checked={isSelected}
                 onClick={() => onSelect(member.id)}
-                className={`flex w-full tap-target items-center gap-4 rounded-2xl bg-surface p-4 text-left active:scale-[0.98] transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                className={`flex w-full tap-target items-center gap-4 rounded-2xl bg-surface p-4 text-left active:scale-[0.97] transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                   isSelected ? "ring-2 ring-ring bg-primary/5 shadow-sm" : "hover:bg-surface-2"
                 }`}
               >

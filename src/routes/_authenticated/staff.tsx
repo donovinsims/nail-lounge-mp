@@ -25,7 +25,11 @@ export const Route = createFileRoute("/_authenticated/staff")({
       if (!staff || staff.role === "owner") {
         throw redirect({ to: "/admin" });
       }
-    } catch {
+    } catch (err) {
+      // If it's a redirect error, let it propagate — don't swallow it
+      if (err instanceof Error && err.message === "Redirect") {
+        throw err;
+      }
       throw redirect({ to: "/auth" });
     }
   },
@@ -38,6 +42,7 @@ function StaffLayout() {
   const signOut = async () => {
     await qc.cancelQueries();
     qc.clear();
+    localStorage.removeItem("dev-bypass");
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   };

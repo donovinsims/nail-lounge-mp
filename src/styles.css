@@ -132,54 +132,6 @@
   --chart-5: #a2543e;
 }
 
-.dark {
-  /* Coastal Neutral dark — derived (doc specifies only Primary #A9BFB6).
-     Warm espresso grounds, sand-toned text. Ready to activate; light is default. */
-  --background: #201c17;
-  --foreground: #f1ece2;
-  --surface: #2a251e;
-  --surface-2: #322c24;
-  --card: #2a251e;
-  --card-foreground: #f1ece2;
-  --popover: #2a251e;
-  --popover-foreground: #f1ece2;
-  --primary: #a9bfb6; /* doc dark-mode primary */
-  --primary-foreground: #1f2a25;
-  --secondary: #3a443f;
-  --secondary-foreground: #d8e2dc;
-  --muted: #322c24;
-  --muted-foreground: #b7a996;
-  --accent: #3d3730;
-  --accent-foreground: #f1ece2;
-  --gold: #d9b562;
-  --taupe: #b7a996;
-  --destructive: #d08a76;
-  --destructive-foreground: #33150b;
-  --destructive-ink: #dfa492;
-  --success: #93b89f;
-  --success-ink: #93b89f;
-  --warning: #e2b563;
-  --warning-ink: #e2b563;
-  --border: rgb(241 236 226 / 12%);
-  --input: #7d7466;
-  --ring: #a9bfb6;
-  --color-input-background: oklch(0.22 0.01 150); /* dark mode — dark green-sand */
-  --color-switch-background: oklch(0.32 0.02 140); /* dark mode — muted olive */
-  --sidebar: #262119;
-  --sidebar-foreground: #f1ece2;
-  --sidebar-primary: #a9bfb6;
-  --sidebar-primary-foreground: #1f2a25;
-  --sidebar-accent: #322c24;
-  --sidebar-accent-foreground: #f1ece2;
-  --sidebar-border: rgb(241 236 226 / 12%);
-  --sidebar-ring: #a9bfb6;
-  --chart-1: #a9bfb6;
-  --chart-2: #d9b562;
-  --chart-3: #b7a996;
-  --chart-4: #93b89f;
-  --chart-5: #d08a76;
-}
-
 @layer base {
   * {
     border-color: var(--color-border);

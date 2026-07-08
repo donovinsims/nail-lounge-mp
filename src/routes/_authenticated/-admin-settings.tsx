@@ -5,7 +5,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/error-handler";
 import { EmptyState } from "@/components/empty-state";
-import { Save, Plus, Trash2, X, Check, Users, Scissors } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Save, Plus, Trash2, X, Check, Users, Scissors, TriangleAlert } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import {
   getAllStaffForSalon,
   createStaff,
@@ -20,8 +31,6 @@ import {
 
 const INPUT_CLS =
   "mt-1.5 w-full tap-target rounded-lg bg-surface-2 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring/60 transition-all";
-const BTN_CLS =
-  "tap-target inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150";
 const BTN_SM_CLS =
   "tap-target inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all";
 
@@ -30,6 +39,11 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
   const [name, setName] = useState(salon.name);
   const [phone, setPhone] = useState(salon.phone || "");
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    type: "staff" | "service";
+    label: string;
+    id: string;
+  } | null>(null);
 
   const saveBusiness = async () => {
     setSaving(true);
@@ -69,15 +83,8 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
     }
   };
 
-  const handleDeleteStaff = async (id: string) => {
-    if (!window.confirm("Permanently deactivate this staff member?")) return;
-    try {
-      await deleteStaff({ data: { id } });
-      toast.success("Staff deactivated");
-      qc.invalidateQueries({ queryKey: ["staff-list"] });
-    } catch (e: unknown) {
-      toast.error(getErrorMessage(e, "Failed to delete staff"));
-    }
+  const handleDeleteStaff = (id: string, label: string) => {
+    setDeleteTarget({ type: "staff", id, label });
   };
 
   // ── Services ─────────────────────────────────────────────────────────
@@ -115,15 +122,27 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
     }
   };
 
-  const handleDeleteService = async (id: string) => {
-    if (!window.confirm("Permanently deactivate this service?")) return;
+  const handleDeleteService = (id: string, label: string) => {
+    setDeleteTarget({ type: "service", id, label });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await deleteService({ data: { id } });
-      toast.success("Service deactivated");
-      qc.invalidateQueries({ queryKey: ["services-list"] });
+      if (deleteTarget.type === "staff") {
+        await deleteStaff({ data: { id: deleteTarget.id } });
+        toast.success("Staff deactivated");
+      } else {
+        await deleteService({ data: { id: deleteTarget.id } });
+        toast.success("Service deactivated");
+      }
+      qc.invalidateQueries({
+        queryKey: deleteTarget.type === "staff" ? ["staff-list"] : ["services-list"],
+      });
     } catch (e: unknown) {
-      toast.error(getErrorMessage(e, "Failed to delete service"));
+      toast.error(getErrorMessage(e, "Failed to delete"));
     }
+    setDeleteTarget(null);
   };
 
   // ── Hours ────────────────────────────────────────────────────────────
@@ -168,12 +187,20 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
         </label>
         <label className="block">
           <span className="text-xs text-muted-foreground font-medium">Phone</span>
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} className={INPUT_CLS} />
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className={INPUT_CLS}
+          />
         </label>
-        <button onClick={saveBusiness} disabled={saving} className={BTN_CLS}>
+        <Button
+          onClick={saving ? () => toast("A save is already in progress") : saveBusiness}
+          className={`tap-target ${saving ? "opacity-50" : ""}`}
+        >
           <Save className="h-4 w-4" />
           {saving ? "Saving..." : "Save changes"}
-        </button>
+        </Button>
       </div>
 
       {/* Staff */}
@@ -221,7 +248,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
               </button>
               <button
                 onClick={() => setStaffForm(null)}
-                className={`${BTN_SM_CLS} bg-surface-3 text-muted-foreground hover:bg-border/40`}
+                className={`${BTN_SM_CLS} bg-muted text-muted-foreground hover:bg-border/40`}
               >
                 <X className="h-3.5 w-3.5" /> Cancel
               </button>
@@ -269,7 +296,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
                   {s.is_active ? "Active" : "Inactive"}
                 </button>
                 <button
-                  onClick={() => handleDeleteStaff(s.id)}
+                  onClick={() => handleDeleteStaff(s.id, s.name)}
                   className="tap-target p-1.5 text-muted-foreground hover:text-destructive-ink transition-colors"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -376,7 +403,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
               </button>
               <button
                 onClick={() => setSvcForm(null)}
-                className={`${BTN_SM_CLS} bg-surface-3 text-muted-foreground hover:bg-border/40`}
+                className={`${BTN_SM_CLS} bg-muted text-muted-foreground hover:bg-border/40`}
               >
                 <X className="h-3.5 w-3.5" /> Cancel
               </button>
@@ -425,7 +452,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
                   {svc.is_active ? "Active" : "Inactive"}
                 </button>
                 <button
-                  onClick={() => handleDeleteService(svc.id)}
+                  onClick={() => handleDeleteService(svc.id, svc.name)}
                   className="tap-target p-1.5 text-muted-foreground hover:text-destructive-ink transition-colors"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -475,10 +502,13 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
             );
           })}
         </div>
-        <button onClick={handleSaveHours} disabled={savingHours} className={BTN_CLS}>
+        <Button
+          onClick={savingHours ? () => toast("A save is already in progress") : handleSaveHours}
+          className={`tap-target ${savingHours ? "opacity-50" : ""}`}
+        >
           <Save className="h-4 w-4" />
           {savingHours ? "Saving..." : "Save hours"}
-        </button>
+        </Button>
       </div>
 
       {/* Social links hint */}
@@ -490,6 +520,36 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
           change them.
         </p>
       </div>
+
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <TriangleAlert className="h-5 w-5 text-destructive" />
+              Delete {deleteTarget?.type === "staff" ? "staff member" : "service"}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Deactivate{" "}
+              {deleteTarget?.type === "staff" ? deleteTarget?.label : `"${deleteTarget?.label}"`}?
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

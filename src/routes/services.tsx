@@ -6,6 +6,7 @@ import { fetchSalon, fetchServices } from "@/lib/salon";
 import { fmtMoney } from "@/lib/utils";
 import { getSalonName } from "@/lib/env";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
+import { Button } from "@/components/ui/button";
 import { ArrowRight, Clock, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/services")({
@@ -56,7 +57,7 @@ function ServicesPage() {
 
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-xs uppercase tracking-[0.35em] text-accent">Menu</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Menu</p>
           <h1 className="mt-6 max-w-3xl font-display text-5xl leading-[0.95] tracking-[-0.01em] sm:text-7xl">
             Services & <span className="italic">pricing.</span>
           </h1>
@@ -64,12 +65,11 @@ function ServicesPage() {
             Clear prices, no surprises. Every service includes shape, cuticle care, and a careful
             finish.
           </p>
-          <Link
-            to="/book"
-            className="mt-10 inline-flex tap-target items-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-          >
-            Reserve <ArrowRight className="h-4 w-4" />
-          </Link>
+          <Button asChild>
+            <Link to="/book" className="mt-10">
+              Reserve <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </section>
 
@@ -78,7 +78,9 @@ function ServicesPage() {
           <section key={category} className="mb-20 last:mb-0">
             <div className="grid gap-10 md:grid-cols-12">
               <header className="md:col-span-4">
-                <p className="text-xs uppercase tracking-[0.3em] text-accent">{category}</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                  {category}
+                </p>
                 <h2 className="mt-3 font-display text-3xl sm:text-4xl">{category}</h2>
               </header>
               <ul className="md:col-span-8 space-y-3">
@@ -94,7 +96,7 @@ function ServicesPage() {
                           className="group flex w-full items-baseline justify-between gap-4 border-b border-dashed border-border/50 px-4 py-4 text-left hover:bg-accent/5 transition tap-target"
                         >
                           <div className="min-w-0">
-                            <p className="font-display text-xl sm:text-2xl group-hover:text-accent transition-colors">
+                            <p className="font-display text-xl sm:text-2xl group-hover:text-primary transition-colors">
                               {s.name}
                             </p>
                             <p className="mt-0.5 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -118,13 +120,11 @@ function ServicesPage() {
                               <Clock className="h-4 w-4" />
                               <span>{s.duration_minutes} minutes</span>
                             </div>
-                            <Link
-                              to="/book"
-                              search={{ service: s.id } as { service: string }}
-                              className="flex w-full tap-target items-center justify-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-                            >
-                              Reserve <ArrowRight className="h-4 w-4" />
-                            </Link>
+                            <Button asChild>
+                              <Link to="/book" search={{ service: s.id } as { service: string }}>
+                                Reserve <ArrowRight className="h-4 w-4" />
+                              </Link>
+                            </Button>
                           </div>
                         )}
                       </div>
@@ -138,27 +138,27 @@ function ServicesPage() {
 
         {/* Bottom CTA band */}
         <div className="mt-16 rounded-3xl bg-surface p-10 text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-accent">Ready when you are</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+            Ready when you are
+          </p>
           <h3 className="mt-4 font-display text-3xl sm:text-4xl">
             Book with your favourite artist.
           </h3>
-          <Link
-            to="/book"
-            className="mt-8 inline-flex tap-target items-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-          >
-            Reserve <ArrowRight className="h-4 w-4" />
-          </Link>
+          <Button asChild>
+            <Link to="/book" className="mt-8">
+              Reserve <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </div>
 
       {/* Mobile sticky CTA */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur-xl px-4 py-3 safe-pb sm:hidden">
-        <Link
-          to="/book"
-          className="flex w-full tap-target items-center justify-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-        >
-          Reserve <Sparkles className="h-4 w-4" />
-        </Link>
+        <Button asChild>
+          <Link to="/book">
+            Reserve <Sparkles className="h-4 w-4" />
+          </Link>
+        </Button>
       </div>
 
       {/* Spacer for mobile sticky CTA */}

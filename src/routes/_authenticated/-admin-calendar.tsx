@@ -161,7 +161,7 @@ export default function CalendarView({ salonId }: { salonId: string }) {
   return (
     <div>
       {/* 14-day scrollable date picker */}
-      <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-none">
+      <div className="flex gap-2 overflow-x-auto pb-4 hide-scrollbar">
         {Array.from({ length: 14 }, (_, i) => {
           const d = new Date();
           d.setDate(d.getDate() + i);

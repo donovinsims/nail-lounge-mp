@@ -45,7 +45,7 @@ export default function StepDateTime({
                 </span>
                 <span className="mt-0.5 text-xl font-bold leading-none">{d.getDate()}</span>
                 {isToday && !selected && (
-                  <span className="text-[9px] uppercase tracking-wider text-accent mt-1">
+                  <span className="text-[9px] uppercase tracking-wider text-muted-foreground mt-1">
                     Today
                   </span>
                 )}
@@ -71,7 +71,7 @@ export default function StepDateTime({
           </div>
         ) : slots.length === 0 ? (
           <p className="py-10 text-center text-sm text-muted-foreground">
-            No availability this day. Try another date.
+            No availability on this date. Please select another date.
           </p>
         ) : (
           <div
@@ -87,7 +87,7 @@ export default function StepDateTime({
                   role="radio"
                   aria-checked={selected}
                   onClick={() => onSlotChange(t)}
-                  className={`py-3 rounded-xl text-sm text-center font-mono font-medium transition duration-150 active:scale-[0.98] ${
+                  className={`py-3 rounded-xl text-sm text-center font-mono font-medium tabular-nums transition duration-150 active:scale-[0.97] ${
                     selected
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "bg-surface text-foreground hover:bg-surface-2 border border-border hover:border-primary/50"

@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { InstagramEmbed, TikTokEmbed } from "@/components/social-embeds";
 import { getSalonName, getSalonSocial } from "@/lib/env";
+import { Button } from "@/components/ui/button";
 import { Instagram, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import art1 from "@/assets/art1.jpg";
@@ -73,7 +74,7 @@ function GalleryPage() {
 
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-xs uppercase tracking-[0.35em] text-accent">Gallery</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Gallery</p>
           <h1 className="mt-6 max-w-3xl font-display text-5xl leading-[0.95] tracking-[-0.01em] sm:text-7xl text-balance">
             Recent <span className="italic">work.</span>
           </h1>
@@ -108,7 +109,7 @@ function GalleryPage() {
             <button
               key={i}
               onClick={() => show(i)}
-              className="group relative block w-full overflow-hidden rounded-2xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 cursor-pointer active:scale-[0.98]"
+              className="group relative block w-full overflow-hidden rounded-2xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 cursor-pointer active:scale-[0.97]"
             >
               <img
                 src={p.src}
@@ -145,14 +146,14 @@ function GalleryPage() {
                 <button
                   onClick={() => step(-1)}
                   aria-label="Previous image"
-                  className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white/50 cursor-pointer active:scale-[0.96]"
+                  className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white/50 cursor-pointer active:scale-[0.97]"
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </button>
                 <button
                   onClick={() => step(1)}
                   aria-label="Next image"
-                  className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white/50 cursor-pointer active:scale-[0.96]"
+                  className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white/50 cursor-pointer active:scale-[0.97]"
                 >
                   <ChevronRight className="h-5 w-5" />
                 </button>
@@ -164,7 +165,9 @@ function GalleryPage() {
         <section className="mt-24">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-accent">Follow along</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                Follow along
+              </p>
               <h2 className="mt-3 font-display text-3xl sm:text-4xl">Live from the studio.</h2>
             </div>
           </div>
@@ -175,16 +178,15 @@ function GalleryPage() {
         </section>
 
         <div className="mt-20 rounded-3xl bg-surface p-10 text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-accent">Inspired?</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Inspired?</p>
           <h3 className="mt-4 font-display text-3xl sm:text-4xl">
             Bring the look. We'll bring the hands.
           </h3>
-          <Link
-            to="/book"
-            className="mt-8 inline-flex tap-target items-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-          >
-            Reserve <ArrowRight className="h-4 w-4" />
-          </Link>
+          <Button asChild>
+            <Link to="/book">
+              Reserve <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </div>
 

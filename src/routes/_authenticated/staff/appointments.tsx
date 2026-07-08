@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getMyStaff } from "@/lib/admin.functions";
 import { getStaffAppointments } from "@/lib/booking.functions";
 import { getSalonName } from "@/lib/env";
@@ -26,28 +26,17 @@ interface Appointment {
 }
 
 function StaffAppointments() {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: appointments = [], isLoading } = useQuery({
+    queryKey: ["staff-appointments"],
+    queryFn: async () => {
+      const staff = await getMyStaff();
+      if (!staff) return [] as Appointment[];
+      const data = await getStaffAppointments({ data: { staffId: staff.id } });
+      return data as Appointment[];
+    },
+  });
 
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const staff = await getMyStaff();
-        if (!staff) return;
-
-        const data = await getStaffAppointments({ data: { staffId: staff.id } });
-        setAppointments(data as Appointment[]);
-      } catch (err) {
-        console.error("Failed to load appointments:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAppointments();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />

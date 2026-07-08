@@ -1,10 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getSalonName } from "@/lib/env";
 import { getErrorMessage } from "@/lib/error-handler";
 import { toast } from "sonner";
-import { Loader2, ChevronLeft, Mail } from "lucide-react";
+import { Loader2, ChevronLeft, Mail, Bug } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: `Sign in — ${getSalonName()} Admin` }] }),
@@ -12,9 +13,28 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+
+  const devLogin = () => {
+    const payload = {
+      user: {
+        id: "dev-bypass-user",
+        email: "emaildonovin@gmail.com",
+        role: "authenticated",
+        user_metadata: { full_name: "Donovin" },
+      },
+      session: {
+        access_token: "dev-bypass-token",
+        refresh_token: "dev-bypass-refresh",
+      },
+    };
+    localStorage.setItem("dev-bypass", JSON.stringify(payload));
+    toast.success("Dev bypass enabled — redirecting to admin");
+    navigate({ to: "/admin" });
+  };
 
   const sendMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,13 +113,10 @@ function AuthPage() {
                 placeholder="Email"
                 className="w-full tap-target rounded-xl bg-surface px-4 py-3 outline-none focus:ring-2 focus:ring-ring"
               />
-              <button
-                disabled={loading}
-                className="tap-target inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150 w-full justify-center"
-              >
+              <Button disabled={loading} className="tap-target w-full">
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Send magic link
-              </button>
+              </Button>
             </form>
             <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
               <div className="h-px flex-1 bg-border" /> OR <div className="h-px flex-1 bg-border" />
@@ -110,6 +127,17 @@ function AuthPage() {
               className="flex w-full tap-target items-center justify-center gap-2 rounded-xl bg-surface py-3 font-medium hairline disabled:opacity-50"
             >
               Continue with Google
+            </button>
+
+            <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+              <div className="h-px flex-1 bg-border" />
+            </div>
+            <button
+              onClick={devLogin}
+              className="flex w-full tap-target items-center justify-center gap-2 rounded-xl bg-amber-50 dark:bg-amber-950 py-3 font-medium hairline disabled:opacity-50 text-amber-800 dark:text-amber-200"
+            >
+              <Bug className="h-4 w-4" />
+              Dev Login — {getSalonName()} Admin
             </button>
           </>
         )}

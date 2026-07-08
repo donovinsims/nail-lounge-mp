@@ -3,7 +3,10 @@ import { useState, useEffect, useCallback } from "react";
 import { getMyStaff } from "@/lib/admin.functions";
 import { getPendingCompletions, completeStaffModal } from "@/lib/booking.functions";
 import { getSalonName } from "@/lib/env";
-import { Loader2 } from "lucide-react";
+import { getErrorMessage } from "@/lib/error-handler";
+import { toast } from "sonner";
+import { Loader2, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/staff/")({
   head: () => ({
@@ -29,6 +32,7 @@ function StaffDashboard() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [modalDismissed, setModalDismissed] = useState(false);
 
   // Form state
   const [tipAmount, setTipAmount] = useState(0);
@@ -88,6 +92,7 @@ function StaffDashboard() {
       }
     } catch (err) {
       console.error("Failed to complete booking:", err);
+      toast.error(getErrorMessage(err, "Failed to complete appointment"));
     } finally {
       setSubmitting(false);
     }
@@ -104,13 +109,24 @@ function StaffDashboard() {
   return (
     <>
       {/* ── Lockout Modal ────────────────────────────────────────────── */}
-      {showModal && currentBooking && (
+      {showModal && !modalDismissed && currentBooking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm">
           <div className="mx-auto w-full max-w-md rounded-2xl border bg-card p-6 shadow-lg">
-            <h2 className="text-lg font-semibold">Complete Appointment</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Finish this booking to continue using the staff portal.
-            </p>
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Complete Appointment</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Finish this booking to continue using the staff portal.
+                </p>
+              </div>
+              <button
+                onClick={() => setModalDismissed(true)}
+                className="tap-target -mr-1 -mt-1 rounded-full p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                aria-label="Dismiss"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
             <div className="mt-4 space-y-1 rounded-xl bg-surface p-3 text-sm">
               <p>
@@ -173,16 +189,12 @@ function StaffDashboard() {
                 />
               </div>
 
-              <button
-                onClick={handleSubmit}
-                disabled={submitting}
-                className="tap-target inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150 w-full justify-center"
-              >
+              <Button onClick={handleSubmit} disabled={submitting} className="tap-target w-full">
                 {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                 {submitting
                   ? "Saving..."
                   : `Complete & ${currentIndex < pending.length - 1 ? "Next" : "Finish"}`}
-              </button>
+              </Button>
 
               <div className="text-center">
                 <Link
@@ -204,6 +216,19 @@ function StaffDashboard() {
           View your upcoming appointments and manage completed services.
         </p>
 
+        {/* Banner when modal is dismissed but completions remain */}
+        {showModal && modalDismissed && pending.length > 0 && (
+          <div className="mt-8 rounded-xl border border-amber-200 bg-amber-50 p-6 text-center dark:border-amber-800 dark:bg-amber-950/30">
+            <p className="font-medium text-amber-800 dark:text-amber-300">
+              You have {pending.length} pending completion
+              {pending.length !== 1 ? "s" : ""}
+            </p>
+            <Button onClick={() => setModalDismissed(false)} className="mt-3">
+              Complete appointments
+            </Button>
+          </div>
+        )}
+
         {!showModal && pending.length === 0 && (
           <div className="mt-8 rounded-xl border bg-card p-8 text-center">
             <p className="text-muted-foreground">
@@ -218,7 +243,7 @@ function StaffDashboard() {
           </div>
         )}
 
-        {showModal && currentBooking && (
+        {showModal && !modalDismissed && currentBooking && (
           <div className="mt-8 rounded-xl border bg-card p-8 text-center text-muted-foreground">
             <p>Complete the appointment above to continue.</p>
           </div>

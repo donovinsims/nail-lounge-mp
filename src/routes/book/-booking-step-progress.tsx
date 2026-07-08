@@ -5,8 +5,8 @@ interface Props {
   onStepClick: (s: number) => void;
 }
 
-const LABELS = ["Service", "Artist", "Date & Time", "Confirm"];
-const MOBILE_LABELS = ["Service", "Artist", "Date/Time", "Confirm"];
+const LABELS = ["Service", "Artist", "Date & Time", "Your Details"];
+const MOBILE_LABELS = ["Service", "Artist", "Date/Time", "Your Details"];
 
 export default function BookingStepProgress({ step, onStepClick }: Props) {
   return (
@@ -33,16 +33,17 @@ export default function BookingStepProgress({ step, onStepClick }: Props) {
                     type="button"
                     aria-current="step"
                     aria-label={`Step ${num}: ${label}`}
-                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent text-accent-foreground text-sm font-semibold flex items-center justify-center cursor-default ring-2 ring-accent ring-offset-2 ring-offset-background"
+                    className="w-11 h-11 rounded-full bg-accent text-accent-foreground text-xs font-semibold flex items-center justify-center cursor-default ring-2 ring-accent ring-offset-2 ring-offset-background"
                   >
                     {num}
                   </button>
                 ) : isCompleted ? (
                   <button
                     type="button"
+                    title="Click to edit"
                     aria-label={`Step ${num}: ${label} (completed)`}
                     onClick={() => onStepClick(num)}
-                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent text-accent-foreground text-sm font-semibold flex items-center justify-center cursor-pointer hover:scale-[1.05] transition-transform duration-150"
+                    className="w-11 h-11 rounded-full bg-accent text-accent-foreground text-xs font-semibold flex items-center justify-center cursor-pointer hover:scale-[1.05] transition-transform duration-150"
                   >
                     <Check className="h-4 w-4" aria-hidden="true" />
                   </button>
@@ -51,14 +52,14 @@ export default function BookingStepProgress({ step, onStepClick }: Props) {
                     type="button"
                     aria-label={`Step ${num}: ${label}`}
                     disabled
-                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-muted text-muted-foreground text-sm font-semibold flex items-center justify-center cursor-default"
+                    className="w-11 h-11 rounded-full bg-muted text-muted-foreground text-xs font-semibold flex items-center justify-center cursor-default"
                   >
                     {num}
                   </button>
                 )}
                 <span
                   className={`text-xs sm:text-xs font-medium whitespace-nowrap ${
-                    isCurrent ? "text-accent" : "text-muted-foreground"
+                    isCurrent ? "text-foreground" : "text-muted-foreground"
                   }`}
                 >
                   <span className="hidden sm:inline">{label}</span>

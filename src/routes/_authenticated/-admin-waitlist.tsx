@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { WaitlistEntryRow } from "@/integrations/supabase/rows";
+import { Button } from "@/components/ui/button";
 import { StatusBadge } from "./-admin-components/status-badge";
 import { EmptyState } from "@/components/empty-state";
+import { toast } from "sonner";
 import { BottomSheet } from "@/components/bottom-sheet";
 import { Phone, User, Plus, Clock, Zap } from "lucide-react";
 import { fmtDate } from "@/lib/utils";
@@ -75,19 +77,25 @@ export default function Waitlist({ salonId }: { salonId: string }) {
           <div className="relative flex-1 min-w-[180px]">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
+              type="tel"
               placeholder="Phone"
               value={form.client_phone}
               onChange={(e) => setForm({ ...form, client_phone: e.target.value })}
               className="w-full tap-target rounded-xl bg-surface-2 pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <button
-            onClick={add}
-            disabled={adding || !form.client_name || !form.client_phone}
-            className="tap-target inline-flex items-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
+          <Button
+            onClick={() => {
+              if (adding || !form.client_name || !form.client_phone) {
+                toast("Enter client name and phone to add to waitlist");
+                return;
+              }
+              add();
+            }}
+            className={`tap-target ${adding || !form.client_name || !form.client_phone ? "opacity-50" : ""}`}
           >
             <Plus className="h-4 w-4" /> Add
-          </button>
+          </Button>
         </div>
       </div>
 

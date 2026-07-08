@@ -1,0 +1,1168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nail Lounge — Owner Pitch</title>
+    <style>
+      /* =========================================================
+       Corey Ganim — Design Tokens
+       ========================================================= */
+
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap");
+
+      :root {
+        --cg-orange: #f06000;
+        --cg-orange-bright: #ff7a1a;
+        --cg-slate: #8090a0;
+        --cg-black: #000000;
+        --cg-charcoal: #1a1a1a;
+        --cg-charcoal-2: #242424;
+        --cg-white: #ffffff;
+        --cg-cream: #f0e0d0;
+        --cg-cream-dim: rgba(240, 224, 208, 0.65);
+        --fg-1: var(--cg-white);
+        --fg-2: var(--cg-cream);
+        --fg-3: var(--cg-slate);
+        --fg-accent: var(--cg-orange);
+        --fg-accent-2: var(--cg-orange-bright);
+        --bg-1: var(--cg-black);
+        --bg-2: var(--cg-charcoal);
+        --bg-3: var(--cg-charcoal-2);
+        --card-border: rgba(255, 255, 255, 0.06);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: var(--bg-1);
+        color: var(--fg-2);
+      }
+
+      /* ---- Slide Container ---- */
+      .slides {
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
+
+      .slide {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 60px 80px;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.5s ease,
+          visibility 0.5s ease;
+        text-align: center;
+        overflow-y: auto;
+      }
+
+      .slide.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .slide-content {
+        max-width: 1000px;
+        width: 100%;
+      }
+
+      /* ---- Typography ---- */
+      h1 {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 900;
+        font-size: clamp(38px, 5.5vw, 72px);
+        line-height: 1.1;
+        color: var(--fg-1);
+        letter-spacing: -0.02em;
+      }
+
+      h2 {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 800;
+        font-size: clamp(28px, 3.5vw, 48px);
+        line-height: 1.15;
+        color: var(--fg-1);
+        letter-spacing: -0.015em;
+        margin-bottom: 24px;
+      }
+
+      h3 {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 700;
+        font-size: clamp(20px, 2vw, 28px);
+        color: var(--fg-1);
+        margin-bottom: 16px;
+      }
+
+      h4 {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--fg-accent);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-bottom: 12px;
+      }
+
+      p,
+      li {
+        font-size: clamp(16px, 1.4vw, 21px);
+        line-height: 1.6;
+        color: var(--fg-2);
+      }
+
+      p + p {
+        margin-top: 16px;
+      }
+
+      .subtitle {
+        font-size: clamp(18px, 1.8vw, 26px);
+        color: var(--fg-cream-dim);
+        margin-top: 16px;
+        line-height: 1.5;
+      }
+
+      .accent {
+        color: var(--fg-accent);
+      }
+
+      .small {
+        font-size: 14px;
+        color: var(--fg-3);
+      }
+
+      /* ---- Accent Line ---- */
+      .accent-line {
+        width: 60px;
+        height: 4px;
+        background: var(--cg-orange);
+        margin: 20px auto 24px;
+        border-radius: 2px;
+      }
+
+      .accent-line.left {
+        margin: 20px 0 24px;
+      }
+
+      /* ---- Layout Helpers ---- */
+      .text-left {
+        text-align: left;
+      }
+      .align-start {
+        align-items: flex-start;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        text-align: left;
+        margin-top: 24px;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 24px;
+        text-align: left;
+        margin-top: 24px;
+      }
+
+      .grid-5 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        gap: 20px;
+        text-align: left;
+        margin-top: 24px;
+      }
+
+      /* ---- Cards ---- */
+      .card {
+        background: var(--bg-2);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 28px 24px;
+        transition:
+          transform 0.2s,
+          border-color 0.2s;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(240, 96, 0, 0.3);
+      }
+
+      .card-icon {
+        font-size: 32px;
+        font-family: "Inter", sans-serif;
+        color: var(--fg-accent);
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .card h4 {
+        margin-bottom: 10px;
+      }
+
+      .card p {
+        font-size: 15px;
+        line-height: 1.5;
+        color: var(--fg-cream-dim);
+      }
+
+      .card-highlight {
+        background: linear-gradient(135deg, rgba(240, 96, 0, 0.12), rgba(255, 122, 26, 0.06));
+        border-color: rgba(240, 96, 0, 0.25);
+      }
+
+      /* ---- Big Number ---- */
+      .big-number {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 900;
+        font-size: clamp(48px, 6vw, 80px);
+        color: var(--fg-accent);
+        line-height: 1;
+      }
+
+      .big-number-label {
+        font-size: 16px;
+        color: var(--fg-3);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-top: 8px;
+      }
+
+      /* ---- Price Display ---- */
+      .price-block {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .price-value {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 900;
+        font-size: clamp(36px, 4vw, 56px);
+        color: var(--fg-accent);
+      }
+
+      .price-strikethrough {
+        font-size: clamp(20px, 2vw, 30px);
+        color: var(--fg-3);
+        text-decoration: line-through;
+      }
+
+      .price-label {
+        font-size: 18px;
+        color: var(--fg-cream-dim);
+      }
+
+      /* ---- Offer Stack ---- */
+      .offer-stack {
+        text-align: left;
+        margin-top: 20px;
+      }
+
+      .offer-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--card-border);
+      }
+
+      .offer-item:last-child {
+        border-bottom: none;
+      }
+
+      .offer-value {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--fg-accent);
+        white-space: nowrap;
+        min-width: 80px;
+        text-align: right;
+      }
+
+      .offer-desc {
+        flex: 1;
+      }
+
+      .offer-desc strong {
+        color: var(--fg-1);
+      }
+
+      .offer-desc p {
+        font-size: 14px;
+        color: var(--fg-cream-dim);
+        margin: 2px 0 0;
+      }
+
+      .offer-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 20px 0;
+        font-family: "Montserrat", sans-serif;
+        font-weight: 800;
+        font-size: 18px;
+        color: var(--fg-1);
+      }
+
+      .offer-total .price {
+        color: var(--fg-accent);
+        font-size: 24px;
+      }
+
+      /* ---- Guarantee Badge ---- */
+      .guarantee-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(240, 96, 0, 0.1);
+        border: 1px solid rgba(240, 96, 0, 0.3);
+        border-radius: 100px;
+        padding: 12px 28px;
+        margin-top: 24px;
+        font-weight: 600;
+        font-size: 16px;
+        color: var(--fg-accent);
+      }
+
+      /* ---- Feature List (Pain->Solution) ---- */
+      .pain-solution {
+        display: grid;
+        grid-template-columns: 1fr 32px 1fr;
+        gap: 12px;
+        align-items: start;
+        text-align: left;
+        margin-top: 20px;
+      }
+
+      .pain-solution .pain {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 16px 20px;
+        border-left: 3px solid var(--fg-3);
+      }
+
+      .pain-solution .pain .label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--fg-3);
+        margin-bottom: 4px;
+      }
+
+      .pain-solution .pain p {
+        font-size: 15px;
+        color: var(--fg-cream-dim);
+      }
+
+      .pain-solution .arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: var(--fg-accent);
+        padding-top: 16px;
+      }
+
+      .pain-solution .solution {
+        background: rgba(240, 96, 0, 0.06);
+        border-radius: 12px;
+        padding: 16px 20px;
+        border-left: 3px solid var(--cg-orange);
+      }
+
+      .pain-solution .solution .label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--fg-accent);
+        margin-bottom: 4px;
+      }
+
+      .pain-solution .solution p {
+        font-size: 15px;
+        color: var(--fg-2);
+      }
+
+      /* ---- Navigation ---- */
+      .nav-bar {
+        position: fixed;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        z-index: 100;
+        background: rgba(26, 26, 26, 0.9);
+        backdrop-filter: blur(12px);
+        padding: 12px 24px;
+        border-radius: 100px;
+        border: 1px solid var(--card-border);
+      }
+
+      .nav-btn {
+        background: none;
+        border: none;
+        color: var(--fg-3);
+        font-size: 18px;
+        cursor: pointer;
+        padding: 6px 10px;
+        border-radius: 8px;
+        transition:
+          color 0.2s,
+          background 0.2s;
+        font-family: "Inter", sans-serif;
+      }
+
+      .nav-btn:hover {
+        color: var(--fg-1);
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .nav-dots {
+        display: flex;
+        gap: 8px;
+      }
+
+      .nav-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--fg-3);
+        opacity: 0.3;
+        transition:
+          opacity 0.3s,
+          background 0.3s;
+        cursor: pointer;
+        border: none;
+        padding: 0;
+      }
+
+      .nav-dot.active {
+        opacity: 1;
+        background: var(--cg-orange);
+      }
+
+      .nav-counter {
+        font-size: 13px;
+        color: var(--fg-3);
+        min-width: 50px;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* ---- Slide 1 (Hero) Specific ---- */
+      .slide-hero .accent-line {
+        width: 80px;
+        height: 3px;
+        margin: 24px auto;
+      }
+
+      .slide-hero h1 {
+        font-size: clamp(42px, 6vw, 80px);
+      }
+
+      .hero-tag {
+        display: inline-block;
+        background: rgba(240, 96, 0, 0.12);
+        border: 1px solid rgba(240, 96, 0, 0.25);
+        border-radius: 100px;
+        padding: 6px 20px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--fg-accent);
+        margin-bottom: 24px;
+      }
+
+      /* ---- Responsive ---- */
+      @media (max-width: 768px) {
+        .slide {
+          padding: 40px 24px;
+        }
+        .grid-2,
+        .grid-3,
+        .grid-5 {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+        .pain-solution {
+          grid-template-columns: 1fr;
+        }
+        .pain-solution .arrow {
+          transform: rotate(90deg);
+          padding: 4px;
+        }
+        .nav-bar {
+          bottom: 16px;
+          padding: 10px 16px;
+          gap: 10px;
+        }
+      }
+
+      /* ---- Animations ---- */
+      .fade-up {
+        opacity: 0;
+        transform: translateY(20px);
+        transition:
+          opacity 0.6s ease,
+          transform 0.6s ease;
+      }
+
+      .slide.active .fade-up {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .slide.active .fade-up-delay-1 {
+        transition-delay: 0.1s;
+      }
+      .slide.active .fade-up-delay-2 {
+        transition-delay: 0.2s;
+      }
+      .slide.active .fade-up-delay-3 {
+        transition-delay: 0.3s;
+      }
+      .slide.active .fade-up-delay-4 {
+        transition-delay: 0.4s;
+      }
+      .slide.active .fade-up-delay-5 {
+        transition-delay: 0.5s;
+      }
+
+      /* ---- Divider ---- */
+      .divider {
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+        margin: 20px 0;
+      }
+
+      /* ---- Value (simple) ---- */
+      .value-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 40px;
+        margin-top: 28px;
+        flex-wrap: wrap;
+      }
+
+      .value-card {
+        text-align: center;
+        padding: 20px 28px;
+        background: var(--bg-2);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        min-width: 180px;
+      }
+
+      .value-card .num {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 900;
+        font-size: clamp(36px, 4vw, 52px);
+        color: var(--cg-orange);
+      }
+
+      .value-card .label {
+        font-size: 14px;
+        color: var(--fg-3);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-top: 4px;
+      }
+
+      .value-card p {
+        font-size: 14px;
+        color: var(--fg-cream-dim);
+        margin-top: 8px;
+      }
+
+      /* ---- Two Column Text ---- */
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        text-align: left;
+        margin-top: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .two-col {
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slides">
+      <!-- ================================
+       SLIDE 1 — HERO
+       ================================ -->
+      <div class="slide slide-hero active" data-index="0">
+        <div class="slide-content">
+          <div class="hero-tag fade-up">Built for you</div>
+          <h1 class="fade-up fade-up-delay-1">
+            Built around<br />
+            <span class="accent">what you need</span>.
+          </h1>
+          <div class="accent-line fade-up fade-up-delay-2"></div>
+          <p class="subtitle fade-up fade-up-delay-2">
+            So I built it. One system that runs your whole salon<br />
+            from your phone. No payment gateways. No percentage math.<br />
+            No staff forgetting to log their numbers.
+          </p>
+          <p class="small fade-up fade-up-delay-3" style="margin-top: 36px">
+            A private presentation for you
+          </p>
+        </div>
+      </div>
+
+      <!-- ================================
+       SLIDE 2 — THE PAINS
+       ================================ -->
+      <div class="slide" data-index="1">
+        <div class="slide-content text-left align-start">
+          <h4 class="fade-up">I hear you</h4>
+          <h2 class="fade-up fade-up-delay-1">
+            You deal with this stuff <span class="accent">every single day</span>.
+          </h2>
+          <p class="subtitle fade-up fade-up-delay-2" style="margin-top: 0">
+            These are the exact things that are driving you crazy:
+          </p>
+
+          <div class="grid-2 fade-up fade-up-delay-3">
+            <div class="card">
+              <div class="card-icon">01</div>
+              <h4>Clients can't book without hitting a paywall</h4>
+              <p>
+                "I don't want Stripe. I don't want deposits. Just let them book and pay me when they
+                show up."
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">02</div>
+              <h4>Payroll math is a nightmare</h4>
+              <p>
+                "No percentage splits. Just show me what each person did and what they earned — no
+                fractions, no formulas."
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">03</div>
+              <h4>Regular software sucks on a phone</h4>
+              <p>
+                "I run everything from my phone — or on paper by hand when I'm on the floor. Regular
+                software doesn't work for either."
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-icon">04</div>
+              <h4>Staff "forget" to log their numbers</h4>
+              <p>
+                "Every week I'm missing tips, payment methods, notes. I can't chase 7 people around
+                for data."
+              </p>
+            </div>
+          </div>
+          <div class="fade-up fade-up-delay-4" style="margin-top: 8px">
+            <div class="card" style="max-width: 480px">
+              <div class="card-icon">05</div>
+              <h4>You can't see the floor at a glance</h4>
+              <p>
+                "I've got 6-7 staff going at once. I need one look and I need to know who's with who
+                and what's happening."
+              </p>
+            </div>
+          </div>
+          <p
+            class="small fade-up fade-up-delay-5"
+            style="margin-top: 24px; font-style: italic; color: var(--fg-cream-dim)"
+          >
+            And the kicker? You're working 7 days a week trying to keep it all together.<br />
+            That's not a business problem. That's a life problem. And this is built to fix it.
+          </p>
+        </div>
+      </div>
+
+      <!-- ================================
+       SLIDE 3 — THE REAL COST
+       ================================ -->
+      <div class="slide" data-index="2">
+        <div class="slide-content">
+          <h4 class="fade-up">What it's costing you</h4>
+          <h2 class="fade-up fade-up-delay-1">
+            The price of <span class="accent">running on fumes</span>.
+          </h2>
+          <div class="grid-3 fade-up fade-up-delay-2" style="margin-top: 32px">
+            <div class="card card-highlight">
+              <div class="big-number">$2K+</div>
+              <div class="big-number-label">Lost Revenue / Month</div>
+              <p style="margin-top: 12px; font-size: 14px">
+                Untracked tips, missed service charges, unreconciled payments. If just 5% slips
+                through on a $39K month.
+              </p>
+            </div>
+            <div class="card card-highlight">
+              <div class="big-number">10+ hrs</div>
+              <div class="big-number-label">Admin Time / Week</div>
+              <p style="margin-top: 12px; font-size: 14px">
+                Chasing staff for data. Manual payroll math. Reconciling bookings. That's time
+                you're not spending with your family.
+              </p>
+            </div>
+            <div class="card card-highlight">
+              <div class="big-number">7 days</div>
+              <div class="big-number-label">A Week</div>
+              <p style="margin-top: 12px; font-size: 14px">
+                You're working every single day with a newborn at home. The biggest cost isn't money
+                — it's the time you can't get back.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================
+       SLIDE 4 — THE SYSTEM
+       ================================ -->
+      <div class="slide" data-index="3">
+        <div class="slide-content text-left align-start">
+          <h4 class="fade-up">So I built this</h4>
+          <h2 class="fade-up fade-up-delay-1">
+            The <span class="accent">Nail Lounge System</span>
+          </h2>
+          <p class="subtitle fade-up fade-up-delay-2" style="margin-top: 0">
+            Everything you asked for. No fluff. No features you'll never use. Just the stuff that
+            actually matters.
+          </p>
+
+          <div class="grid-3 fade-up fade-up-delay-3" style="margin-top: 24px">
+            <div class="card card-highlight">
+              <div class="card-icon">✓</div>
+              <h4>Booking Without Payment Screens</h4>
+              <p>
+                Clients book online, instantly confirmed. No Stripe. No deposits. You collect
+                in-studio — Cash, Credit, Venmo, Cash App.
+              </p>
+            </div>
+            <div class="card card-highlight">
+              <div class="card-icon">✓</div>
+              <h4>Payroll Ledger. No Math Required.</h4>
+              <p>
+                Staff name. Service. Tip amount. Payment method. Exportable. Exactly what you asked
+                for — zero percentages, zero fractions.
+              </p>
+            </div>
+            <div class="card card-highlight">
+              <div class="card-icon">✓</div>
+              <h4>Mobile CRM That Actually Works</h4>
+              <p>
+                Spreadsheet-style client tracking. Delightful on a phone. No horizontal scrolling.
+                No confusing menus. Tap and go.
+              </p>
+            </div>
+            <div class="card card-highlight">
+              <div class="card-icon">✓</div>
+              <h4>Staff Lockout (So Data Can't Slip)</h4>
+              <p>
+                Appointment done? Staff can't move on until they log the tip, payment method, and
+                notes. Zero data leakage. Ever.
+              </p>
+            </div>
+            <div class="card card-highlight">
+              <div class="card-icon">✓</div>
+              <h4>Master Floor Overlay</h4>
+              <p>
+                Color-coded grid. Staff columns × time rows. One glance and you know exactly who's
+                with who, what service, what status.
+              </p>
+            </div>
+            <div
+              class="card"
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-color: rgba(240, 96, 0, 0.15);
+              "
+            >
+              <div style="text-align: center">
+                <div
+                  style="
+                    font-family: &quot;Montserrat&quot;, sans-serif;
+                    font-weight: 800;
+                    font-size: 14px;
+                    color: var(--fg-accent);
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                  "
+                >
+                  One-Time Setup
+                </div>
+                <div
+                  style="
+                    font-family: &quot;Montserrat&quot;, sans-serif;
+                    font-weight: 900;
+                    font-size: 42px;
+                    color: var(--fg-1);
+                    margin: 8px 0;
+                  "
+                >
+                  $750–$1,250
+                </div>
+                <div style="font-size: 14px; color: var(--fg-cream-dim)">
+                  Payment plan available. Fully set up.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================
+       SLIDE 5 — PAIN → SOLUTION
+       ================================ -->
+      <div class="slide" data-index="4">
+        <div class="slide-content text-left align-start">
+          <h4 class="fade-up">Consider it handled.</h4>
+          <h2 class="fade-up fade-up-delay-1">
+            Every complaint has a <span class="accent">direct answer</span>.
+          </h2>
+
+          <div class="fade-up fade-up-delay-2">
+            <div class="pain-solution">
+              <div class="pain">
+                <div class="label">The problem</div>
+                <p>"I don't want clients paying online. No Stripe, no deposits."</p>
+              </div>
+              <div class="arrow">→</div>
+              <div class="solution">
+                <div class="label">Done</div>
+                <p>
+                  Booking confirms instantly. Zero payment screen. Collect in-studio: Cash, Credit,
+                  Venmo, Cash App.
+                </p>
+              </div>
+            </div>
+
+            <div class="pain-solution">
+              <div class="pain">
+                <div class="label">The problem</div>
+                <p>"No percentage math. Just show me what each person earned."</p>
+              </div>
+              <div class="arrow">→</div>
+              <div class="solution">
+                <div class="label">Done</div>
+                <p>
+                  Payroll ledger = staff + service + tip + method. Exportable. No fractions. No
+                  split math.
+                </p>
+              </div>
+            </div>
+
+            <div class="pain-solution">
+              <div class="pain">
+                <div class="label">The problem</div>
+                <p>"I run my business from my phone. Regular software is impossible to use."</p>
+              </div>
+              <div class="arrow">→</div>
+              <div class="solution">
+                <div class="label">Done</div>
+                <p>
+                  Premium mobile-first CRM. Spreadsheet layout. Zero horizontal scrolling. Tap, see,
+                  done.
+                </p>
+              </div>
+            </div>
+
+            <div class="pain-solution">
+              <div class="pain">
+                <div class="label">The problem</div>
+                <p>"Staff forget to log tips and payments. I'm missing data every week."</p>
+              </div>
+              <div class="arrow">→</div>
+              <div class="solution">
+                <div class="label">Done</div>
+                <p>
+                  Staff Lockout Modal — can't proceed until tip, payment method, and notes are
+                  logged.
+                </p>
+              </div>
+            </div>
+
+            <div class="pain-solution">
+              <div class="pain">
+                <div class="label">The problem</div>
+                <p>"I can't see what 6-7 staff are doing at the same time. It's chaos."</p>
+              </div>
+              <div class="arrow">→</div>
+              <div class="solution">
+                <div class="label">Done</div>
+                <p>
+                  Master Calendar Overlay — color-coded grid. Staff × Time. One glance and you know
+                  everything.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================
+       SLIDE 6 — THE MATH
+       ================================ -->
+      <div class="slide" data-index="5">
+        <div class="slide-content">
+          <h4 class="fade-up">The math is simple</h4>
+          <h2 class="fade-up fade-up-delay-1">
+            This pays for itself in the <span class="accent">first week</span>.
+          </h2>
+
+          <div class="value-row fade-up fade-up-delay-2">
+            <div class="value-card">
+              <div class="num">$24K+</div>
+              <div class="label">Potential Leakage / Year</div>
+              <p>$2K+/mo in lost tips, missed charges, unreconciled payments</p>
+            </div>
+            <div class="value-card">
+              <div class="num">500+ hrs</div>
+              <div class="label">Saved / Year</div>
+              <p>10+ hrs/week of admin time you get back — to spend with your family</p>
+            </div>
+            <div
+              class="value-card"
+              style="
+                border-color: rgba(240, 96, 0, 0.3);
+                background: linear-gradient(
+                  135deg,
+                  rgba(240, 96, 0, 0.12),
+                  rgba(255, 122, 26, 0.06)
+                );
+              "
+            >
+              <div class="num" style="font-size: clamp(28px, 3vw, 38px)">$750–$1,250</div>
+              <div class="label">One-Time Investment</div>
+              <p>That's less than what a single day of leakage costs you right now</p>
+            </div>
+          </div>
+
+          <div
+            class="fade-up fade-up-delay-3"
+            style="
+              margin-top: 32px;
+              text-align: left;
+              max-width: 600px;
+              margin-left: auto;
+              margin-right: auto;
+            "
+          >
+            <p style="font-size: 17px">
+              <strong style="color: var(--fg-1)">Here's the bottom line:</strong> You're losing more
+              than this every month in untracked tips and missed data. The system pays for itself
+              before you've even finished setting it up.
+            </p>
+            <p style="font-size: 17px">
+              And the time savings? That's the real win. 10 hours a week is 500 hours a year. That's
+              time with your kid. That's time off. That's not having to be at the salon every single
+              day.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================
+       SLIDE 7 — EVERYTHING INCLUDED
+       ================================ -->
+      <div class="slide" data-index="6">
+        <div class="slide-content text-left align-start">
+          <h4 class="fade-up">Everything included</h4>
+          <h2 class="fade-up fade-up-delay-1">
+            One price. <span class="accent">No recurring surprises</span>.
+          </h2>
+
+          <div class="offer-stack fade-up fade-up-delay-2">
+            <div class="offer-item">
+              <div style="flex: 1">
+                <strong>Core Platform</strong> — Full system access
+                <p>
+                  Online booking (no payment required), mobile CRM, staff management, service
+                  catalog, multi-staff calendar, payroll ledger. Everything in one dashboard.
+                </p>
+              </div>
+              <div class="offer-value">$5,000</div>
+            </div>
+
+            <div class="offer-item" style="border-bottom: 1px solid var(--card-border)">
+              <div style="flex: 1">
+                <strong>Staff Lockout Workflow</strong> — Built-in accountability
+                <p>
+                  Mandatory tip / payment / notes capture on every completed appointment. Zero data
+                  leakage ever. Exportable records.
+                </p>
+              </div>
+              <div class="offer-value">$1,500</div>
+            </div>
+
+            <div class="offer-item" style="border-bottom: 1px solid var(--card-border)">
+              <div style="flex: 1">
+                <strong>Master Floor Overlay</strong> — Color-coded staff × time grid
+                <p>
+                  See every client-staff pairing, service, and status in one unified view. Real-time
+                  salon floor awareness.
+                </p>
+              </div>
+              <div class="offer-value">$2,000</div>
+            </div>
+
+            <div class="offer-item" style="border-bottom: 1px solid var(--card-border)">
+              <div style="flex: 1">
+                <strong>White-Glove Onboarding</strong> — We set it up together
+                <p>
+                  I import your staff, services, hours, and client data. Two hands-on video
+                  sessions. You're live in under a week.
+                </p>
+              </div>
+              <div class="offer-value">$1,500</div>
+            </div>
+
+            <div class="offer-item">
+              <div style="flex: 1">
+                <strong>Unlimited Support + Lifetime Updates</strong> — Free, forever
+                <p>
+                  Direct line to me. Need an extra feature or tweak down the road? I'll add it. No
+                  charge. No up-sell. Ever.
+                </p>
+              </div>
+              <div class="offer-value">$5,000</div>
+            </div>
+          </div>
+
+          <div class="offer-total fade-up fade-up-delay-3">
+            <span>Total Value</span>
+            <span style="color: var(--fg-3); text-decoration: line-through; font-size: 20px"
+              >$15,000</span
+            >
+            <span class="price">$750–$1,250</span>
+          </div>
+
+          <div style="text-align: center; margin-top: 8px">
+            <p class="small" style="font-size: 13px">
+              One-time. Payment plan available. Lifetime updates. That's it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================
+     NAVIGATION
+     ================================ -->
+    <div class="nav-bar">
+      <button class="nav-btn" id="prevBtn" aria-label="Previous slide">←</button>
+      <div class="nav-dots" id="navDots"></div>
+      <span class="nav-counter" id="slideCounter">1 / 7</span>
+      <button class="nav-btn" id="nextBtn" aria-label="Next slide">→</button>
+    </div>
+
+    <script>
+      (function () {
+        const slides = document.querySelectorAll(".slide");
+        const total = slides.length;
+        let current = 0;
+
+        const dotsContainer = document.getElementById("navDots");
+        for (let i = 0; i < total; i++) {
+          const dot = document.createElement("button");
+          dot.className = "nav-dot" + (i === 0 ? " active" : "");
+          dot.setAttribute("aria-label", "Slide " + (i + 1));
+          dot.addEventListener("click", function () {
+            goTo(i);
+          });
+          dotsContainer.appendChild(dot);
+        }
+
+        const counter = document.getElementById("slideCounter");
+
+        function goTo(index) {
+          if (index < 0) index = 0;
+          if (index >= total) index = 0;
+          slides.forEach((s, i) => {
+            s.classList.toggle("active", i === index);
+          });
+          document.querySelectorAll(".nav-dot").forEach((d, i) => {
+            d.classList.toggle("active", i === index);
+          });
+          counter.textContent = index + 1 + " / " + total;
+          current = index;
+        }
+
+        document.getElementById("prevBtn").addEventListener("click", function () {
+          goTo(current - 1);
+        });
+        document.getElementById("nextBtn").addEventListener("click", function () {
+          goTo(current + 1);
+        });
+
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ") {
+            e.preventDefault();
+            goTo(current + 1);
+          } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+            e.preventDefault();
+            goTo(current - 1);
+          }
+        });
+
+        // Touch/swipe
+        let touchStartX = 0;
+        document.addEventListener("touchstart", function (e) {
+          touchStartX = e.changedTouches[0].screenX;
+        });
+        document.addEventListener("touchend", function (e) {
+          const diff = touchStartX - e.changedTouches[0].screenX;
+          if (Math.abs(diff) > 50) {
+            if (diff > 0) goTo(current + 1);
+            else goTo(current - 1);
+          }
+        });
+
+        // Click on slide body to advance
+        document.querySelector(".slides").addEventListener("click", function (e) {
+          if (e.target.closest(".nav-bar")) return;
+          goTo(current + 1);
+        });
+      })();
+    </script>
+  </body>
+</html>

@@ -67,7 +67,7 @@ export default function FloorView({ salonId }: { salonId: string }) {
             <button
               key={f.id}
               onClick={() => cycle(f.id, f.status)}
-              className={`rounded-2xl p-5 text-left transition-all active:scale-[0.98] ${
+              className={`rounded-2xl p-5 text-left transition-all active:scale-[0.97] ${
                 isWithClient
                   ? "bg-surface ring-1 ring-warning/20 shadow-sm"
                   : "bg-surface hover:bg-surface-2"

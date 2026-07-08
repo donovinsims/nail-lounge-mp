@@ -1,0 +1,98 @@
+-- get_available_slots RPC: add SECURITY DEFINER so anon callers can read bookings
+-- The old get_busy_slots (replaced by this function) had SECURITY DEFINER.
+-- Migration 20260707000004 revoked anon SELECT on bookings, but this function
+-- needs to query bookings to compute availability — so it must run as the owner.
+
+CREATE OR REPLACE FUNCTION get_available_slots(
+  p_staff_id UUID,
+  p_date DATE,
+  p_service_duration_minutes INT,
+  p_salon_id UUID
+)
+RETURNS TABLE(start_time TIMESTAMPTZ)
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_business_open TIME := '09:00';
+  v_business_close TIME := '19:00';
+  v_staff_start TIME;
+  v_staff_end TIME;
+  v_day_name TEXT;
+  v_slot TIMESTAMPTZ;
+  v_slot_end TIMESTAMPTZ;
+  v_day_start TIMESTAMPTZ;
+  v_day_end TIMESTAMPTZ;
+  v_min_lead_time TIMESTAMPTZ;
+BEGIN
+  v_min_lead_time := NOW() + INTERVAL '30 minutes';
+  v_day_start := p_date::TIMESTAMPTZ;
+  v_day_end := (p_date + INTERVAL '1 day')::TIMESTAMPTZ;
+  v_day_name := LOWER(TRIM(TO_CHAR(p_date, 'day')));
+
+  -- Get staff working hours from JSONB working_hours column
+  -- Shape: {"mon": {"open": "09:00", "close": "17:00"}, ...}
+  -- Note: working_hours is a JSONB object (NOT array), so we use -> key access
+  SELECT
+    (working_hours->v_day_name->>'open')::TIME,
+    (working_hours->v_day_name->>'close')::TIME
+  INTO v_staff_start, v_staff_end
+  FROM staff
+  WHERE id = p_staff_id;
+
+  -- Get salon business hours from JSONB business_hours column
+  -- Shape: {"mon": {"open": "09:30", "close": "19:30"}, ...}
+  -- Note: business_hours is a JSONB object (NOT array), so we use -> key access
+  SELECT
+    (business_hours->v_day_name->>'open')::TIME,
+    (business_hours->v_day_name->>'close')::TIME
+  INTO v_business_open, v_business_close
+  FROM salons
+  WHERE id = p_salon_id;
+
+  -- Fallback if no hours set for this day
+  IF v_business_open IS NULL THEN v_business_open := '09:00'; END IF;
+  IF v_business_close IS NULL THEN v_business_close := '19:00'; END IF;
+  IF v_staff_start IS NULL THEN v_staff_start := '09:00'; END IF;
+  IF v_staff_end IS NULL THEN v_staff_end := '17:00'; END IF;
+
+  -- Start from the later of business open and staff start
+  v_slot := GREATEST(
+    v_day_start + v_business_open,
+    v_day_start + v_staff_start
+  );
+
+  -- Generate 15-min slots
+  WHILE v_slot + (p_service_duration_minutes || ' minutes')::INTERVAL <= LEAST(
+    v_day_start + v_business_close,
+    v_day_start + v_staff_end
+  ) LOOP
+    v_slot_end := v_slot + (p_service_duration_minutes || ' minutes')::INTERVAL;
+
+    -- Check minimum lead time (30 min)
+    IF v_slot >= v_min_lead_time THEN
+      -- Check no booking conflict using the stored end_time column
+      -- (bookings has end_time TIMESTAMPTZ, NOT a duration_minutes column)
+      IF NOT EXISTS (
+        SELECT 1
+        FROM bookings b
+        WHERE b.staff_id = p_staff_id
+          AND b.status IN ('confirmed', 'completed')
+          AND b.start_time < v_slot_end
+          AND b.end_time > v_slot
+      ) THEN
+        start_time := v_slot;
+        RETURN NEXT;
+      END IF;
+    END IF;
+
+    v_slot := v_slot + INTERVAL '15 minutes';
+  END LOOP;
+END;
+$$;
+
+-- Revoke public and grant only to anon + authenticated (same pattern as old get_busy_slots)
+REVOKE ALL ON FUNCTION get_available_slots(UUID, DATE, INT, UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION get_available_slots(UUID, DATE, INT, UUID) TO anon, authenticated;

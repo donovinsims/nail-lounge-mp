@@ -1,17 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Check, Loader2 } from "lucide-react";
-import { fmtTime, fmtDate, fmtMoney } from "@/lib/utils";
+import { cn, fmtTime, fmtDate, fmtMoney } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+import { PHONE_RE } from "@/lib/validation";
 
 const confirmFormSchema = z.object({
   clientName: z.string().trim().min(1, "Name is required").max(100),
-  clientPhone: z.string().regex(/^[\d\s\-()]{7,20}$/, "Enter a valid US phone number"),
+  clientPhone: z.string().regex(PHONE_RE, "Enter a valid US phone number"),
   clientEmail: z.string().email("Invalid email").optional().or(z.literal("")),
 });
 
@@ -92,14 +92,43 @@ export default function StepConfirm({
     onSubmit();
   });
 
+  const nameVal = (watchedValues.clientName ?? "").trim();
+  const phoneVal = (watchedValues.clientPhone ?? "").trim();
+  const isNameValid = nameVal.length > 0;
+  const isPhoneValid = phoneVal.length > 0 && PHONE_RE.test(phoneVal);
+
+  const isDisabled =
+    isPending || !slot || !service || (!isNoPreference && !staff) || !isNameValid || !isPhoneValid;
+
+  const [disabledHint, setDisabledHint] = useState<string | null>(null);
+
+  const handleDisabledClick = () => {
+    const missing: string[] = [];
+    if (!service) missing.push("a service");
+    if (!slot) missing.push("an appointment time");
+    if (!isNoPreference && !staff) missing.push("a staff member");
+    if (!isNameValid) missing.push("your name");
+    if (!isPhoneValid) missing.push("a valid phone number");
+
+    let hint: string;
+    if (missing.length === 0) {
+      hint = "Please complete all fields to continue";
+    } else if (missing.length === 1) {
+      hint = `Please enter ${missing[0]} to continue`;
+    } else {
+      const last = missing.pop();
+      hint = `Please enter ${missing.join(", ")} and ${last} to continue`;
+    }
+    setDisabledHint(hint);
+    setTimeout(() => setDisabledHint(null), 3000);
+  };
+
   return (
     <div className="space-y-4">
       {/* Order Summary Card */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium">Your Booking</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm">
+      <div className="rounded-2xl bg-surface p-5">
+        <p className="mb-3 text-sm font-medium">Your Booking</p>
+        <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Service</span>
             <span className="font-medium">{service?.name ?? "—"}</span>
@@ -114,19 +143,19 @@ export default function StepConfirm({
             <span className="text-muted-foreground">When</span>
             <span className="font-medium">{slot ? `${fmtDate(slot)}, ${fmtTime(slot)}` : "—"}</span>
           </div>
-          <Separator />
+          <hr className="border-border/60" />
           <div className="flex justify-between font-medium">
             <span>Total</span>
             <span className="font-mono">{fmtMoney(Number(service?.price ?? 0))}</span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Client Info Fields */}
       <div className="space-y-3">
         <div className="space-y-1">
           <Label htmlFor="name">
-            Full name <span className="text-destructive-ink">*</span>
+            Name <span className="text-destructive-ink">*</span>
           </Label>
           <Input
             id="name"
@@ -163,7 +192,6 @@ export default function StepConfirm({
               {form.formState.errors.clientPhone.message}
             </p>
           )}
-          <p className="text-xs text-muted-foreground">US number: (555) 123-4567</p>
         </div>
 
         <div className="space-y-1">
@@ -178,8 +206,11 @@ export default function StepConfirm({
             placeholder="you@example.com"
             autoComplete="email"
             disabled={isPending}
+            aria-invalid={!!form.formState.errors.clientEmail}
           />
         </div>
+
+        <p className="text-xs text-muted-foreground">* Required</p>
       </div>
 
       {/* Payment Section */}
@@ -194,11 +225,18 @@ export default function StepConfirm({
       </div>
 
       {/* Submit Button */}
-      <button
+      <Button
         type="button"
-        disabled={isPending || !slot || !service || (!isNoPreference && !staff)}
-        onClick={onFormSubmit}
-        className="flex tap-target w-full items-center justify-center gap-2 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50"
+        disabled={isPending}
+        onClick={() => {
+          if (isDisabled && !isPending) {
+            handleDisabledClick();
+          } else if (!isPending) {
+            onFormSubmit();
+          }
+        }}
+        aria-disabled={isDisabled || undefined}
+        className={cn("tap-target w-full", (isDisabled || isPending) && "opacity-50")}
       >
         {isPending ? (
           <>
@@ -208,7 +246,13 @@ export default function StepConfirm({
         ) : (
           <>Confirm booking</>
         )}
-      </button>
+      </Button>
+
+      {disabledHint && (
+        <p className="text-xs text-warning-ink text-center mt-2 animate-in fade-in slide-in-from-bottom-1 duration-[240ms]">
+          {disabledHint}
+        </p>
+      )}
     </div>
   );
 }

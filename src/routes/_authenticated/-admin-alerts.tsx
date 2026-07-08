@@ -9,6 +9,7 @@ import {
   type CustomerHistoryEntry,
 } from "@/lib/owner-alerts.functions";
 import { fmtDate, fmtMoney } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { BottomSheet } from "@/components/bottom-sheet";
 import { EmptyState } from "@/components/empty-state";
 import { AlertTriangle, Check, Phone, Search, Users } from "lucide-react";
@@ -90,8 +91,8 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
         {unacknowledged.length === 0 ? (
           <EmptyState
             icon={<AlertTriangle className="h-12 w-12" />}
-            title="No alerts"
-            body="All customer ratings have been 4 or higher. You'll be notified here if a low rating comes in."
+            title="No alerts yet"
+            body="You'll be notified here when a client gives a low rating or there's an issue."
           />
         ) : (
           <div className="grid gap-3">
@@ -126,12 +127,9 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
                     <p className="mt-2 text-sm text-muted-foreground">{ratingLabel(a.rating)}</p>
                   </div>
 
-                  <button
-                    onClick={() => handleAcknowledge(a.id)}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150 shrink-0"
-                  >
+                  <Button onClick={() => handleAcknowledge(a.id)} className="shrink-0 gap-1.5">
                     <Check className="h-4 w-4" /> Acknowledge
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Mobile: trigger button */}
@@ -168,12 +166,9 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
                   onOpenChange={(o) => !o && setAlertSheetId(null)}
                   title={<span className={ratingColor(a.rating)}>Rating: {a.rating}/5</span>}
                   footer={
-                    <button
-                      onClick={() => handleAcknowledge(a.id)}
-                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-3 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
-                    >
+                    <Button onClick={() => handleAcknowledge(a.id)} className="w-full gap-1.5">
                       <Check className="h-4 w-4" /> Acknowledge
-                    </button>
+                    </Button>
                   }
                 >
                   <div className="space-y-4 text-sm">
@@ -357,12 +352,11 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
                       onOpenChange={(o) => !o && setCustSheetId(null)}
                       title={c.name}
                       footer={
-                        <a
-                          href={`tel:${c.phone}`}
-                          className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-3 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
-                        >
-                          <Phone className="h-4 w-4" /> Call {c.phone}
-                        </a>
+                        <Button asChild className="w-full gap-1.5">
+                          <a href={`tel:${c.phone}`}>
+                            <Phone className="h-4 w-4" /> Call {c.phone}
+                          </a>
+                        </Button>
                       }
                     >
                       <div className="space-y-4 text-sm">

@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type ComponentType } from "react";
 import type { StaffRow, SalonRow, OwnerAlertRow } from "@/integrations/supabase/rows";
 import { supabase } from "@/integrations/supabase/client";
-import { getSalonName, getSalonNameShort } from "@/lib/env";
+import { getSalonName } from "@/lib/env";
 import { getMyStaff, linkSelfToFirstSalon } from "@/lib/admin.functions";
 import { getOwnerAlerts } from "@/lib/owner-alerts.functions";
 import { getErrorMessage } from "@/lib/error-handler";
@@ -19,7 +19,10 @@ import {
   LogOut,
   Loader2,
   AlertTriangle,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Import extracted tab components
 import Dashboard from "./-admin-dashboard";
@@ -53,11 +56,11 @@ type StaffWithSalon = StaffRow & {
 const NAV: { id: Tab; label: string; icon: ComponentType<{ className?: string }> }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutGrid },
   { id: "calendar", label: "Calendar", icon: Calendar },
-  { id: "floor", label: "Live Floor", icon: Users },
+  { id: "floor", label: "Floor Status", icon: Users },
   { id: "commissions", label: "Commissions", icon: DollarSign },
   { id: "alerts", label: "Alerts", icon: AlertTriangle },
   { id: "waitlist", label: "Waitlist", icon: Clock },
-  { id: "calls", label: "AI Calls", icon: Phone },
+  { id: "calls", label: "Call Log", icon: Phone },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -136,6 +139,7 @@ function Admin() {
   const signOut = async () => {
     await qc.cancelQueries();
     qc.clear();
+    localStorage.removeItem("dev-bypass");
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   };
@@ -158,12 +162,9 @@ function Admin() {
           This can happen if your account has duplicate staff records.
         </p>
         <div className="flex gap-3">
-          <button
-            onClick={() => refetch()}
-            className="tap-target inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
-          >
+          <Button onClick={() => refetch()} className="tap-target">
             Try again
-          </button>
+          </Button>
           <button
             onClick={signOut}
             className="rounded-xl bg-surface px-5 py-2.5 text-sm font-semibold hairline"
@@ -203,11 +204,23 @@ function Admin() {
       <aside
         className={`${collapsed ? "w-16" : "w-56"} hidden md:flex flex-col border-r border-border bg-sidebar text-sidebar-foreground transition-all`}
       >
-        <button onClick={() => setCollapsed((c) => !c)} className="p-4 text-left">
-          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            {collapsed ? getSalonNameShort() : getSalonName()}
-          </p>
-          {!collapsed && <p className="mt-1 truncate text-sm font-semibold">{salon?.name}</p>}
+        <button
+          onClick={() => setCollapsed((c) => !c)}
+          className="flex w-full items-center gap-3 p-4 text-left"
+        >
+          {collapsed ? (
+            <PanelLeftOpen className="mx-auto h-4 w-4 text-muted-foreground" />
+          ) : (
+            <>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  {getSalonName()}
+                </p>
+                <p className="mt-1 truncate text-sm font-semibold">{salon?.name}</p>
+              </div>
+              <PanelLeftClose className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </>
+          )}
         </button>
         <nav className="mt-2 flex-1 px-2 space-y-0.5">
           {NAV.map((n) => {
@@ -260,30 +273,34 @@ function Admin() {
 
       {/* Mobile bottom nav — horizontally scrollable to fit all 8 tabs */}
       <nav className="md:hidden fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur safe-pb">
-        <div className="flex overflow-x-auto hide-scrollbar gap-1 px-2 pt-2">
-          {NAV.map((n) => {
-            const isActive = tab === n.id;
-            const showBadge = n.id === "alerts" && unacknowledgedCount > 0;
-            return (
-              <button
-                key={n.id}
-                onClick={() => setTab(n.id)}
-                className={`relative flex shrink-0 flex-col items-center gap-1 rounded-lg px-3 py-2 text-[10px] transition-colors ${
-                  isActive
-                    ? "bg-muted text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <div className="relative">
-                  <n.icon className="h-5 w-5" />
-                  {showBadge && (
-                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-destructive" />
-                  )}
-                </div>
-                {n.label}
-              </button>
-            );
-          })}
+        <div className="relative">
+          <div className="flex overflow-x-auto hide-scrollbar gap-1 px-2 pt-2">
+            {NAV.map((n) => {
+              const isActive = tab === n.id;
+              const showBadge = n.id === "alerts" && unacknowledgedCount > 0;
+              return (
+                <button
+                  key={n.id}
+                  onClick={() => setTab(n.id)}
+                  className={`relative flex shrink-0 flex-col items-center gap-1 rounded-lg px-3 py-2 text-[10px] transition-colors ${
+                    isActive
+                      ? "bg-muted text-foreground font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <div className="relative">
+                    <n.icon className="h-5 w-5" />
+                    {showBadge && (
+                      <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-destructive" />
+                    )}
+                  </div>
+                  {n.label}
+                </button>
+              );
+            })}
+          </div>
+          {/* Gradient fade hint — more tabs available to scroll */}
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none" />
         </div>
       </nav>
 

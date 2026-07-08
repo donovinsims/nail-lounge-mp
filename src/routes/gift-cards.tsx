@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { getSalonName, getSalonPhoneHref, getSalonSocial } from "@/lib/env";
+import { getSalonName, getSalonPhone, getSalonPhoneHref, getSalonSocial } from "@/lib/env";
+import { Button } from "@/components/ui/button";
 import { Gift, Users, Sparkles, Phone, Mail, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/gift-cards")({
@@ -51,7 +52,9 @@ function GiftCardsPage() {
 
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-xs uppercase tracking-[0.35em] text-accent">Gift cards & parties</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+            Gift cards & parties
+          </p>
           <h1 className="mt-6 max-w-3xl font-display text-5xl leading-[0.95] tracking-[-0.01em] sm:text-7xl">
             The easiest <span className="italic">good gift.</span>
           </h1>
@@ -66,11 +69,11 @@ function GiftCardsPage() {
       <section className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
         <div className="grid gap-10 md:grid-cols-12">
           <header className="md:col-span-4">
-            <Gift className="h-6 w-6 text-accent" />
+            <Gift className="h-6 w-6 text-muted-foreground" />
             <h2 className="mt-4 font-display text-3xl sm:text-4xl">Gift cards</h2>
             <p className="mt-3 text-sm text-muted-foreground">
-              Available in-studio or by phone. Mailed in a hand-tied envelope or sent digitally with
-              a personal note.
+              Ready to purchase? Call or email us and we'll set up your digital gift card. Mailed in
+              a hand-tied envelope or sent digitally with a personal note.
             </p>
           </header>
 
@@ -88,19 +91,42 @@ function GiftCardsPage() {
             <p className="mt-6 text-xs text-muted-foreground">
               Custom amounts available. Cards never expire and can be used toward any service.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href={`tel:${getSalonPhoneHref()}`}
-                className="inline-flex tap-target items-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-              >
-                <Phone className="h-3.5 w-3.5" /> Call to purchase
-              </a>
-              <a
-                href={`mailto:${getSalonSocial().email}?subject=Gift%20card%20request`}
-                className="inline-flex tap-target items-center gap-2 rounded-lg border border-border bg-card h-11 px-5 text-sm font-medium tracking-[0.01em] shadow-1 transition duration-150 hover:shadow-2"
-              >
-                <Mail className="h-3.5 w-3.5" /> Email us
-              </a>
+            <div className="mt-6 space-y-2 text-sm">
+              <p>
+                Call us:{" "}
+                <a
+                  href={`tel:${getSalonPhoneHref()}`}
+                  className="font-medium text-muted-foreground hover:underline"
+                >
+                  {getSalonPhone()}
+                </a>
+              </p>
+              <p>
+                Email:{" "}
+                <a
+                  href={`mailto:${getSalonSocial().email}`}
+                  className="font-medium text-muted-foreground hover:underline"
+                >
+                  {getSalonSocial().email}
+                </a>
+              </p>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild>
+                <a href={`tel:${getSalonPhoneHref()}`}>
+                  <Phone className="h-3.5 w-3.5" /> Call to purchase
+                </a>
+              </Button>
+              <Button asChild>
+                <a href={`mailto:${getSalonSocial().email}?subject=Private%20party%20request`}>
+                  Request a party
+                </a>
+              </Button>
+              <Button variant="outline" asChild>
+                <a href={`mailto:${getSalonSocial().email}`}>
+                  <Mail className="h-3.5 w-3.5" /> Email us
+                </a>
+              </Button>
             </div>
           </div>
         </div>
@@ -111,15 +137,17 @@ function GiftCardsPage() {
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <div className="flex items-end justify-between">
             <div>
-              <Users className="h-6 w-6 text-accent" />
-              <p className="mt-4 text-xs uppercase tracking-[0.3em] text-accent">Private parties</p>
+              <Users className="h-6 w-6 text-muted-foreground" />
+              <p className="mt-4 text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                Private parties
+              </p>
               <h2 className="mt-3 font-display text-4xl sm:text-5xl">For 4 or more.</h2>
             </div>
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2">
             {OCCASIONS.map((o) => (
               <article key={o.title} className="rounded-3xl bg-card p-8">
-                <Sparkles className="h-5 w-5 text-accent" />
+                <Sparkles className="h-5 w-5 text-muted-foreground" />
                 <h3 className="mt-4 font-display text-2xl">{o.title}</h3>
                 <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{o.body}</p>
               </article>
@@ -147,18 +175,16 @@ function GiftCardsPage() {
               </li>
             </ol>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href={`mailto:${getSalonSocial().email}?subject=Private%20party%20request`}
-                className="inline-flex tap-target items-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
-              >
-                Request a party
-              </a>
-              <Link
-                to="/book"
-                className="inline-flex tap-target items-center gap-2 rounded-lg border border-border bg-card h-11 px-5 text-sm font-medium tracking-[0.01em] shadow-1 transition duration-150 hover:shadow-2"
-              >
-                Or book individually <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
+              <Button asChild>
+                <a href={`tel:${getSalonPhoneHref()}`}>
+                  <Phone className="h-4 w-4" /> Call to order
+                </a>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/gift-cards">
+                  Learn more <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

@@ -29,7 +29,7 @@ function PrivacyPage() {
 
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-xs uppercase tracking-[0.35em] text-accent">Legal</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Legal</p>
           <h1 className="mt-6 font-display text-5xl leading-[0.95] tracking-[-0.01em] sm:text-7xl">
             Privacy <span className="italic">Policy.</span>
           </h1>

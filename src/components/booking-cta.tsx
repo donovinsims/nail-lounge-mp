@@ -64,7 +64,7 @@ export function BookingCTA({
       <div className="mt-6 flex justify-center">
         <Link
           to="/book"
-          className={`inline-flex items-center gap-2 rounded-full px-8 py-3 text-sm font-medium transition-all ${
+          className={`inline-flex items-center gap-2 rounded-lg h-11 px-5 text-sm font-medium transition-all ${
             variant === "primary"
               ? "bg-white text-primary hover:bg-white/90"
               : "bg-primary text-primary-foreground hover:bg-primary/90"

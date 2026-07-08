@@ -8,8 +8,10 @@ import { fmtTime, fmtDate } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { createPublicBooking } from "@/lib/booking.functions";
 import { getSalonName } from "@/lib/env";
+import { PHONE_RE } from "@/lib/validation";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { ChevronLeft, Loader2, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import StepService from "./book/-step-service";
 import StepStaff from "./book/-step-staff";
@@ -54,6 +56,7 @@ function Book() {
   });
 
   const [step, setStep] = useState<Step>(1);
+  const [direction, setDirection] = useState<1 | -1>(1);
   const [serviceId, setServiceId] = useState<string | null>(null);
   const [staffId, setStaffId] = useState<string | null>(null);
   const [date, setDate] = useState<Date>(() => new Date());
@@ -80,9 +83,11 @@ function Book() {
   }, [search.staff, staff, serviceId]);
 
   const next = () => {
+    setDirection(1);
     setStep((s) => Math.min(4, s + 1) as Step);
   };
   const back = () => {
+    setDirection(-1);
     setStep((s) => Math.max(1, s - 1) as Step);
   };
 
@@ -240,7 +245,7 @@ function Book() {
     if (mutation.isPending) setAnnouncement("Submitting your booking\u2026");
   }, [mutation.isPending]);
 
-  const PHONE_RE = /^[\d\s\-()]{7,20}$/;
+  // PHONE_RE imported from @/lib/validation
   const canSubmit =
     !mutation.isPending &&
     name.trim().length > 0 &&
@@ -309,7 +314,7 @@ function Book() {
         >
           {step === 1 ? (
             <>
-              <p className="text-xs uppercase tracking-[0.35em] text-accent">Booking</p>
+              <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Booking</p>
               <h1 className="mt-4 font-display text-4xl leading-[0.95] sm:text-5xl">
                 Reserve <span className="italic">your seat.</span>
               </h1>
@@ -318,7 +323,9 @@ function Book() {
               </p>
             </>
           ) : (
-            <p className="text-xs uppercase tracking-[0.35em] text-accent">Step {step} of 4</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+              Step {step} of 4
+            </p>
           )}
         </div>
       </section>
@@ -339,7 +346,7 @@ function Book() {
           />
           <Link
             to="/"
-            className="absolute right-0 top-0 hidden sm:inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-surface transition"
+            className="absolute right-0 top-0 inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-surface transition"
             aria-label="Cancel booking and return home"
           >
             <X className="h-3.5 w-3.5" />
@@ -381,7 +388,12 @@ function Book() {
               {announcement}
             </div>
 
-            <div key={step} className="animate-in fade-in slide-in-from-right-4 duration-[400ms]">
+            <div
+              key={step}
+              className={`animate-in fade-in ${
+                direction === 1 ? "slide-in-from-right-4" : "slide-in-from-left-4"
+              } duration-[400ms]`}
+            >
               {step === 1 && (
                 <StepService
                   services={services}
@@ -454,7 +466,7 @@ function Book() {
                 </button>
               )}
               {step < 4 && (
-                <button
+                <Button
                   disabled={
                     (step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)
                   }
@@ -469,10 +481,10 @@ function Book() {
                       next();
                     }
                   }}
-                  className="tap-target inline-flex items-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50"
+                  className="tap-target"
                 >
                   Continue
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -504,21 +516,17 @@ function Book() {
             </button>
           )}
           {step < 4 ? (
-            <button
+            <Button
               disabled={
                 (step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)
               }
               onClick={next}
-              className="flex-1 tap-target rounded-lg bg-primary h-11 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50"
+              className="tap-target flex-1"
             >
               Continue
-            </button>
+            </Button>
           ) : (
-            <button
-              disabled={!canSubmit}
-              onClick={handleSubmit}
-              className="flex-1 tap-target rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50"
-            >
+            <Button disabled={!canSubmit} onClick={handleSubmit} className="tap-target flex-1">
               {mutation.isPending ? (
                 <span className="inline-flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -527,7 +535,7 @@ function Book() {
               ) : (
                 "Confirm booking"
               )}
-            </button>
+            </Button>
           )}
         </div>
       </div>

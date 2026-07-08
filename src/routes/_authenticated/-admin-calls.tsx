@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { AiCallRow } from "@/integrations/supabase/rows";
 import { fmtDate } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { BottomSheet } from "@/components/bottom-sheet";
 import { StatusBadge } from "./-admin-components/status-badge";
 import { EmptyState } from "@/components/empty-state";
@@ -99,12 +100,9 @@ export default function Calls({ salonId }: { salonId: string }) {
               {/* CTA for book appointments */}
               {c.intent === "book_appointment" && !c.converted_booking_id && (
                 <div className="mt-4 pt-3 border-t border-border">
-                  <button
-                    onClick={() => navigate({ to: "/book" })}
-                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
-                  >
+                  <Button onClick={() => navigate({ to: "/book" })}>
                     <Check className="h-4 w-4" /> Convert to booking
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -151,21 +149,20 @@ export default function Calls({ salonId }: { salonId: string }) {
               title={`${c.caller_name} · ${c.caller_phone}`}
               footer={
                 c.intent === "book_appointment" && !c.converted_booking_id ? (
-                  <button
+                  <Button
                     onClick={() => {
                       navigate({ to: "/book" });
                     }}
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
+                    className="w-full"
                   >
                     <Check className="h-4 w-4" /> Convert to booking
-                  </button>
+                  </Button>
                 ) : (
-                  <a
-                    href={`tel:${c.caller_phone}`}
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150"
-                  >
-                    <PhoneCall className="h-4 w-4" /> Call back
-                  </a>
+                  <Button asChild className="w-full">
+                    <a href={`tel:${c.caller_phone}`}>
+                      <PhoneCall className="h-4 w-4" /> Call back
+                    </a>
+                  </Button>
                 )
               }
             >
