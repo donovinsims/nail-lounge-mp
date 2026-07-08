@@ -24,9 +24,9 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
       throw new Error("Unauthorized: No request headers available");
     }
 
-    // Dev bypass — skip JWT verification for the configured admin email
+    // Dev bypass — skip JWT verification for local development only
     const devBypass = request.headers.get("x-dev-bypass");
-    if (devBypass) {
+    if (devBypass && process.env.NODE_ENV === "development") {
       try {
         const parsed = JSON.parse(devBypass);
         if (parsed?.user?.email === "emaildonovin@gmail.com") {

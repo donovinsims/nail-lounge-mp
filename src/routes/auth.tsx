@@ -130,16 +130,20 @@ function AuthPage() {
               Continue with Google
             </button>
 
-            <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-              <div className="h-px flex-1 bg-border" />
-            </div>
-            <button
-              onClick={devLogin}
-              className="flex w-full tap-target items-center justify-center gap-2 rounded-xl bg-amber-50 dark:bg-amber-950 py-3 font-medium hairline disabled:opacity-50 text-amber-800 dark:text-amber-200"
-            >
-              <Bug className="h-4 w-4" />
-              Dev Login — {getSalonName()} Admin
-            </button>
+            {import.meta.env.DEV && (
+              <>
+                <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+                  <div className="h-px flex-1 bg-border" />
+                </div>
+                <button
+                  onClick={devLogin}
+                  className="flex w-full tap-target items-center justify-center gap-2 rounded-xl bg-amber-50 dark:bg-amber-950 py-3 font-medium hairline disabled:opacity-50 text-amber-800 dark:text-amber-200"
+                >
+                  <Bug className="h-4 w-4" />
+                  Dev Login — {getSalonName()} Admin
+                </button>
+              </>
+            )}
           </>
         )}
       </div>
