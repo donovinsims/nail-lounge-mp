@@ -21,7 +21,7 @@ function AuthPage() {
   const devLogin = () => {
     const payload = {
       user: {
-        id: "dev-bypass-user",
+        id: "00000000-0000-0000-0000-000000000000",
         email: "emaildonovin@gmail.com",
         role: "authenticated",
         user_metadata: { full_name: "Donovin" },
