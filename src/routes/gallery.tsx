@@ -49,7 +49,7 @@ function GalleryPage() {
 
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-[11px] uppercase tracking-[0.35em] text-accent">Gallery</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-accent">Gallery</p>
           <h1 className="mt-6 max-w-3xl font-display text-5xl leading-[0.95] tracking-[-0.01em] sm:text-7xl">
             Recent <span className="italic">work.</span>
           </h1>
@@ -97,7 +97,7 @@ function GalleryPage() {
                 src={p.src}
                 alt={p.alt}
                 loading="lazy"
-                className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                className="h-full w-full object-cover transition duration-[400ms] group-hover:scale-105"
               />
             </figure>
           ))}
@@ -106,7 +106,7 @@ function GalleryPage() {
         <section className="mt-24">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.3em] text-accent">Follow along</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-accent">Follow along</p>
               <h2 className="mt-3 font-display text-3xl sm:text-4xl">Live from the studio.</h2>
             </div>
           </div>
@@ -117,13 +117,13 @@ function GalleryPage() {
         </section>
 
         <div className="mt-20 rounded-3xl bg-surface p-10 text-center">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-accent">Inspired?</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-accent">Inspired?</p>
           <h3 className="mt-4 font-display text-3xl sm:text-4xl">
             Bring the look. We'll bring the hands.
           </h3>
           <Link
             to="/book"
-            className="mt-8 inline-flex tap-target items-center gap-3 rounded-full bg-primary px-8 py-4 text-sm font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
+            className="mt-8 inline-flex tap-target items-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
           >
             Reserve <ArrowRight className="h-4 w-4" />
           </Link>

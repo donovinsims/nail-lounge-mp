@@ -289,10 +289,10 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
                             <span
                               className={
                                 c.lastRating <= 2
-                                  ? "text-destructive font-bold"
+                                  ? "text-destructive-ink font-bold"
                                   : c.lastRating <= 3
-                                    ? "text-warning font-bold"
-                                    : "text-green-600 font-bold"
+                                    ? "text-warning-ink font-bold"
+                                    : "text-success-ink font-bold"
                               }
                             >
                               {c.lastRating}/5
@@ -334,10 +334,10 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
                           <span
                             className={
                               c.lastRating <= 2
-                                ? "text-destructive font-semibold"
+                                ? "text-destructive-ink font-semibold"
                                 : c.lastRating <= 3
-                                  ? "text-warning font-semibold"
-                                  : "text-green-600 font-semibold"
+                                  ? "text-warning-ink font-semibold"
+                                  : "text-success-ink font-semibold"
                             }
                           >
                             {c.lastRating}/5
@@ -428,10 +428,10 @@ export default function Alerts({ salonId: _salonId }: { salonId: string }) {
                             <span
                               className={
                                 c.lastRating <= 2
-                                  ? "text-destructive font-bold"
+                                  ? "text-destructive-ink font-bold"
                                   : c.lastRating <= 3
-                                    ? "text-warning font-bold"
-                                    : "text-green-600 font-bold"
+                                    ? "text-warning-ink font-bold"
+                                    : "text-success-ink font-bold"
                               }
                             >
                               {c.lastRating}/5

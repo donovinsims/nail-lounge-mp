@@ -213,7 +213,7 @@ export default function Commissions({ salonId }: { salonId: string }) {
                   <td className="text-muted-foreground">{r.payment_method || "—"}</td>
                   <td className="p-4">
                     {r.paid ? (
-                      <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600">
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-success-ink">
                         <Check className="h-3.5 w-3.5" /> Paid
                       </span>
                     ) : (

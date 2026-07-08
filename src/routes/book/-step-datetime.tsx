@@ -34,13 +34,13 @@ export default function StepDateTime({
                   onDateChange(d);
                   onSlotChange(null);
                 }}
-                className={`shrink-0 tap-target flex flex-col items-center justify-center rounded-2xl px-5 py-3 transition active:scale-[0.97] duration-75 ${
+                className={`shrink-0 tap-target flex flex-col items-center justify-center rounded-2xl px-5 py-3 transition active:scale-[0.97] duration-150 ${
                   selected
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "bg-surface text-foreground hover:bg-surface-2"
                 }`}
               >
-                <span className="text-[11px] uppercase tracking-wider font-medium">
+                <span className="text-xs uppercase tracking-wider font-medium">
                   {d.toLocaleDateString("en-US", { weekday: "short" })}
                 </span>
                 <span className="mt-0.5 text-xl font-bold leading-none">{d.getDate()}</span>
@@ -87,7 +87,7 @@ export default function StepDateTime({
                   role="radio"
                   aria-checked={selected}
                   onClick={() => onSlotChange(t)}
-                  className={`w-full py-4 rounded-xl text-sm text-center font-medium transition-all duration-75 active:scale-[0.98] ${
+                  className={`w-full py-4 rounded-lg text-sm text-center font-mono font-medium transition-all duration-150 active:scale-[0.98] ${
                     selected
                       ? "bg-primary/5 text-primary ring-2 ring-ring shadow-sm"
                       : "bg-surface text-foreground hover:bg-surface-2"

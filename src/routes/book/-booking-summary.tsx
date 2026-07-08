@@ -14,7 +14,7 @@ export default function BookingSummary({ service, staff, slot }: BookingSummaryP
       <div className="space-y-1.5">
         <Row label="Service" value={service?.name ?? null} />
         <Row label="Artist" value={staff?.name ?? null} />
-        <Row label="When" value={slot ? `${fmtDate(slot)}, ${fmtTime(slot)}` : null} />
+        <Row label="When" value={slot ? `${fmtDate(slot)}, ${fmtTime(slot)}` : null} mono />
       </div>
 
       <div className="border-t border-border" />
@@ -29,11 +29,11 @@ export default function BookingSummary({ service, staff, slot }: BookingSummaryP
   );
 }
 
-function Row({ label, value }: { label: string; value: string | null }) {
+function Row({ label, value, mono }: { label: string; value: string | null; mono?: boolean }) {
   return (
     <div className="flex justify-between">
       <span className="text-muted-foreground">{label}</span>
-      <span className={value ? "font-medium" : "text-muted-foreground"}>
+      <span className={value ? `font-medium${mono ? " font-mono" : ""}` : "text-muted-foreground"}>
         {value ?? "Not selected"}
       </span>
     </div>

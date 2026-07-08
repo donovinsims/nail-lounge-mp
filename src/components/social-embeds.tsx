@@ -37,9 +37,7 @@ export function InstagramEmbed() {
         >
           <Instagram className="h-4 w-4 text-accent" /> @{handle}
         </a>
-        <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-          Instagram
-        </span>
+        <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Instagram</span>
       </div>
       {inView ? (
         <iframe
@@ -75,9 +73,7 @@ export function TikTokEmbed() {
           </span>{" "}
           @{handle}
         </a>
-        <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-          TikTok
-        </span>
+        <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">TikTok</span>
       </div>
       {inView ? (
         <iframe

@@ -18,9 +18,9 @@ import {
 } from "@/lib/admin-crud.functions";
 
 const INPUT_CLS =
-  "mt-1.5 w-full tap-target rounded-xl bg-surface-2 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all";
+  "mt-1.5 w-full tap-target rounded-lg bg-surface-2 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring/60 transition-all";
 const BTN_CLS =
-  "tap-target inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-all";
+  "tap-target inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium tracking-[0.01em] text-primary-foreground shadow-1 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 transition duration-150";
 const BTN_SM_CLS =
   "tap-target inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all";
 
@@ -213,7 +213,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
             <div className="flex gap-2">
               <button
                 onClick={handleCreateStaff}
-                className={`${BTN_SM_CLS} bg-emerald-600 text-white hover:bg-emerald-700`}
+                className={`${BTN_SM_CLS} bg-primary text-primary-foreground shadow-1 hover:shadow-2`}
               >
                 <Check className="h-3.5 w-3.5" /> Save
               </button>
@@ -256,7 +256,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
                   onClick={() => handleToggleStaffActive(s.id, s.is_active)}
                   className={`text-xs font-medium px-2 py-1 rounded-lg transition-all ${
                     s.is_active
-                      ? "bg-emerald-500/10 text-emerald-600"
+                      ? "bg-success/15 text-success-ink"
                       : "bg-muted text-muted-foreground"
                   }`}
                 >
@@ -264,7 +264,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
                 </button>
                 <button
                   onClick={() => handleDeleteStaff(s.id)}
-                  className="tap-target p-1.5 text-muted-foreground hover:text-red-500 transition-colors"
+                  className="tap-target p-1.5 text-muted-foreground hover:text-destructive-ink transition-colors"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -353,7 +353,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
             <div className="flex gap-2">
               <button
                 onClick={handleCreateService}
-                className={`${BTN_SM_CLS} bg-emerald-600 text-white hover:bg-emerald-700`}
+                className={`${BTN_SM_CLS} bg-primary text-primary-foreground shadow-1 hover:shadow-2`}
               >
                 <Check className="h-3.5 w-3.5" /> Save
               </button>
@@ -392,7 +392,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
                   onClick={() => handleToggleSvcActive(svc.id, svc.is_active)}
                   className={`text-xs font-medium px-2 py-1 rounded-lg transition-all ${
                     svc.is_active
-                      ? "bg-emerald-500/10 text-emerald-600"
+                      ? "bg-success/15 text-success-ink"
                       : "bg-muted text-muted-foreground"
                   }`}
                 >
@@ -400,7 +400,7 @@ export default function SettingsView({ salon }: { salon: SalonRow }) {
                 </button>
                 <button
                   onClick={() => handleDeleteService(svc.id)}
-                  className="tap-target p-1.5 text-muted-foreground hover:text-red-500 transition-colors"
+                  className="tap-target p-1.5 text-muted-foreground hover:text-destructive-ink transition-colors"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

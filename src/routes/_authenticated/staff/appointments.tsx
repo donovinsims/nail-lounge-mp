@@ -101,12 +101,12 @@ function StaffAppointments() {
                 </p>
               </div>
               <span
-                className={`rounded-full px-3 py-1 text-xs font-medium ${
+                className={`rounded-full px-3 py-1 text-xs font-mono font-medium ${
                   apt.status === "confirmed"
-                    ? "bg-blue-100 text-blue-700"
+                    ? "bg-success/15 text-success-ink"
                     : apt.status === "completed"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-gray-100 text-gray-600"
+                      ? "bg-primary/12 text-primary"
+                      : "bg-primary/12 text-primary"
                 }`}
               >
                 {apt.status}

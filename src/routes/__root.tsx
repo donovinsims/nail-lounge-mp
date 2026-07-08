@@ -35,7 +35,7 @@ function NotFoundComponent() {
         </p>
         <Link
           to="/"
-          className="mt-6 inline-flex tap-target items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground"
+          className="mt-6 inline-flex tap-target h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02]"
         >
           Go home
         </Link>
@@ -57,7 +57,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             router.invalidate();
             reset();
           }}
-          className="mt-6 rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground"
+          className="mt-6 h-11 rounded-lg bg-primary px-6 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02]"
         >
           Try again
         </button>
@@ -71,7 +71,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#0a0a0a" },
+      { name: "theme-color", content: "#ede7de" },
       { title: `${getSalonName()} — Book your appointment` },
       {
         name: "description",
@@ -102,7 +102,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Figtree:ital,wght@0,300..700;1,400..500&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap",
       },
     ],
     scripts: [

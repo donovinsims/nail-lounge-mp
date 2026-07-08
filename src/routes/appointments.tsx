@@ -102,7 +102,7 @@ function Appointments() {
                   <p className="text-xs text-muted-foreground">with {b.staff?.name}</p>
                 </div>
                 <span
-                  className={`text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded-full ${b.status === "cancelled" ? "bg-destructive/10 text-destructive" : b.status === "completed" ? "bg-success/10 text-success" : "bg-surface-2"}`}
+                  className={`text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded-full ${b.status === "cancelled" ? "bg-destructive/15 text-destructive-ink" : b.status === "completed" ? "bg-success/15 text-success-ink" : "bg-surface-2"}`}
                 >
                   {b.status}
                 </span>
