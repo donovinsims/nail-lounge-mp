@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, beforeAll, afterAll } from "vitest";
 import {
   getSalonName,
   getSalonNameShort,
@@ -14,6 +14,41 @@ import {
 } from "./env";
 
 describe("env defaults", () => {
+  const saved: Record<string, string | undefined> = {};
+
+  beforeAll(() => {
+    // Clear VITE_* vars so every function hits its default/empty fallback.
+    // Otherwise the real .env values leak through and tests fail.
+    const vars: string[] = [
+      "VITE_SALON_NAME",
+      "VITE_SALON_ADDRESS",
+      "VITE_SALON_PHONE",
+      "VITE_SALON_TAGLINE",
+      "VITE_OG_IMAGE",
+      "VITE_SALON_EMAIL",
+      "VITE_SALON_MAPS_URL",
+      "VITE_SALON_MAP_EMBED",
+      "VITE_SALON_INSTAGRAM",
+      "VITE_SALON_FACEBOOK",
+      "VITE_SALON_TIKTOK",
+      "VITE_SALON_YELP",
+      "VITE_SALON_GOOGLE_REVIEWS",
+      "VITE_APP_URL",
+      "VITE_UMAMI_WEBSITE_ID",
+      "VITE_UMAMI_HOST",
+    ];
+    for (const v of vars) {
+      saved[v] = process.env[v];
+      delete process.env[v];
+    }
+  });
+
+  afterAll(() => {
+    for (const [k, v] of Object.entries(saved)) {
+      if (v !== undefined) process.env[k] = v;
+    }
+  });
+
   it("getSalonName returns default name", () => {
     expect(getSalonName()).toBe("Your Salon Name");
   });

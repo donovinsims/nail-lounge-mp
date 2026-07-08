@@ -1,0 +1,22 @@
+Here is the detailed, strictly fact-based breakdown of the owner's pain points and exact needs, FROM conversations I have had with him. 
+
+### 1. Digital Payment Processing & Online Booking Friction
+ * **The Pain Point:** The owner completely rejects the use of Stripe, digital Point-of-Sale (POS) systems, and online checkout flows for his business. He does not want to force clients to pay deposits online or deal with the complexities of digital payment gateways.
+ * **The Detailed Need:** He needs a frictionless online booking system where customers can secure an appointment and instantly reach a confirmed status without hitting a payment screen. For collecting revenue, he requires the system to strictly track in-store physical payments. The platform must allow him to categorize every transaction precisely into one of four approved methods: Credit/Debit, Cash, Venmo, or Cash App.
+
+### 2. Overcomplicated Payroll & Commission Math
+ * **The Pain Point:** Traditional salon payroll math is too complicated for his desired workflow. He specifically stated he does not want to use complex, percentage-based commission splits (such as 60/40 math) because it makes paying his staff an administrative headache.
+
+ * **The Detailed Need:** He needs a highly simplified, exportable payroll ledger. Instead of calculating percentages, the system must present him with exact, absolute data: the staff member's name, the specific service they provided, the exact tip amount they earned, and the in-store payment method used (Cash, Venmo, etc.). This allows him to look at the dashboard and know exactly what is owed to who without doing any fractional math.
+### 3. CRM Usability for a Non-Technical, Mobile-Heavy User
+
+ * **The Pain Point:** The owner is "extremely non-technical" and relies heavily on his mobile phone to manage the business. Standard web-based spreadsheets or clunky software interfaces are deeply frustrating and difficult for him to navigate on a small screen.
+ * **The Detailed Need:** He needs a "spreadsheet-type CRM" embedded directly inside his admin dashboard to track all past, current, and future/repeat customers. Because of his lack of technical expertise and heavy reliance on his smartphone, this CRM must be an absolute delight to use on mobile. It needs to capture all of a customer's information the moment they book an appointment and present it in a premium, highly responsive mobile layout that completely avoids the frustration of horizontal scrolling or confusing menus.
+### 4. Mandatory Staff Accountability & Data Logging
+ * **The Pain Point:** Relying on staff to voluntarily remember to log payment methods, tips, and service notes after finishing an appointment leads to missing data and inaccurate payroll records.
+
+ * **The Detailed Need:** He needs a mandatory, system-enforced workflow that physically stops staff from skipping data entry. When an appointment is marked completed, the system must trigger a "Staff Lockout modal"—a full-screen overlay that freezes the staff member out of their dashboard. They must be forced to enter the exact tip amount, the in-store payment method, and any service notes before the system will unlock and let them proceed to their next client.
+
+### 5. Unified Visibility of a Multi-Staff Salon Floor
+ * **The Pain Point:** Managing a busy floor with 6 to 7 staff members is chaotic without a single, easy-to-read view of everyone's schedule and current client pairings.
+ * **The Detailed Need:** He needs a "Master Calendar Overlay". This must be a unified grid layout where columns represent his 6-7 staff members and rows represent time slots. He needs to see exactly which client is paired with which staff member, the service booked, and the real-time status of the appointment (confirmed, completed, cancelled, or no_show). This must be color-coded so he can instantly understand the flow and availability of the entire salon floor at a single glance.
