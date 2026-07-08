@@ -57,7 +57,7 @@ export default function BookingStepProgress({ step, onStepClick }: Props) {
                   </button>
                 )}
                 <span
-                  className={`text-[11px] sm:text-xs font-medium whitespace-nowrap ${
+                  className={`text-xs sm:text-xs font-medium whitespace-nowrap ${
                     isCurrent ? "text-accent" : "text-muted-foreground"
                   }`}
                 >

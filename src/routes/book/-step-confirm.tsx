@@ -151,7 +151,7 @@ export default function StepConfirm({
               Enter a valid phone number (e.g., (815) 555-0123)
             </p>
           )}
-          <p className="mt-1 text-[11px] text-muted-foreground">US number: (555) 123-4567</p>
+          <p className="mt-1 text-xs text-muted-foreground">US number: (555) 123-4567</p>
         </label>
 
         <label className="block">

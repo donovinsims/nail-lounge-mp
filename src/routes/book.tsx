@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, useRef } from "react";
@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { createPublicBooking } from "@/lib/booking.functions";
 import { getSalonName } from "@/lib/env";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import StepService from "./book/-step-service";
 import StepStaff from "./book/-step-staff";
@@ -254,7 +254,7 @@ function Book() {
         >
           {step === 1 ? (
             <>
-              <p className="text-[11px] uppercase tracking-[0.35em] text-accent">Booking</p>
+              <p className="text-xs uppercase tracking-[0.35em] text-accent">Booking</p>
               <h1 className="mt-4 font-display text-4xl leading-[0.95] sm:text-5xl">
                 Reserve your <span className="italic">seat.</span>
               </h1>
@@ -263,31 +263,34 @@ function Book() {
               </p>
             </>
           ) : (
-            <p className="text-[11px] uppercase tracking-[0.35em] text-accent">Step {step} of 4</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-accent">Step {step} of 4</p>
           )}
         </div>
       </section>
 
-      {/* Step progress */}
+      {/* Step progress + cancel */}
       <div className="mx-auto max-w-5xl px-6 pt-8 pb-6">
-        <BookingStepProgress
-          step={step}
-          onStepClick={(s: number) => {
-            setStep(s as Step);
-            if (s < step) {
-              if (s <= 3) setSlot(null);
-              if (s <= 2) {
-                setStaffId(null);
-                setSlot(null);
+        <div className="relative">
+          <BookingStepProgress
+            step={step}
+            onStepClick={(s: number) => {
+              setStep(s as Step);
+              if (s < step) {
+                // Keep existing field values when going back
+                // Only slot is cleared since it depends on date/staff
+                if (s <= 3) setSlot(null);
               }
-              if (s <= 1) {
-                setServiceId(null);
-                setStaffId(null);
-                setSlot(null);
-              }
-            }
-          }}
-        />
+            }}
+          />
+          <Link
+            to="/"
+            className="absolute right-0 top-0 hidden sm:inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-surface transition"
+            aria-label="Cancel booking and return home"
+          >
+            <X className="h-3.5 w-3.5" />
+            Cancel
+          </Link>
+        </div>
       </div>
 
       {/* Mobile booking summary chips — visible below md */}

@@ -14,6 +14,7 @@ export interface SalonSocialConfig {
   facebook: string;
   tiktok: string;
   yelp: string;
+  googleReviews: string;
 }
 
 export function getSalonId(): string | undefined {
@@ -65,6 +66,8 @@ export function getSalonSocial(): SalonSocialConfig {
     facebook: import.meta.env.VITE_SALON_FACEBOOK || "",
     tiktok: import.meta.env.VITE_SALON_TIKTOK || "",
     yelp: import.meta.env.VITE_SALON_YELP || "",
+    googleReviews:
+      import.meta.env.VITE_SALON_GOOGLE_REVIEWS || import.meta.env.VITE_SALON_MAPS_URL || "",
   };
 }
 

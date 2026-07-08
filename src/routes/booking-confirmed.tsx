@@ -26,7 +26,7 @@ function BookingConfirmed() {
   const { bookingId } = Route.useSearch();
   const fetchDetails = useServerFn(getBookingDetails);
 
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, error } = useQuery({
     queryKey: ["booking-details", bookingId],
     queryFn: () =>
       (
@@ -56,7 +56,42 @@ function BookingConfirmed() {
     );
   }
 
-  if (isError || !data) {
+  const isNetworkError =
+    isError &&
+    (error?.message?.toLowerCase().includes("failed to fetch") ||
+      error?.message?.toLowerCase().includes("network"));
+
+  if (isError) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-2xl bg-surface p-8 text-center shadow-lg space-y-5">
+          {isNetworkError ? (
+            <>
+              <h1 className="text-xl font-semibold">Connection Error</h1>
+              <p className="text-sm text-muted-foreground">
+                Couldn't reach our servers. Please check your internet connection and try again.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="text-xl font-semibold text-destructive">Booking Not Found</h1>
+              <p className="text-sm text-muted-foreground">
+                We couldn't find your booking details. Please check your confirmation SMS.
+              </p>
+            </>
+          )}
+          <Link
+            to="/"
+            className="inline-block rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-all"
+          >
+            Back to home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
     return (
       <div className="flex min-h-dvh items-center justify-center px-4">
         <div className="w-full max-w-md rounded-2xl bg-surface p-8 text-center shadow-lg space-y-5">

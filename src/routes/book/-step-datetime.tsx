@@ -40,7 +40,7 @@ export default function StepDateTime({
                     : "bg-surface text-foreground hover:bg-surface-2"
                 }`}
               >
-                <span className="text-[11px] uppercase tracking-wider font-medium">
+                <span className="text-xs uppercase tracking-wider font-medium">
                   {d.toLocaleDateString("en-US", { weekday: "short" })}
                 </span>
                 <span className="mt-0.5 text-xl font-bold leading-none">{d.getDate()}</span>

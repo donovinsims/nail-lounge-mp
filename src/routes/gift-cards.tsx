@@ -51,9 +51,7 @@ function GiftCardsPage() {
 
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-[11px] uppercase tracking-[0.35em] text-accent">
-            Gift cards & parties
-          </p>
+          <p className="text-xs uppercase tracking-[0.35em] text-accent">Gift cards & parties</p>
           <h1 className="mt-6 max-w-3xl font-display text-5xl leading-[0.95] tracking-[-0.01em] sm:text-7xl">
             The easiest <span className="italic">good gift.</span>
           </h1>
@@ -81,7 +79,7 @@ function GiftCardsPage() {
               {AMOUNTS.map((a) => (
                 <div key={a} className="rounded-2xl bg-surface p-6 text-center">
                   <p className="font-display text-4xl">${a}</p>
-                  <p className="mt-1 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  <p className="mt-1 text-xs uppercase tracking-[0.25em] text-muted-foreground">
                     Gift card
                   </p>
                 </div>
@@ -114,9 +112,7 @@ function GiftCardsPage() {
           <div className="flex items-end justify-between">
             <div>
               <Users className="h-6 w-6 text-accent" />
-              <p className="mt-4 text-[11px] uppercase tracking-[0.3em] text-accent">
-                Private parties
-              </p>
+              <p className="mt-4 text-xs uppercase tracking-[0.3em] text-accent">Private parties</p>
               <h2 className="mt-3 font-display text-4xl sm:text-5xl">For 4 or more.</h2>
             </div>
           </div>
