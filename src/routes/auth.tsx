@@ -19,9 +19,10 @@ function AuthPage() {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
 
   const devLogin = () => {
+    const userId = crypto.randomUUID();
     const payload = {
       user: {
-        id: "00000000-0000-0000-0000-000000000000",
+        id: userId,
         email: "emaildonovin@gmail.com",
         role: "authenticated",
         user_metadata: { full_name: "Donovin" },

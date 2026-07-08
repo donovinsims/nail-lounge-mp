@@ -36,6 +36,7 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
               supabase: supabaseAdmin,
               userId: parsed.user.id,
               claims: { sub: parsed.user.id, email: parsed.user.email, role: parsed.user.role },
+              devBypass: true,
             },
           });
         }
@@ -85,6 +86,7 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
         supabase,
         userId: user.id,
         claims: { sub: user.id, email: user.email, role: user.role },
+        devBypass: false,
       },
     });
   },

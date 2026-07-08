@@ -94,8 +94,23 @@ function Admin() {
   });
   const [linkError, setLinkError] = useState<string | null>(null);
 
-  // Get the owner's name from auth metadata
+  // Get the owner's name from auth metadata (or dev bypass)
   useEffect(() => {
+    const bypass = localStorage.getItem("dev-bypass");
+    if (bypass) {
+      try {
+        const parsed = JSON.parse(bypass);
+        const name =
+          parsed?.user?.user_metadata?.full_name ||
+          parsed?.user?.user_metadata?.name ||
+          parsed?.user?.email ||
+          "Owner";
+        setOwnerName(name.split(" ")[0]);
+        return;
+      } catch {
+        // fall through to supabase auth
+      }
+    }
     (async () => {
       const { data } = await supabase.auth.getUser();
       if (data?.user)
