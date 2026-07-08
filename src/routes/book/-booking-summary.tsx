@@ -33,11 +33,7 @@ function Row({ label, value, mono }: { label: string; value: string | null; mono
   return (
     <div className="flex justify-between">
       <span className="text-muted-foreground">{label}</span>
-      <span
-        className={
-          value ? `font-medium${mono ? " font-mono" : ""}` : "text-muted-foreground"
-        }
-      >
+      <span className={value ? `font-medium${mono ? " font-mono" : ""}` : "text-muted-foreground"}>
         {value ?? "Not selected"}
       </span>
     </div>

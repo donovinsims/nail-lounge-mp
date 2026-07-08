@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -7,6 +8,16 @@ import { getBookingDetails } from "@/lib/booking.functions";
 import { getSalonName } from "@/lib/env";
 import { fmtDate, fmtTime, fmtMoney } from "@/lib/utils";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-2">
+      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
+      <span className="text-sm font-medium text-right">{value}</span>
+    </div>
+  );
+}
 
 export const searchSchema = z.object({
   bookingId: z.string().uuid(),
@@ -163,17 +174,6 @@ function BookingConfirmed() {
       )}
 
       <SiteFooter />
-    </div>
-  );
-}
-
-export function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-2">
-      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        {label}
-      </span>
-      <span className="text-sm font-medium text-right">{value}</span>
     </div>
   );
 }

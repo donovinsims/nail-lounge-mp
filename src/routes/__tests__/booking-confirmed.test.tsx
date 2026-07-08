@@ -5,7 +5,8 @@ import { describe, it, expect } from "vitest";
 // real thing, not replicas (replicas silently drift from production behavior).
 // ---------------------------------------------------------------------------
 
-import { searchSchema, DetailRow } from "../booking-confirmed";
+import { searchSchema } from "../booking-confirmed";
+import { DetailRow } from "../../components/booking-detail-row";
 
 // ---------------------------------------------------------------------------
 // searchSchema (validates ?bookingId= in the URL)

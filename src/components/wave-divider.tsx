@@ -11,7 +11,13 @@
  * - `flip` mirrors the wave for a section's opposite edge.
  * - Purely decorative: aria-hidden, never focusable, no layout logic.
  */
-export function WaveDivider({ className = "", flip = false }: { className?: string; flip?: boolean }) {
+export function WaveDivider({
+  className = "",
+  flip = false,
+}: {
+  className?: string;
+  flip?: boolean;
+}) {
   return (
     <svg
       aria-hidden="true"
