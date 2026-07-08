@@ -74,7 +74,7 @@ function GalleryPage() {
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <p className="text-xs uppercase tracking-[0.35em] text-accent">Gallery</p>
-          <h1 className="mt-6 max-w-3xl font-display text-5xl leading-[0.95] tracking-[-0.01em] sm:text-7xl">
+          <h1 className="mt-6 max-w-3xl font-display text-5xl leading-[0.95] tracking-[-0.01em] sm:text-7xl text-balance">
             Recent <span className="italic">work.</span>
           </h1>
           <p className="mt-6 max-w-xl text-base text-muted-foreground">
@@ -98,14 +98,6 @@ function GalleryPage() {
             >
               TikTok
             </a>
-            <a
-              href={getSalonSocial().tiktok}
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs uppercase tracking-[0.25em] underline-offset-4 hover:underline"
-            >
-              TikTok
-            </a>
           </div>
         </div>
       </section>
@@ -116,13 +108,13 @@ function GalleryPage() {
             <button
               key={i}
               onClick={() => show(i)}
-              className="group relative block w-full overflow-hidden rounded-2xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 cursor-pointer"
+              className="group relative block w-full overflow-hidden rounded-2xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 cursor-pointer active:scale-[0.98]"
             >
               <img
                 src={p.src}
                 alt={p.alt}
                 loading="lazy"
-                className="w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                className="w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] [outline:1px_solid_rgba(0,0,0,0.1)] outline-offset-[-1px]"
               />
               <div className="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-black/60 via-transparent to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <p className="text-sm text-white">{p.caption}</p>
@@ -132,14 +124,20 @@ function GalleryPage() {
         </div>
 
         <Dialog open={activeIndex !== null} onOpenChange={(o) => !o && close()}>
-          <DialogContent className="max-w-3xl overflow-hidden border-0 bg-transparent p-0 shadow-none">
+          <DialogContent
+            className="max-w-3xl overflow-hidden border-0 bg-transparent p-0 shadow-none"
+            onKeyDown={(e) => {
+              if (e.key === "ArrowLeft") step(-1);
+              if (e.key === "ArrowRight") step(1);
+            }}
+          >
             {activeIndex !== null && PIECES[activeIndex] && (
               <figure className="relative">
                 <DialogTitle className="sr-only">{PIECES[activeIndex].caption}</DialogTitle>
                 <img
                   src={PIECES[activeIndex].src}
                   alt={PIECES[activeIndex].alt}
-                  className="max-h-[80vh] w-full rounded-xl object-contain"
+                  className="max-h-[80vh] w-full rounded-xl object-contain [outline:1px_solid_rgba(0,0,0,0.1)] outline-offset-[-1px]"
                 />
                 <figcaption className="absolute inset-x-0 bottom-0 rounded-b-xl bg-gradient-to-t from-black/70 to-transparent p-4 text-center text-sm text-white">
                   {PIECES[activeIndex].caption}
