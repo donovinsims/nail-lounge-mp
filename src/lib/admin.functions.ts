@@ -26,6 +26,21 @@ export const linkSelfToFirstSalon = createServerFn({ method: "POST" })
     const salonId = getSalonId();
     if (!salonId) throw new Error("SALON_ID not configured — set VITE_SALON_ID in .env");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Ensure the auth user exists in auth.users before we create a staff record
+    // referencing it — the foreign key constraint requires it.
+    // Handles the dev bypass where the user may not exist yet.
+    const { error: notFound } = await supabaseAdmin.auth.admin.getUserById(context.userId);
+    if (notFound) {
+      const { error: createError } = await supabaseAdmin.auth.admin.createUser({
+        id: context.userId,
+        email: context.claims?.email || "owner@nail-lounge.dev",
+        email_confirm: true,
+        user_metadata: { full_name: "Owner" },
+      });
+      if (createError) throw createError;
+    }
+
     const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("full_name, email")
