@@ -35,7 +35,7 @@ function NotFoundComponent() {
         </p>
         <Link
           to="/"
-          className="mt-6 inline-flex tap-target items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground"
+          className="mt-6 inline-flex tap-target h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02]"
         >
           Go home
         </Link>
@@ -57,7 +57,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             router.invalidate();
             reset();
           }}
-          className="mt-6 rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground"
+          className="mt-6 h-11 rounded-lg bg-primary px-6 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02]"
         >
           Try again
         </button>
@@ -71,7 +71,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#0a0a0a" },
+      { name: "theme-color", content: "#ede7de" },
       { title: `${getSalonName()} — Book your appointment` },
       {
         name: "description",

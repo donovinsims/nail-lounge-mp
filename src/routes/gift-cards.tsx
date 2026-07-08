@@ -93,13 +93,13 @@ function GiftCardsPage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href={`tel:${getSalonPhoneHref()}`}
-                className="inline-flex tap-target items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
+                className="inline-flex tap-target items-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
               >
                 <Phone className="h-3.5 w-3.5" /> Call to purchase
               </a>
               <a
                 href={`mailto:${getSalonSocial().email}?subject=Gift%20card%20request`}
-                className="inline-flex tap-target items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-xs font-medium uppercase tracking-[0.18em] hover:bg-surface transition"
+                className="inline-flex tap-target items-center gap-2 rounded-lg border border-border bg-card h-11 px-5 text-sm font-medium tracking-[0.01em] shadow-1 transition duration-150 hover:shadow-2"
               >
                 <Mail className="h-3.5 w-3.5" /> Email us
               </a>
@@ -153,13 +153,13 @@ function GiftCardsPage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href={`mailto:${getSalonSocial().email}?subject=Private%20party%20request`}
-                className="inline-flex tap-target items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
+                className="inline-flex tap-target items-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
               >
                 Request a party
               </a>
               <Link
                 to="/book"
-                className="inline-flex tap-target items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-xs font-medium uppercase tracking-[0.18em] hover:bg-surface transition"
+                className="inline-flex tap-target items-center gap-2 rounded-lg border border-border bg-card h-11 px-5 text-sm font-medium tracking-[0.01em] shadow-1 transition duration-150 hover:shadow-2"
               >
                 Or book individually <ArrowRight className="h-3.5 w-3.5" />
               </Link>

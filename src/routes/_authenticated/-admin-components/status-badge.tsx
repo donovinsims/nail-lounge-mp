@@ -10,10 +10,10 @@ interface StatusBadgeProps {
 }
 
 const variantStyles: Record<StatusVariant, string> = {
-  default: "bg-surface-2 text-foreground",
-  success: "bg-success/10 text-success",
-  warning: "bg-warning/15 text-warning",
-  destructive: "bg-destructive/10 text-destructive",
+  default: "bg-primary/12 text-primary",
+  success: "bg-success/15 text-success-ink",
+  warning: "bg-warning/15 text-warning-ink",
+  destructive: "bg-destructive/15 text-destructive-ink",
   info: "bg-accent/10 text-accent",
   muted: "bg-muted text-muted-foreground",
 };

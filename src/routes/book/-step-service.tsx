@@ -65,13 +65,13 @@ export default function StepService({
                 role="radio"
                 aria-checked={isSelected}
                 onClick={() => onSelect(service.id)}
-                className={`flex w-full tap-target items-center justify-between gap-3 rounded-2xl bg-surface p-4 text-left active:scale-[0.98] transition-all duration-200 ${
+                className={`flex w-full tap-target items-center justify-between gap-3 rounded-2xl bg-surface p-4 text-left active:scale-[0.98] transition-all duration-150 ${
                   isSelected ? "ring-2 ring-ring bg-primary/5 shadow-sm" : "hover:bg-surface-2"
                 }`}
               >
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{service.name}</p>
-                  <p className="mt-0.5 text-xs sm:text-sm text-muted-foreground">
+                  <p className="mt-0.5 font-mono text-xs sm:text-sm text-muted-foreground">
                     {service.category ?? "Service"} · {service.duration_minutes} min
                   </p>
                 </div>

@@ -59,7 +59,7 @@ export default function StepStaff({ staff, selectedId, onSelect, isLoading }: St
                 role="radio"
                 aria-checked={isSelected}
                 onClick={() => onSelect(member.id)}
-                className={`flex w-full tap-target items-center gap-4 rounded-2xl bg-surface p-4 text-left active:scale-[0.98] transition-transform duration-75 ${
+                className={`flex w-full tap-target items-center gap-4 rounded-2xl bg-surface p-4 text-left active:scale-[0.98] transition-transform duration-150 ${
                   isSelected ? "ring-2 ring-ring bg-primary/5 shadow-sm" : "hover:bg-surface-2"
                 }`}
               >

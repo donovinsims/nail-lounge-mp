@@ -82,8 +82,8 @@ function BookingConfirmed() {
       <div className="w-full max-w-md space-y-6">
         {/* Success Header */}
         <div className="rounded-2xl bg-surface p-8 text-center shadow-lg space-y-4">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50">
-            <CheckCircle className="h-8 w-8 text-emerald-500" />
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-success/15">
+            <CheckCircle className="h-8 w-8 text-success-ink" />
           </div>
           <div className="space-y-1">
             <h1 className="font-display text-2xl tracking-tight">You're all set!</h1>
@@ -109,7 +109,7 @@ function BookingConfirmed() {
           </div>
 
           <div className="border-t border-border pt-4">
-            <div className="rounded-xl bg-amber-50 p-4 text-sm text-amber-800 space-y-1">
+            <div className="rounded-xl bg-warning/15 p-4 text-sm text-warning-ink space-y-1">
               <p className="font-medium">Payment</p>
               <p>
                 Pay in-studio at the time of your appointment. We accept credit/debit, cash, Venmo,

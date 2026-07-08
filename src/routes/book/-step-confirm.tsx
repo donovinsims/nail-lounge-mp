@@ -96,7 +96,7 @@ export default function StepConfirm({
       <div className="space-y-2">
         <label className="block">
           <span className="text-xs font-medium text-muted-foreground">
-            Full name <span className="text-red-500">*</span>
+            Full name <span className="text-destructive-ink">*</span>
           </span>
           <input
             value={name}
@@ -111,11 +111,11 @@ export default function StepConfirm({
             aria-invalid={showNameError || undefined}
             aria-describedby={showNameError ? "name-error" : undefined}
             className={`mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none transition-all focus:ring-2 focus:ring-ring disabled:opacity-50 ${
-              showNameError ? "ring-2 ring-red-400" : ""
+              showNameError ? "ring-2 ring-destructive" : ""
             }`}
           />
           {showNameError && (
-            <p id="name-error" role="alert" className="mt-1 text-xs text-red-500">
+            <p id="name-error" role="alert" className="mt-1 text-xs text-destructive-ink">
               Please enter your name
             </p>
           )}
@@ -123,7 +123,7 @@ export default function StepConfirm({
 
         <label className="block">
           <span className="text-xs font-medium text-muted-foreground">
-            Phone <span className="text-red-500">*</span>
+            Phone <span className="text-destructive-ink">*</span>
           </span>
           <input
             value={phone}
@@ -138,16 +138,16 @@ export default function StepConfirm({
             aria-invalid={showPhoneError || undefined}
             aria-describedby={showPhoneError ? "phone-error" : undefined}
             className={`mt-1 w-full tap-target rounded-xl bg-surface px-4 text-base outline-none transition-all focus:ring-2 focus:ring-ring disabled:opacity-50 ${
-              showPhoneError || showPhoneFormatError ? "ring-2 ring-red-400" : ""
+              showPhoneError || showPhoneFormatError ? "ring-2 ring-destructive" : ""
             }`}
           />
           {showPhoneError && (
-            <p id="phone-error" role="alert" className="mt-1 text-xs text-red-500">
+            <p id="phone-error" role="alert" className="mt-1 text-xs text-destructive-ink">
               Required
             </p>
           )}
           {showPhoneFormatError && (
-            <p className="mt-1 text-xs text-amber-600">
+            <p className="mt-1 text-xs text-warning-ink">
               Enter a valid phone number (e.g., (815) 555-0123)
             </p>
           )}
@@ -192,7 +192,7 @@ export default function StepConfirm({
         type="button"
         disabled={!canSubmit}
         onClick={onSubmit}
-        className="flex tap-target w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-base font-semibold text-primary-foreground disabled:opacity-50"
+        className="flex tap-target w-full items-center justify-center gap-2 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50"
       >
         {isPending ? (
           <>

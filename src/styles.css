@@ -211,6 +211,13 @@
     padding-top: max(env(safe-area-inset-top), 1rem);
   }
 
+  /* Iconography: rounded outline at 1.5px stroke (doc) — lucide ships 2px.
+     One rule instead of 43 per-file strokeWidth props; decorative inline SVGs
+     (no .lucide class) are unaffected. */
+  .lucide {
+    stroke-width: 1.5;
+  }
+
   /* Calm-by-default: honor reduced-motion everywhere (doc: Motion section) */
   @media (prefers-reduced-motion: reduce) {
     *,

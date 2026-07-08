@@ -66,7 +66,7 @@ function ServicesPage() {
           </p>
           <Link
             to="/book"
-            className="mt-10 inline-flex tap-target items-center gap-3 rounded-full bg-primary px-8 py-4 text-sm font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
+            className="mt-10 inline-flex tap-target items-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
           >
             Reserve your seat <ArrowRight className="h-4 w-4" />
           </Link>
@@ -108,7 +108,7 @@ function ServicesPage() {
 
                         {/* Expanded detail */}
                         {isOpen && (
-                          <div className="px-4 py-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                          <div className="px-4 py-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-[240ms]">
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <Clock className="h-4 w-4" />
                               <span>{s.duration_minutes} minutes</span>
@@ -116,7 +116,7 @@ function ServicesPage() {
                             <Link
                               to="/book"
                               search={{ service: s.id } as { service: string }}
-                              className="flex w-full tap-target items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-medium text-primary-foreground hover:opacity-90 transition"
+                              className="flex w-full tap-target items-center justify-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
                             >
                               Book Now <ArrowRight className="h-4 w-4" />
                             </Link>
@@ -139,7 +139,7 @@ function ServicesPage() {
           </h3>
           <Link
             to="/book"
-            className="mt-8 inline-flex tap-target items-center gap-3 rounded-full bg-primary px-8 py-4 text-sm font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
+            className="mt-8 inline-flex tap-target items-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
           >
             Reserve <ArrowRight className="h-4 w-4" />
           </Link>
@@ -150,7 +150,7 @@ function ServicesPage() {
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur-xl px-4 py-3 safe-pb sm:hidden">
         <Link
           to="/book"
-          className="flex w-full tap-target items-center justify-center gap-3 rounded-full bg-primary py-4 text-sm font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
+          className="flex w-full tap-target items-center justify-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
         >
           Reserve your seat <Sparkles className="h-4 w-4" />
         </Link>

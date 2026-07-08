@@ -97,7 +97,7 @@ function GalleryPage() {
                 src={p.src}
                 alt={p.alt}
                 loading="lazy"
-                className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                className="h-full w-full object-cover transition duration-[400ms] group-hover:scale-105"
               />
             </figure>
           ))}
@@ -123,7 +123,7 @@ function GalleryPage() {
           </h3>
           <Link
             to="/book"
-            className="mt-8 inline-flex tap-target items-center gap-3 rounded-full bg-primary px-8 py-4 text-sm font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
+            className="mt-8 inline-flex tap-target items-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
           >
             Reserve <ArrowRight className="h-4 w-4" />
           </Link>

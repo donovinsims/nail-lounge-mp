@@ -20,21 +20,21 @@ export function SiteHeader() {
           <Link
             to="/services"
             className="hover:text-foreground transition"
-            activeProps={{ className: "text-foreground" }}
+            activeProps={{ className: "text-primary font-medium" }}
           >
             Services
           </Link>
           <Link
             to="/gallery"
             className="hover:text-foreground transition"
-            activeProps={{ className: "text-foreground" }}
+            activeProps={{ className: "text-primary font-medium" }}
           >
             Gallery
           </Link>
           <Link
             to="/gift-cards"
             className="hover:text-foreground transition"
-            activeProps={{ className: "text-foreground" }}
+            activeProps={{ className: "text-primary font-medium" }}
           >
             Gift Cards
           </Link>
@@ -47,7 +47,7 @@ export function SiteHeader() {
         </nav>
         <Link
           to="/book"
-          className="hidden sm:inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
+          className="hidden sm:inline-flex h-11 items-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition-[transform,box-shadow] duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
         >
           Reserve
         </Link>

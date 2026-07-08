@@ -122,7 +122,7 @@ function Home() {
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <Link
                 to="/book"
-                className="inline-flex tap-target items-center gap-3 rounded-full bg-primary px-8 py-4 text-sm font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
+                className="inline-flex tap-target items-center gap-3 rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
               >
                 Reserve your seat <ArrowRight className="h-4 w-4" />
               </Link>
@@ -143,7 +143,7 @@ function Home() {
             </div>
           </div>
           <div className="md:col-span-6">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-surface">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-surface">
               <img
                 src={heroImg}
                 alt="Marble nail salon workstation with a curated selection of polishes"
@@ -335,7 +335,7 @@ function Home() {
                     <Link
                       to="/book"
                       search={{ staff: s.id }}
-                      className="mt-6 inline-flex tap-target items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-primary-foreground hover:opacity-90 transition"
+                      className="mt-6 inline-flex tap-target items-center justify-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
                     >
                       Book with {s.name.split(" ")[0]}
                     </Link>
@@ -379,7 +379,7 @@ function Home() {
                   src={src as string}
                   alt={alt as string}
                   loading="lazy"
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  className="h-full w-full object-cover transition duration-[400ms] group-hover:scale-105"
                 />
               </figure>
             ))}
@@ -518,7 +518,7 @@ function Home() {
           </h2>
           <Link
             to="/book"
-            className="inline-flex tap-target items-center gap-3 rounded-full bg-background px-10 py-4 text-sm font-medium uppercase tracking-[0.2em] text-foreground hover:opacity-90 transition"
+            className="inline-flex tap-target items-center gap-3 rounded-lg bg-background h-12 px-7 text-sm font-medium tracking-[0.01em] text-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99]"
           >
             Reserve <ArrowRight className="h-4 w-4" />
           </Link>

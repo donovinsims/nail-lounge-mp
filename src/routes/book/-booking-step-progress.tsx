@@ -42,7 +42,7 @@ export default function BookingStepProgress({ step, onStepClick }: Props) {
                     type="button"
                     aria-label={`Step ${num}: ${label} (completed)`}
                     onClick={() => onStepClick(num)}
-                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent text-accent-foreground text-sm font-semibold flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent text-accent-foreground text-sm font-semibold flex items-center justify-center cursor-pointer hover:scale-[1.05] transition-transform duration-150"
                   >
                     <Check className="h-4 w-4" aria-hidden="true" />
                   </button>

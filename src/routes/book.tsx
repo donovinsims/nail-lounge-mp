@@ -323,7 +323,7 @@ function Book() {
               {announcement}
             </div>
 
-            <div key={step} className="animate-in fade-in slide-in-from-right-4 duration-300">
+            <div key={step} className="animate-in fade-in slide-in-from-right-4 duration-[400ms]">
               {step === 1 && (
                 <StepService
                   services={services}
@@ -390,7 +390,7 @@ function Book() {
 
             {/* Disabled button hint */}
             {disabledHint && (
-              <p className="text-xs text-amber-600 text-center mt-2 animate-in fade-in slide-in-from-bottom-1 duration-200">
+              <p className="text-xs text-warning-ink text-center mt-2 animate-in fade-in slide-in-from-bottom-1 duration-[240ms]">
                 {disabledHint}
               </p>
             )}
@@ -400,7 +400,7 @@ function Book() {
               {step > 1 && (
                 <button
                   onClick={back}
-                  className="tap-target inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-medium hover:bg-surface transition"
+                  className="tap-target inline-flex items-center gap-2 rounded-lg border border-border h-11 px-5 text-sm font-medium tracking-[0.01em] shadow-1 transition duration-150 hover:shadow-2"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   Back
@@ -422,7 +422,7 @@ function Book() {
                       next();
                     }
                   }}
-                  className="tap-target inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-40 hover:opacity-90 transition"
+                  className="tap-target inline-flex items-center gap-2 rounded-lg bg-primary h-11 px-5 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-40"
                 >
                   Continue
                 </button>
@@ -457,7 +457,7 @@ function Book() {
                 (step === 1 && !serviceId) || (step === 2 && !staffId) || (step === 3 && !slot)
               }
               onClick={next}
-              className="flex-1 tap-target rounded-full bg-primary py-3.5 text-sm font-semibold text-primary-foreground disabled:opacity-40 transition"
+              className="flex-1 tap-target rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-40"
             >
               Continue
             </button>
@@ -465,7 +465,7 @@ function Book() {
             <button
               disabled={!canSubmit}
               onClick={handleSubmit}
-              className="flex-1 tap-target rounded-full bg-primary py-3.5 text-sm font-semibold text-primary-foreground disabled:opacity-50 transition"
+              className="flex-1 tap-target rounded-lg bg-primary h-12 px-7 text-sm font-medium tracking-[0.01em] text-primary-foreground shadow-1 transition duration-150 hover:shadow-2 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50"
             >
               {mutation.isPending ? (
                 <span className="inline-flex items-center gap-2">
