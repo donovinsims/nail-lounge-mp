@@ -138,6 +138,12 @@ function RootShell({ children }: { children: ReactNode }) {
         {umamiId && <script defer src={`${umamiHost}/script.js`} data-website-id={umamiId} />}
       </head>
       <body>
+        <a
+          href="#main-content"
+          className="fixed left-1/2 -translate-x-1/2 -translate-y-full rounded-b-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-lg focus:translate-y-0 focus:outline-none z-[100] transition-transform"
+        >
+          Skip to content
+        </a>
         {children}
         <Scripts />
       </body>

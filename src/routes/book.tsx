@@ -302,7 +302,7 @@ function Book() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <main id="main-content" className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
       {/* Header section */}
@@ -544,6 +544,6 @@ function Book() {
       <div className="h-24 sm:hidden" />
 
       <SiteFooter />
-    </div>
+    </main>
   );
 }

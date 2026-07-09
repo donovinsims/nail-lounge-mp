@@ -18,7 +18,7 @@ export interface StepStaffProps {
 export default function StepStaff({ staff, selectedId, onSelect, isLoading }: StepStaffProps) {
   if (isLoading) {
     return (
-      <div className="grid place-items-center py-10">
+      <main id="main-content" className="grid place-items-center py-10">
         <div className="flex flex-col items-center gap-3">
           <div className="flex gap-1">
             <span
@@ -36,16 +36,16 @@ export default function StepStaff({ staff, selectedId, onSelect, isLoading }: St
           </div>
           <span className="text-sm text-muted-foreground">Loading artists…</span>
         </div>
-      </div>
+      </main>
     );
   }
 
   if (staff.length === 0) {
     return (
-      <div className="py-10 text-center text-sm text-muted-foreground">
+      <main id="main-content" className="py-10 text-center text-sm text-muted-foreground">
         No artists are available right now. Select No Preference if you'd like us to assign someone,
         or try a different date.
-      </div>
+      </main>
     );
   }
 
@@ -53,7 +53,7 @@ export default function StepStaff({ staff, selectedId, onSelect, isLoading }: St
   const isNoPrefSelected = selectedId === "no-preference";
 
   return (
-    <div role="radiogroup" aria-label="Select an artist">
+    <main id="main-content" role="radiogroup" aria-label="Select an artist">
       {showNoPreference && (
         <>
           <button
@@ -128,6 +128,6 @@ export default function StepStaff({ staff, selectedId, onSelect, isLoading }: St
           );
         })}
       </ul>
-    </div>
+    </main>
   );
 }

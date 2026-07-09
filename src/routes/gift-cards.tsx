@@ -47,7 +47,7 @@ const OCCASIONS = [
 
 function GiftCardsPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <main id="main-content" className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
       <section className="border-b border-border/60">
@@ -191,6 +191,6 @@ function GiftCardsPage() {
       </section>
 
       <SiteFooter />
-    </div>
+    </main>
   );
 }

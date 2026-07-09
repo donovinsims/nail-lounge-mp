@@ -52,7 +52,7 @@ function ServicesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <main id="main-content" className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
       <section className="border-b border-border/60">
@@ -165,6 +165,6 @@ function ServicesPage() {
       <div className="h-20 sm:hidden" />
 
       <SiteFooter />
-    </div>
+    </main>
   );
 }

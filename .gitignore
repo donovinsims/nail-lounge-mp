@@ -49,4 +49,6 @@ supabase/.temp/
 
 # Deepwork session state (keep out of git)
 .slim/deepwork/
+
+# Vercel project metadata
 .vercel

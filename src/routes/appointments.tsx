@@ -75,7 +75,7 @@ function Appointments() {
   }, [phone, navigate, phoneParam]);
 
   return (
-    <div className="min-h-screen bg-background px-5 py-6 safe-pt">
+    <main id="main-content" className="min-h-screen bg-background px-5 py-6 safe-pt">
       <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground">
         <ChevronLeft className="h-4 w-4" /> Back
       </Link>
@@ -183,6 +183,6 @@ function Appointments() {
           </ul>
         )}
       </div>
-    </div>
+    </main>
   );
 }

@@ -99,7 +99,7 @@ function BookingConfirmed() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <main id="main-content" className="flex min-h-screen flex-col bg-background text-foreground">
       <SiteHeader />
 
       {isPending && (
@@ -199,6 +199,6 @@ function BookingConfirmed() {
       )}
 
       <SiteFooter />
-    </div>
+    </main>
   );
 }
