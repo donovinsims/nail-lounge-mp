@@ -1,12 +1,21 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getSalonId } from "@/lib/env";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
+
+type AuthContext = {
+  supabase: SupabaseClient<Database>;
+  userId: string;
+  claims?: { email?: string };
+  devBypass?: boolean;
+};
 
 export const getMyStaff = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     if (!context) throw new Error("No auth context");
-    const ctx = context as { supabase: any; userId: string; devBypass?: boolean };
+    const ctx = context as AuthContext;
 
     // Dev bypass: look up any staff record for the configured salon
     if (ctx.devBypass) {
@@ -32,7 +41,7 @@ export const linkSelfToFirstSalon = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     if (!context) throw new Error("No auth context");
-    const ctx = context as { supabase: any; userId: string; claims?: { email?: string }; devBypass?: boolean };
+    const ctx = context as AuthContext;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const salonId = getSalonId();
