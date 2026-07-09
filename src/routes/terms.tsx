@@ -24,7 +24,7 @@ export const Route = createFileRoute("/terms")({
 
 function TermsPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <main id="main-content" className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
       <section className="border-b border-border/60">
@@ -182,6 +182,6 @@ function TermsPage() {
       </section>
 
       <SiteFooter />
-    </div>
+    </main>
   );
 }

@@ -134,7 +134,10 @@ function CallbackPage() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-5 text-center">
+      <main
+        id="main-content"
+        className="flex min-h-screen flex-col items-center justify-center gap-4 px-5 text-center"
+      >
         <p className="text-sm text-destructive">{error}</p>
         <button
           onClick={() => navigate({ to: "/auth", replace: true })}
@@ -142,14 +145,17 @@ function CallbackPage() {
         >
           Back to sign in
         </button>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
+    <main
+      id="main-content"
+      className="flex min-h-screen items-center justify-center text-sm text-muted-foreground"
+    >
       Completing sign in…
-    </div>
+    </main>
   );
 }
 

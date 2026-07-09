@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { getSalonName } from "@/lib/env";
+import { getSalonName, getSalonPhone, getSalonSocial } from "@/lib/env";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/privacy")({
 
 function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <main id="main-content" className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
       <section className="border-b border-border/60">
@@ -133,10 +133,10 @@ function PrivacyPage() {
           <ul>
             <li>In person at our studio</li>
             <li>
-              By phone: <span className="text-foreground">{import.meta.env.VITE_SALON_PHONE}</span>
+              By phone: <span className="text-foreground">{getSalonPhone()}</span>
             </li>
             <li>
-              By email: <span className="text-foreground">{import.meta.env.VITE_SALON_EMAIL}</span>
+              By email: <span className="text-foreground">{getSalonSocial().email}</span>
             </li>
           </ul>
         </div>
@@ -152,6 +152,6 @@ function PrivacyPage() {
       </section>
 
       <SiteFooter />
-    </div>
+    </main>
   );
 }

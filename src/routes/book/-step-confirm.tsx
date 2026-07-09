@@ -124,7 +124,7 @@ export default function StepConfirm({
   };
 
   return (
-    <div className="space-y-4">
+    <main id="main-content" className="space-y-4">
       {/* Order Summary Card */}
       <div className="rounded-2xl bg-surface p-5">
         <p className="mb-3 text-sm font-medium">Your Booking</p>
@@ -253,6 +253,6 @@ export default function StepConfirm({
           {disabledHint}
         </p>
       )}
-    </div>
+    </main>
   );
 }
